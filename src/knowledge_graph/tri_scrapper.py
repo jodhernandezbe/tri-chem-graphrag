@@ -102,7 +102,7 @@ class TRIScrapper:
                 raise FileNotFoundError(f"File not found at {file_path}")
 
             inf_chardet = chardet.detect(open(file_path, "rb").read())
-            inf_encoding = inf_chardet["encoding"]
+            inf_encoding = inf_chardet.get("encoding", "utf-8")
             with open(file_path, "r", encoding=inf_encoding) as file:
                 self._tri_file_columns_dictionary[file_type] = [line.rstrip().replace("\n", "") for line in file.readlines()]
 
@@ -199,7 +199,7 @@ class TRIScrapper:
             low_memory=False,
             skiprows=[0],
             lineterminator="\n",
-            usecols=list(range(len(columns))),
+            usecols=range(len(columns)),
         )
         df.columns = columns
         return df
