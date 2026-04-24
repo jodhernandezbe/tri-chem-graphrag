@@ -28,7 +28,7 @@ from bs4 import BeautifulSoup
 from src.config_manager import ConfigManager
 
 CURRENT_DIR = pathlib.Path(__file__).parent
-WORKING_DIR = CURRENT_DIR.parent.parent
+WORKING_DIR = CURRENT_DIR.parent.parent.parent
 ANCILLARY_DIR = WORKING_DIR / "ancillary"
 RAW_DATA_DIR = WORKING_DIR / "data" / "raw"
 EPA_BASE_URL = "https://www.epa.gov"

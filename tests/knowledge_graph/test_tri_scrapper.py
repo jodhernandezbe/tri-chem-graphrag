@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-from src.knowledge_graph.tri_scrapper import TRI_FILE_TYPES, TRIScrapper
+from src.knowledge_graph.extract.tri_scrapper import TRI_FILE_TYPES, TRIScrapper
 
 
 class TestTRIScrapper:
@@ -34,7 +34,7 @@ class TestTRIScrapper:
 
         try:
             # Patch the RAW_DATA_DIR to use our test directory
-            with patch("src.knowledge_graph.tri_scrapper.RAW_DATA_DIR", test_raw_data_dir):
+            with patch("src.knowledge_graph.extract.tri_scrapper.RAW_DATA_DIR", test_raw_data_dir):
                 scrapper = TRIScrapper()
 
                 # Test with one year
