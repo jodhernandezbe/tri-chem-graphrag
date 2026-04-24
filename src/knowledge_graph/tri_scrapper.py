@@ -13,28 +13,35 @@ Date: 2026-04-23
 """
 
 import io
+import logging
 import pathlib
 import zipfile
 from collections import defaultdict
 from typing import IO, Any, Dict, List, Optional
+from urllib.parse import urljoin
 
 import chardet
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from config_manager import ConfigManager
+from src.config_manager import ConfigManager
 
 CURRENT_DIR = pathlib.Path(__file__).parent
 WORKING_DIR = CURRENT_DIR.parent.parent
 ANCILLARY_DIR = WORKING_DIR / "ancillary"
 RAW_DATA_DIR = WORKING_DIR / "data" / "raw"
+EPA_BASE_URL = "https://www.epa.gov"
 
 TRI_FILE_TYPES = [
     "1b",  # Chemical Activity and Use
     "2a",  # Source Reduction
     "2b",  # On-site Treatment
 ]
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class TRIScrapper:
@@ -58,6 +65,7 @@ class TRIScrapper:
         self._calling_tri_columns()
 
     def _visit(self) -> None:
+        logger.info(f"Visiting {self._url}")
         html = requests.get(self._url, timeout=30).text
         self._soup = BeautifulSoup(html, "html.parser")
 
@@ -69,10 +77,12 @@ class TRIScrapper:
             Dict[str, str]: Mapping of years to zip file URLs.
         """
         if self._tri_zip_options is None:
+            logger.info("Getting TRI zip options")
 
             self._visit()
             self._tri_zip_options = {}
             for option in self._soup.select(self._queries["CSS_TO_OPTIONS"]):
+                logger.info(f"Processing option: {option.get_text(strip=True)}")
 
                 raw_ref = option.get("value")
                 if isinstance(raw_ref, str):
@@ -106,12 +116,15 @@ class TRIScrapper:
             None
 
         """
+        logger.info(f"Extracting TRI data for year {year}")
+
         zip_url = self.tri_zip_options.get(year)
         if zip_url is None:
             raise ValueError(f"Year {year} not found in TRI zip options")
 
         zip_file = self._get_zip_file(zip_url)
-        self._extract_file_types_from_zip(zip_file, year)
+        with zipfile.ZipFile(io.BytesIO(zip_file)) as zip_file_object:
+            self._extract_file_types_from_zip(zip_file_object, year)
 
     def extract_tri_data_all_years(self, years: List[str]) -> None:
         """Extract the TRI data for all years from the TRI zip file.
@@ -125,14 +138,18 @@ class TRIScrapper:
         for year in years:
             self.extract_tri_data_by_year(year)
 
-    def _get_zip_file(self, zip_url: str) -> zipfile.ZipFile:
+    def _get_zip_file(self, zip_url: str) -> bytes:
+        # Convert relative URLs to absolute URLs
+        if zip_url.startswith("/"):
+            base_url = EPA_BASE_URL
+            zip_url = urljoin(base_url, zip_url)
+
         response = requests.get(zip_url, timeout=120)
 
         if not response.ok:
             raise ValueError(f"Failed to download zip file from {zip_url}")
 
-        with zipfile.ZipFile(io.BytesIO(response.content)) as zip_file:
-            return zip_file
+        return response.content
 
     def _extract_file_types_from_zip(
         self,
@@ -140,6 +157,15 @@ class TRIScrapper:
         year: str,
     ) -> None:
         for file_type in TRI_FILE_TYPES:
+            logger.info(f"Extracting and saving file type {file_type} for year {year}")
+
+            if not zip_file.getinfo(f"US_{file_type}_{year}.txt"):
+                raise FileNotFoundError(f"File not found in zip file: US_{file_type}_{year}.txt")
+
+            if pathlib.Path(RAW_DATA_DIR / f"tri_{file_type}_{year}.csv").exists():
+                logger.info(f"File already exists: US_{file_type}_{year}.csv")
+                continue
+
             with zip_file.open(f"US_{file_type}_{year}.txt") as txt_file:
                 df_file_type = self._convert_txt_to_csv(txt_file, file_type)
                 self._save_csv_file(df_file_type, file_type, year)

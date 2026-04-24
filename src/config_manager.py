@@ -45,7 +45,7 @@ class ConfigManager:
 
         """
         if self._config is None:
-            config_path = CURRENT_DIR / "config" / "config.yaml"
+            config_path = CURRENT_DIR.parent / "config" / "config.yaml"
             try:
                 with open(config_path, "r") as file:
                     loaded_config = yaml.safe_load(file)
