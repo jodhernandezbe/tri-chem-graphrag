@@ -1,0 +1,47 @@
+---
+services:
+  neo4j:
+    image: neo4j:5.15-community
+    container_name: neo4j
+    environment:
+      - NEO4J_AUTH=tri_neo4j_user/tri_neo4j_password
+      - NEO4J_PLUGINS=["apoc"]
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    restart: unless-stopped
+
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: python-app-dev
+    depends_on:
+      - neo4j
+    volumes:
+      - .:/app
+      - /app/docs
+      - /app/Dockerfile*
+      - /app/docker-compose*
+    working_dir: /app
+    command: tail -f /dev/null
+
+  app-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: python-app-prod
+    depends_on:
+      - neo4j
+    volumes:
+      - ./config:/app/config
+    working_dir: /app
+    profiles:
+      - prod
+
+volumes:
+  neo4j_data:
+  neo4j_logs:

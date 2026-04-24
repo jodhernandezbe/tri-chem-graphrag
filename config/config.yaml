@@ -1,0 +1,10 @@
+---
+DUMMY_NEO4J_CONFIG:
+  NEO4J_URI: bolt://localhost:7687
+  NEO4J_USER: tri_neo4j_user
+  NEO4J_PASSWORD: tri_neo4j_password
+WEB_SITES:
+  TRI:
+    URL: https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-plus-data-files-calendar-years-1987-present
+    QUERIES:
+      CSS_TO_OPTIONS: "#select_year > option"

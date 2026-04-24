@@ -14,7 +14,6 @@ Date: 2026-04-23
 
 import io
 import pathlib
-import time
 import zipfile
 from collections import defaultdict
 from typing import IO, Any, Dict, List, Optional
@@ -60,7 +59,6 @@ class TRIScrapper:
 
     def _visit(self) -> None:
         html = requests.get(self._url, timeout=30).text
-        time.sleep(15)
         self._soup = BeautifulSoup(html, "html.parser")
 
     @property
@@ -74,11 +72,12 @@ class TRIScrapper:
 
             self._visit()
             self._tri_zip_options = {}
-            for link in self._soup.find_all(self._queries["TRI_YEAR_REPORTED"]):
+            for option in self._soup.select(self._queries["CSS_TO_OPTIONS"]):
 
-                raw_ref = link.get(self._queries["TRI_ZIP"])
+                raw_ref = option.get("value")
                 if isinstance(raw_ref, str):
-                    self._tri_zip_options[link.text] = raw_ref
+                    year = option.get_text(strip=True)
+                    self._tri_zip_options[year] = raw_ref
                 else:
                     continue
 
@@ -88,7 +87,7 @@ class TRIScrapper:
         self._tri_file_columns_dictionary: Dict[str, List[str]] = defaultdict(list)
 
         for file_type in TRI_FILE_TYPES:
-            file_path = ANCILLARY_DIR / "tri" / f"tri_file_{file_type}_columns.txt"
+            file_path = ANCILLARY_DIR / "tri" / "columns" / f"tri_file_{file_type}_columns.txt"
             if not file_path.exists():
                 raise FileNotFoundError(f"File not found at {file_path}")
 
