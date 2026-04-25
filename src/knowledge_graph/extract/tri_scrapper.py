@@ -40,7 +40,6 @@ TRI_FILE_TYPES = [
 ]
 
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -101,7 +100,8 @@ class TRIScrapper:
             if not file_path.exists():
                 raise FileNotFoundError(f"File not found at {file_path}")
 
-            inf_chardet = chardet.detect(open(file_path, "rb").read())
+            with open(file_path, "rb") as f:
+                inf_chardet = chardet.detect(f.read())
             inf_encoding = inf_chardet.get("encoding", "utf-8")
             with open(file_path, "r", encoding=inf_encoding) as file:
                 self._tri_file_columns_dictionary[file_type] = [line.rstrip().replace("\n", "") for line in file.readlines()]

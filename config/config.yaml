@@ -8,3 +8,15 @@ WEB_SITES:
     URL: https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-plus-data-files-calendar-years-1987-present
     QUERIES:
       CSS_TO_OPTIONS: "#select_year > option"
+  CENSUS_API:
+    BASE_URL: "https://api.census.gov/data"
+    DATASET: "timeseries/intltrade/exports/naics"
+    MAX_CONCURRENT_REQUESTS: 10
+    PARAMETERS:
+      GET:
+        - "NAICS_SDESC"
+        - "time={time}"
+      NAICS_CODE: "NAICS={naics_code}"
+      KEY: "{census_api_key}"
+  US_SPENDING_API:
+    BASE_URL: "https://api.usaspending.gov/api/v2/references/naics/{naics_code}/"
