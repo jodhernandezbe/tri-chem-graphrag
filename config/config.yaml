@@ -20,3 +20,233 @@ WEB_SITES:
       KEY: "{census_api_key}"
   US_SPENDING_API:
     BASE_URL: "https://api.usaspending.gov/api/v2/references/naics/{naics_code}/"
+TRI_FILE_TYPES:
+  NAICS_COLUMN: primary_naics_code
+  CAS_NUMBER_COLUMN: cas_number
+  SOURCE_REDUCTION_CODES_CONSIDERED:
+    - R1
+    - R2
+    - R3
+  MAXIMUM_AMOUNT_CODE_NOMENCLATURE:
+    - CODE: "01"
+      DESCRIPTION: "0 to 99 pounds"
+      VALUE: 22.4528
+    - CODE: "02"
+      DESCRIPTION: "100 to 999 pounds"
+      VALUE: 249.2488
+    - CODE: "03"
+      DESCRIPTION: "1,000 to 9,999 pounds"
+      VALUE: 2494.5292
+    - CODE: "04"
+      DESCRIPTION: "10,000 to 99,999 pounds"
+      VALUE: 24947.3332
+    - CODE: "05"
+      DESCRIPTION: "100,000 to 999,999 pounds"
+      VALUE: 249475.3732
+    - CODE: "06"
+      DESCRIPTION: "1,000,000 to 9,999,999 pounds"
+      VALUE: 2494755.7732
+    - CODE: "07"
+      DESCRIPTION: "10,000,000 to 49,999,999 pounds"
+      VALUE: 13607759.7732
+    - CODE: "08"
+      DESCRIPTION: "50,000,000 to 99,999,999 pounds"
+      VALUE: 34019399.7732
+    - CODE: "09"
+      DESCRIPTION: "100,000,000 to 499,999,999 pounds"
+      VALUE: 136077599.7732
+    - CODE: "10"
+      DESCRIPTION: "500,000,000 to 999,999,999 pounds"
+      VALUE: 340193999.7732
+    - CODE: "11"
+      DESCRIPTION: "1,000,000,000 to 10,000,000,000 pounds"
+      VALUE: 2494756000.0000
+    - CODE: "12"
+      DESCRIPTION: "0 to 0.099 grams (dioxins)"
+      VALUE: 0.0000495
+    - CODE: "13"
+      DESCRIPTION: "0.1 to 0.99 grams (dioxins)"
+      VALUE: 0.000545
+    - CODE: "14"
+      DESCRIPTION: "1 to 9.99 grams (dioxins)"
+      VALUE: 0.005495
+    - CODE: "15"
+      DESCRIPTION: "10 to 99 grams (dioxins)"
+      VALUE: 0.0545
+    - CODE: "16"
+      DESCRIPTION: "100 to 999 grams (dioxins)"
+      VALUE: 0.5495
+    - CODE: "17"
+      DESCRIPTION: "1,000 to 9,999 grams (dioxins)"
+      VALUE: 5.4995
+    - CODE: "18"
+      DESCRIPTION: "10,000 to 99,999 grams (dioxins)"
+      VALUE: 54.9995
+    - CODE: "19"
+      DESCRIPTION: "100,000 to 999,999 grams (dioxins)"
+      VALUE: 549.9995
+    - CODE: "20"
+      DESCRIPTION: "1,000,000 to 100,000,000 grams (dioxins)"
+      VALUE: 50500.0000
+  SOURCE_REDUCTION_CODE_NOMENCLATURE:
+    - CODE: "R1"
+      DESCRIPTION: "100% (elimination of the chemical)"
+      VALUE: 100.00
+    - CODE: "R2"
+      DESCRIPTION: "greater than or equal to 50%, but less than 100%"
+      VALUE: 50.00
+    - CODE: "R3"
+      DESCRIPTION: "greater than or equal to 25%, but less than 50%"
+      VALUE: 25.00
+    - CODE: "R4"
+      DESCRIPTION: "greater than or equal to 15%, but less than 25%"
+      VALUE: 15.00
+    - CODE: "R5"
+      DESCRIPTION: "greater than or equal to 5%, but less than 15%"
+      VALUE: 5.00
+    - CODE: "R6"
+      DESCRIPTION: "greater than 0%, but less than 5%"
+      VALUE: 0.00
+  FILE_TYPES:
+    - FILE_TYPE: "1a"
+      DESCRIPTION: "Releases and Waste Management"
+      COLUMNS_TO_USE:
+        - reporting_year
+        - trifid
+        - facility_state
+        - primary_naics_code
+        - document_control_number
+        - cas_number
+        - chemical_name
+        - maximum_amount_on_site
+    - FILE_TYPE: "1b"
+      DESCRIPTION: "Chemical Activity and Use"
+      COLUMNS_TO_USE:
+        - document_control_number
+        - produce_the_chemical
+        - import_the_chemical
+        - on_site_use_of_the_chemical
+        - sale_or_distribution_of_the_chemical
+        - as_a_byproduct
+        - as_a_manufactured_impurity
+        - used_as_a_reactant
+        - p206_inhibitors
+        - p207_emulsifiers
+        - p208_surfactants
+        - p209_lubricants
+        - p210_flame_retardants
+        - p211_rheological_modifiers
+        - p299_other
+        - used_as_an_article_component
+        - repackaging
+        - as_a_process_impurity
+        - recycling
+        - used_as_a_chemical_processing_aid
+        - z101_process_solvents
+        - z102_catalysts
+        - z103_inhibitors
+        - z104_initiators
+        - z105_reaction_terminators
+        - z106_solution_buffers
+        - z199_other
+        - used_as_a_manufacturing_aid
+        - z201_process_lubricants
+        - z202_metalworking_fluids
+        - z203_coolants
+        - z204_refrigerants
+        - z205_hydraulic_fluids
+        - z299_other
+        - ancillary_or_other_use
+        - z301_cleaner
+        - z302_degreaser
+        - z303_lubricant
+        - z304_fuel
+        - z305_flame_retardant
+        - z306_waste_treatment
+        - z307_water_treatment
+        - z308_construction_materials
+        - z399_other
+    - FILE_TYPE: "2a"
+      DESCRIPTION: "Source Reduction"
+      COLUMNS_TO_USE:
+        - document_control_number
+KNOWLEDGE_GRAPH:
+  NODES:
+    - NODE_TYPE: Chemical
+      PROPERTIES:
+        - COLUMN: chemical_name
+          NAME: name
+        - COLUMN: cas_number
+          NAME: cas_number
+        - COLUMN: canonical_smiles
+          NAME: canonical_smiles
+        - COLUMN: tri_chem_id
+          NAME: tri_chem_id
+    - NODE_TYPE: Facility
+      PROPERTIES:
+        - COLUMN: trifid
+          NAME: trifid
+        - COLUMN: facility_state
+          NAME: state
+    - NODE_TYPE: Activity
+      PROPERTIES:
+        - COLUMN: chemical_activity
+          NAME: name
+    - NODE_TYPE: Reduction
+      PROPERTIES:
+        - COLUMN: source_reduction_code
+          NAME: code
+        - COLUMN: source_reduction_description
+          NAME: name
+    - NODE_TYPE: Sector
+      PROPERTIES:
+        - COLUMN: naics_code
+          NAME: naics_code
+        - COLUMN: naics_title
+          NAME: naics_title
+    - NODE_TYPE: Report
+      PROPERTIES:
+        - COLUMN: document_control_number
+          NAME: document_control_number
+        - COLUMN: reporting_year
+          NAME: reporting_year
+  EDGES:
+    - EDGE_TYPE: CLASSIFIED_AS
+      FROM_NODE_TYPE: Facility
+      TO_NODE_TYPE: Sector
+      PROPERTIES: []
+    - EDGE_TYPE: DOCUMENTS
+      FROM_NODE_TYPE: Report
+      TO_NODE_TYPE: Reduction
+      PROPERTIES:
+        - COLUMN: annual_reduction
+          NAME: annual_reduction
+          NOTE: I consider the minimum of the interval as a conservative estimate.
+    - EDGE_TYPE: REPORTS_ON
+      FROM_NODE_TYPE: Report
+      TO_NODE_TYPE: Chemical
+      PROPERTIES:
+        - COLUMN: maximum_amount
+          NAME: maximum_amount
+          NOTE: I consider the midpoint of the interval as a conservative estimate.
+    - EDGE_TYPE: FILED_BY
+      FROM_NODE_TYPE: Report
+      TO_NODE_TYPE: Facility
+      PROPERTIES: []
+    - EDGE_TYPE: RECORDS
+      FROM_NODE_TYPE: Facility
+      TO_NODE_TYPE: Activity
+      PROPERTIES: []
+RAG_GRAPH:
+  EMBEDDINGS:
+    - EMBEDDING_TYPE: MorganFingerprint
+      PROPERTIES:
+        - RADIUS: 2
+          N_BITS: 2048
+    - EMBEDDING_TYPE: MolDeBERTa
+      PROPERTIES:
+        - MODEL_NAME: "SaeedLab/MolDeBERTa-base-123M-mtr"
+    - EMBEDDING_TYPE: NAICSEmbeddings
+      PROPERTIES:
+        - MODEL_NAME: "sentence-transformers/all-MiniLM-L6-v2"
+          MAX_LENGTH: 512

@@ -30,7 +30,7 @@ class NaicsDataFetcher:
     """Singleton class for fetching NAICS code descriptions from the Census API with caching."""
 
     def __new__(cls):
-        """Ensure only a single instance of NaicsDataFetcher is created."""
+        """Create or return existing singleton instance."""
         if not hasattr(cls, "instance"):
             cls.instance = super(NaicsDataFetcher, cls).__new__(cls)
         return cls.instance
@@ -45,15 +45,6 @@ class NaicsDataFetcher:
         self._naics_cache: Dict[str, Optional[str]] = {}
 
     def _load_api_key(self) -> str:
-        """Load the Census API key from the .env file.
-
-        Returns:
-            str: The API key for the Census Bureau.
-
-        Raises:
-            EnvironmentError: If the .env file or the CENSUS_DATA_API_KEY is not found.
-
-        """
         load_dotenv()
         api_key = os.getenv("CENSUS_DATA_API_KEY")
 
@@ -68,16 +59,6 @@ class NaicsDataFetcher:
         naics_code: str,
         session: aiohttp.ClientSession,
     ) -> Union[str, None]:
-        """Get the auxiliar endpoint for the Census API.
-
-        Args:
-            naics_code (str): The NAICS code to fetch data for.
-            session (aiohttp.ClientSession): The shared aiohttp session.
-
-        Returns:
-            str: The auxiliar endpoint for the Census API.
-
-        """
         query_url = self.us_spending_cfg["BASE_URL"].format(naics_code=naics_code)
         async with session.get(query_url) as response:
             if response.status == 200:
@@ -92,15 +73,6 @@ class NaicsDataFetcher:
         naics_code: str,
         session: aiohttp.ClientSession,
     ) -> Dict[str, Optional[str]]:
-        """Fetch data for a single NAICS code asynchronously using a shared session.
-
-        Args:
-            naics_code (str): The NAICS code to fetch data for.
-            session (aiohttp.ClientSession): The shared aiohttp session.
-
-        Returns:
-            Dict[str, Optional[str]]: A dictionary with `naics_code` and `naics_title`.
-        """
         if naics_title := self._naics_cache.get(naics_code):
             return {"naics_code": naics_code, "naics_title": naics_title}
 
@@ -137,14 +109,6 @@ class NaicsDataFetcher:
         self,
         naics_codes: List[str],
     ) -> List[Dict[str, Optional[str]]]:
-        """Fetch data for multiple NAICS codes asynchronously using a shared session.
-
-        Args:
-            naics_codes (List[str]): A list of unique NAICS codes to fetch data for.
-
-        Returns:
-            List[Dict[str, Optional[str]]]: A list of dictionaries with `naics_code` and `naics_title`.
-        """
         async with aiohttp.ClientSession() as session:  # Shared session for all requests
             tasks = [self._fetch_single_naics_data(code, session) for code in naics_codes]
             return await asyncio.gather(*tasks)

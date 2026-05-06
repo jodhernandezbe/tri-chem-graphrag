@@ -34,9 +34,9 @@ RAW_DATA_DIR = WORKING_DIR / "data" / "raw"
 EPA_BASE_URL = "https://www.epa.gov"
 
 TRI_FILE_TYPES = [
+    "1a",  # Releases and Waste Management
     "1b",  # Chemical Activity and Use
     "2a",  # Source Reduction
-    "2b",  # On-site Treatment
 ]
 
 
@@ -47,11 +47,7 @@ class TRIScrapper:
     """Singleton class for scraping TRI data from EPA's TRI database."""
 
     def __new__(cls):
-        """Create a new instance using singleton pattern.
-
-        Returns:
-            TRIScrapper: The singleton instance.
-        """
+        """Create or return existing singleton instance."""
         if not hasattr(cls, "instance"):
             cls.instance = super(TRIScrapper, cls).__new__(cls)
         return cls.instance
@@ -110,7 +106,7 @@ class TRIScrapper:
         """Extract the TRI data for a given year from the TRI zip file.
 
         Args:
-            year: The year to extract the TRI data for.
+            year (str): The year to extract the TRI data for.
 
         Returns:
             None
@@ -130,7 +126,7 @@ class TRIScrapper:
         """Extract the TRI data for all years from the TRI zip file.
 
         Args:
-            years: The years to extract the TRI data for.
+            years (List[str]): The years to extract the TRI data for.
 
         Returns:
             None
