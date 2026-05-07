@@ -1,0 +1,82 @@
+# TRI Chemical GraphRAG Domain Context
+
+## TRI (Toxic Release Inventory) Data
+- EPA's annual reporting system for industrial chemical releases
+- File types: 1a (Releases/Waste), 1b (Chemical Activity), 2a (Source Reduction)
+- Key identifiers: CAS numbers, TRI chemical IDs, NAICS codes
+- Data format: Tab-delimited text files converted to CSV
+
+## Chemical Risk Assessment Pipeline
+- **Source Reduction** (TRI 2a data) → pollution prevention strategies, waste minimization
+- **Chemical Exposure** → release amounts, pathways, receptor populations
+- **Risk Assessment** → toxicity data integration, exposure modeling
+- **Knowledge Graph** enables risk pathway analysis and chemical alternatives assessment
+
+## Source Reduction Focus
+- **TRI Form 2a**: Source reduction and recycling activities data
+- **P2 Strategies**: Process modifications, input substitution, product reformulation
+- **Quantitative Metrics**: Annual reduction amounts, efficiency improvements
+- **Trend Analysis**: Multi-year source reduction effectiveness across industries
+
+## Chemical Data Handling
+- **SMILES**: Canonical molecular representations for chemical structures
+- **CAS Registry Numbers**: Unique chemical substance identifiers
+- **Chemical Names**: Common and IUPAC nomenclature
+- Use RDKit for molecular processing and fingerprinting
+
+## NAICS (North American Industry Classification)
+- 6-digit codes for industrial sectors
+- API integration for title/description lookup
+- Hierarchical structure (2-digit sectors to 6-digit industries)
+
+## Neo4j Knowledge Graph Schema (see graph_model.svg)
+### Nodes:
+- **Chemical** (purple): name, cas_number, canonical_smiles, tri_chem_id
+- **Facility** (yellow): trifid, state
+- **Report** (orange): document_control_number, reporting_year
+- **Sector** (red): naics_code, naics_title
+- **Activity** (gray): name
+- **Reduction** (blue): code, name
+
+### Relationships:
+- **CLASSIFIED_AS**: Facility → Sector
+- **FILED_BY**: Report → Facility
+- **REPORTS_ON**: Report → Chemical (with maximum_amount property)
+- **RECORDS**: Report → Activity
+- **DOCUMENTS**: Report → Reduction (with annual_reduction property)
+
+## Data Flow Pattern
+1. **Extract**: Web scraping EPA TRI database, API calls for enrichment
+2. **Transform**: Clean, validate, enrich with NAICS/SMILES data
+3. **Load**: Neo4j graph database with semantic relationships
+4. **RAG**: Knowledge graph querying for risk assessment insights
+
+## Risk Assessment Use Cases
+- Chemical alternatives identification via structural similarity
+- Source reduction effectiveness analysis across industries
+- Exposure pathway mapping through facility-chemical relationships
+- Toxicity data integration with release quantities
+
+## External APIs
+- EPA TRI database (web scraping with BeautifulSoup)
+- NAICS API for industry classifications
+- Chemical databases for SMILES/molecular data
+
+## Common Data Issues
+- Encoding problems (ISO-8859-1 vs UTF-8)
+- Missing or malformed CAS numbers
+- API rate limiting and timeouts
+- Large file sizes requiring streaming/chunking
+
+## Performance Patterns
+- **Batch Neo4j operations**: 500-1000 records per batch for writes/reads
+- **Connection pooling**: Use Neo4j driver pool, avoid creating new connections
+- **API semaphores**: asyncio.Semaphore(5) for NAICS, asyncio.Semaphore(3) for EPA
+- **Memory optimization**: Process DataFrames in chunks, use pandas.read_csv(chunksize=)
+
+## Critical Security Rules
+- Never commit actual TRI CSV data to repository
+- All Neo4j queries must use parameterized statements
+- Sanitize all chemical names and user inputs
+- Environment variables only for database credentials
+- Validate file encodings before processing

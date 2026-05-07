@@ -1,0 +1,45 @@
+{
+  "name": "TRI Chemical GraphRAG",
+  "description": "Neo4j knowledge graph and LangGraph RAG system for TRI chemical data analysis",
+  "include": [
+    "src/**/*.py",
+    "tests/**/*.py",
+    "config/**/*.yaml",
+    "*.md",
+    "*.svg",
+    "pyproject.toml",
+    ".pre-commit-config.yaml"
+  ],
+  "exclude": [
+    "data/**/*",
+    ".venv/**/*",
+    "__pycache__/**/*",
+    "*.pyc",
+    ".git/**/*",
+    "docs/**/*"
+  ],
+  "customInstructions": [
+    "Always use typing module for type hints",
+    "Follow SOLID and DRY principles",
+    "Max 16 lines per function",
+    "Use trailing commas in parameters",
+    "Absolute imports only",
+    "Extract common patterns into utilities to avoid spaghetti code"
+  ],
+  "filePatterns": {
+    "tests": "test_*.py",
+    "configs": "*.yaml",
+    "schemas": "graph_model.svg",
+    "transformers": "*_transformer.py",
+    "extractors": "*_extractor.py"
+  },
+  "skills": [
+    "data-engineering",
+    "neo4j",
+    "chemical-informatics",
+    "async-python",
+    "risk-assessment",
+    "environmental-chemistry",
+    "toxicology-data"
+  ]
+}
