@@ -168,3 +168,6 @@ data/raw/tri_*.csv
 
 # Intermediary data
 data/processed/tri_*_transformed.csv
+
+
+*.dump
