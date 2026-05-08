@@ -61,10 +61,10 @@ class BaseEmbeddings(Embeddings, ABC):
         """Embed a list of documents.
 
         Args:
-            texts: List of text documents to embed.
+            texts (List[str]): List of text documents to embed.
 
         Returns:
-            List of embeddings for the documents.
+            List[List[float]]: List of embeddings for the documents.
         """
         if not texts:
             return []
@@ -74,9 +74,9 @@ class BaseEmbeddings(Embeddings, ABC):
         """Embed a query.
 
         Args:
-            text: Text query to embed.
+            text (str): Text query to embed.
 
         Returns:
-            Embedding for the query.
+            List[float]: Embedding for the query.
         """
         return self._get_embedding([text])[0]

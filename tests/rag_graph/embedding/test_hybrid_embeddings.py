@@ -190,6 +190,7 @@ class TestHybridMolecularEmbeddings:
                     return_tensors="pt",
                     padding=True,
                     truncation=True,
+                    max_length=128,
                 )
 
     def test_no_grad_context(self):

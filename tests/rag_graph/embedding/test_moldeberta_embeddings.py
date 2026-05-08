@@ -133,7 +133,7 @@ class TestMolDeBERTaEmbeddings:
                     return_tensors="pt",
                     padding=True,
                     truncation=True,
-                    max_length=512,
+                    max_length=128,
                 )
 
     def test_mean_pooling_calculation(self):
@@ -232,5 +232,5 @@ class TestMolDeBERTaEmbeddings:
                     return_tensors="pt",
                     padding=True,
                     truncation=True,
-                    max_length=512,
+                    max_length=128,
                 )

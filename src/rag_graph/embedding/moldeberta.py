@@ -19,9 +19,9 @@ class MolDeBERTaEmbeddings(BaseEmbeddings):
     def __init__(
         self,
         model_name: str = "SaeedLab/MolDeBERTa-base-123M-mtr",
+        max_length: int = 128,
     ):
-        # This model is specifically trained on SMILES strings
-        super().__init__(model_name)
+        super().__init__(model_name, max_length=max_length)
 
     def _get_embedding(self, texts: List[str]) -> List[List[float]]:
         inputs = self._tokenize_texts(texts)

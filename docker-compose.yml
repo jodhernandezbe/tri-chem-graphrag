@@ -4,7 +4,7 @@ services:
     image: neo4j:5.15-community
     container_name: neo4j
     environment:
-      - NEO4J_AUTH=tri_neo4j_user/tri_neo4j_password
+      - NEO4J_AUTH=neo4j/tri_neo4j_password
       - NEO4J_PLUGINS=["apoc"]
     ports:
       - "7474:7474"

@@ -27,34 +27,34 @@ class Tri2aTransformer(BaseTriTransformer):
         super().__init__(file_type="2a")
         self._reduction_codes_considered = set(self.config["TRI_FILE_TYPES"]["SOURCE_REDUCTION_CODES_CONSIDERED"])
 
+    def _filter_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+        base_columns = [col for col in self._get_columns_to_use() if col in df.columns]
+        reduction_columns = [
+            col for col in df.columns if "source_reduction_activity" in col or "est_annual_reduction_code" in col
+        ]
+        return df[base_columns + reduction_columns].copy()  # type: ignore[return-value]
+
     def _get_reduction_value_from_config(self, code: str) -> Optional[float]:
         for reduction_info in self.config["TRI_FILE_TYPES"]["SOURCE_REDUCTION_CODE_NOMENCLATURE"]:
             if reduction_info["CODE"] == code:
                 return reduction_info["VALUE"]
         return None
 
-    def _get_reduction_columns_mapping(self) -> Dict[str, List[str]]:
-        all_columns = self._get_columns_to_use()
-
+    def _get_reduction_columns_mapping(self, all_columns: List[str]) -> Dict[str, List[str]]:
         codes = [col for col in all_columns if "source_reduction_activity_code" in col and "est_annual" not in col]
         descriptions = [col for col in all_columns if "source_reduction_activity_description" in col]
         annual_reductions = [col for col in all_columns if "est_annual_reduction_code" in col]
-
         return {"codes": codes, "descriptions": descriptions, "annual_reductions": annual_reductions}
 
-    def _is_considered_reduction_code(self, code_value: object) -> bool:
-        if not pd.api.types.is_scalar(code_value) or bool(pd.isna(code_value)):
+    def _is_valid_scalar(self, value: object) -> bool:
+        if not pd.api.types.is_scalar(value) or bool(pd.isna(value)):
+            return False
+        return bool(str(value).strip())
+
+    def _is_significant_annual_reduction(self, code_value: object) -> bool:
+        if not self._is_valid_scalar(code_value):
             return False
         return str(code_value).strip() in self._reduction_codes_considered
-
-    def _get_reduction_code_from_row(self, row: pd.Series, code_column: str) -> Optional[str]:
-        if code_column not in row.index:
-            return None
-
-        code_value = row.at[code_column]
-        if self._is_considered_reduction_code(code_value):
-            return str(code_value).strip()
-        return None
 
     def _get_column_value_safely(self, row: pd.Series, column: Optional[str]) -> Optional[str]:
         if column is not None and column in row.index:
@@ -65,72 +65,64 @@ class Tri2aTransformer(BaseTriTransformer):
         return None
 
     def _create_reduction_row(self, base_row: pd.Series, reduction_data: Dict) -> pd.Series:
-        expanded_row = base_row.copy()
-        expanded_row["source_reduction_code"] = reduction_data["code"]
-        expanded_row["source_reduction_description"] = reduction_data.get("description")
+        annual_code = reduction_data.get("annual_reduction")
+        return pd.Series(
+            {
+                "document_control_number": base_row["document_control_number"],
+                "source_reduction_code": reduction_data["code"],
+                "source_reduction_description": reduction_data.get("description"),
+                "annual_reduction": self._get_reduction_value_from_config(annual_code) if annual_code else None,
+            }
+        )
 
-        # Convert annual reduction code to numeric value
-        annual_reduction_code = reduction_data.get("annual_reduction")
-        if annual_reduction_code:
-            expanded_row["annual_reduction"] = self._get_reduction_value_from_config(annual_reduction_code)
-        else:
-            expanded_row["annual_reduction"] = None
-
-        return expanded_row
-
-    def _create_empty_reduction_row(self, base_row: pd.Series) -> pd.Series:
-        row = base_row.copy()
-        row["source_reduction_code"] = None
-        row["source_reduction_description"] = None
-        row["annual_reduction"] = None
-        return row
-
-    def _extract_reduction_activities_from_row(self, row: pd.Series) -> List[Dict]:
-        columns_mapping = self._get_reduction_columns_mapping()
+    def _extract_reduction_activities_from_row(
+        self,
+        row: pd.Series,
+        columns_mapping: Dict[str, List[str]],
+    ) -> List[Dict]:
         codes = columns_mapping["codes"]
         descriptions = columns_mapping["descriptions"]
         annual_reductions = columns_mapping["annual_reductions"]
-
         activities = []
 
         for i, code_col in enumerate(codes):
-            reduction_code = self._get_reduction_code_from_row(row, code_col)
-
-            if reduction_code:
-                desc_col = descriptions[i] if i < len(descriptions) else None
-                annual_col = annual_reductions[i] if i < len(annual_reductions) else None
-
-                activity = {
-                    "code": reduction_code,
-                    "description": self._get_column_value_safely(row, desc_col),
-                    "annual_reduction": self._get_column_value_safely(row, annual_col),
+            activity_code = self._get_column_value_safely(row, code_col)
+            if not activity_code:
+                continue
+            annual_col = annual_reductions[i] if i < len(annual_reductions) else None
+            annual_code = self._get_column_value_safely(row, annual_col)
+            if not self._is_significant_annual_reduction(annual_code):
+                continue
+            activities.append(
+                {
+                    "code": activity_code,
+                    "description": self._get_column_value_safely(row, descriptions[i] if i < len(descriptions) else None),
+                    "annual_reduction": annual_code,
                 }
-                activities.append(activity)
+            )
 
         return activities
 
-    def _expand_single_row(self, row: pd.Series) -> List[pd.Series]:
-        reduction_activities = self._extract_reduction_activities_from_row(row)
-
-        if reduction_activities:
-            return [self._create_reduction_row(row, activity) for activity in reduction_activities]
-        else:
-            return [self._create_empty_reduction_row(row)]
+    def _expand_single_row(self, row: pd.Series, columns_mapping: Dict[str, List[str]]) -> List[pd.Series]:
+        activities = self._extract_reduction_activities_from_row(row, columns_mapping)
+        return [self._create_reduction_row(row, activity) for activity in activities]
 
     def _expand_reduction_activities(self, df: pd.DataFrame) -> pd.DataFrame:
-        expanded_rows = []
-
+        columns_mapping = self._get_reduction_columns_mapping(list(df.columns))
+        expanded_rows: List[pd.Series] = []
         for _, row in df.iterrows():
-            expanded_rows.extend(self._expand_single_row(row))
-
-        return pd.DataFrame(expanded_rows)
-
-    def _add_naics_alias(self, df: pd.DataFrame) -> pd.DataFrame:
-        df_copy = df.copy()
-        naics_column = self.config["TRI_FILE_TYPES"]["NAICS_COLUMN"]
-        if naics_column in df_copy.columns:
-            df_copy["naics_code"] = df_copy[naics_column]
-        return df_copy
+            expanded_rows.extend(self._expand_single_row(row, columns_mapping))
+        if not expanded_rows:
+            return pd.DataFrame(
+                columns=pd.Index(
+                    ["document_control_number", "source_reduction_code", "source_reduction_description", "annual_reduction"]
+                )
+            )
+        result = pd.DataFrame(expanded_rows)
+        if "document_control_number" in result.columns:
+            numeric: pd.Series = pd.to_numeric(result["document_control_number"], errors="coerce")  # type: ignore[assignment]
+            result["document_control_number"] = numeric.astype("Int64")
+        return result
 
     def _clean_numeric_columns(self, df: pd.DataFrame) -> pd.DataFrame:
         df_copy = df.copy()
@@ -142,21 +134,13 @@ class Tri2aTransformer(BaseTriTransformer):
         """Transform 2a data according to knowledge graph requirements.
 
         Args:
-            df (pd.DataFrame): Input DataFrame with filtered 2a data
+            df (pd.DataFrame): Input DataFrame with filtered 2a data.
 
         Returns:
-            pd.DataFrame: Transformed DataFrame ready for knowledge graph loading
+            pd.DataFrame: Transformed DataFrame ready for knowledge graph loading.
         """
         logger.info("Transforming TRI 2a data")
-
-        # Add naics_code alias for knowledge graph
-        df_with_naics = self._add_naics_alias(df)
-
-        # Expand rows based on reduction activities
-        df_expanded = self._expand_reduction_activities(df_with_naics)
-
-        # Clean numeric columns
+        df_expanded = self._expand_reduction_activities(df)
         df_cleaned = self._clean_numeric_columns(df_expanded)
-
-        logger.info(f"Transformed 2a data: {len(df)} -> {len(df_cleaned)} rows after reduction activity expansion")
+        logger.info(f"Transformed 2a data: {len(df)} rows → {len(df_cleaned)} reduction activity rows")
         return df_cleaned

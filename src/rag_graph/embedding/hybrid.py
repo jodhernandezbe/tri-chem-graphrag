@@ -21,10 +21,11 @@ class HybridMolecularEmbeddings(BaseEmbeddings):
     def __init__(
         self,
         model_name: str = "SaeedLab/MolDeBERTa-base-123M-mtr",
+        max_length: int = 128,
         radius: int = 2,
         n_bits: int = 1024,
     ):
-        super().__init__(model_name)
+        super().__init__(model_name, max_length=max_length)
         self.radius = radius
         self.n_bits = n_bits
 
@@ -43,6 +44,7 @@ class HybridMolecularEmbeddings(BaseEmbeddings):
             return_tensors="pt",
             padding=True,
             truncation=True,
+            max_length=self.max_length,
         )
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
         with torch.no_grad():

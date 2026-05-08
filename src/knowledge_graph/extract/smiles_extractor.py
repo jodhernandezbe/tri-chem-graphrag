@@ -4,36 +4,36 @@
 """RDKit-based canonical SMILES extractor for chemical identification.
 
 This module provides functionality to generate canonical SMILES from CAS numbers
-and chemical names using the RDKit library.
+and chemical names using the PubChem REST API and RDKit for canonicalization.
 
 Author: Jose D. Hernandez-Betancur
 Date: 2026-05-02
 """
 
 import logging
-import pathlib
-from typing import Dict, List, Optional, Union
+import time
+from typing import Dict, Optional
+from urllib.parse import quote
 
 import pandas as pd
+import requests
 
 try:
     from rdkit import Chem
-    from rdkit.Chem import Descriptors
 
     RDKIT_AVAILABLE = True
 except ImportError:
     RDKIT_AVAILABLE = False
     logging.warning("RDKit not available. SMILES extraction will be disabled.")
 
-CURRENT_DIR = pathlib.Path(__file__).parent
-WORKING_DIR = CURRENT_DIR.parent.parent.parent
-INTERMEDIARY_DATA_DIR = WORKING_DIR / "data" / "processed"
-
 logger = logging.getLogger(__name__)
+
+_PUBCHEM_URL = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{identifier}/property/CanonicalSMILES/JSON"
+_PUBCHEM_DELAY = 0.2
 
 
 class SmilesExtractor:
-    """Singleton class for extracting canonical SMILES from chemical identifiers."""
+    """Singleton class for extracting canonical SMILES from chemical identifiers via PubChem."""
 
     def __new__(cls):
         """Create or return existing singleton instance."""
@@ -43,161 +43,99 @@ class SmilesExtractor:
 
     def __init__(self):
         if not RDKIT_AVAILABLE:
-            raise ImportError("RDKit is required for SMILES extraction. Please install rdkit-pypi.")
+            raise ImportError("RDKit is required for SMILES canonicalization. Please install rdkit-pypi.")
 
-        self._name_cache: Dict[str, Optional[str]] = {}
         self._cas_cache: Dict[str, Optional[str]] = {}
         self._cache_hits = 0
         self._cache_misses = 0
 
-    def _normalize_chemical_name(self, chemical_name: str) -> str:
-        return chemical_name.strip().lower()
-
     def _normalize_cas_number(self, cas_number: str) -> str:
         return cas_number.strip().replace("-", "").replace(" ", "")
 
-    def _smiles_from_name(self, chemical_name: str) -> Optional[str]:
-        if pd.isna(chemical_name) or not chemical_name.strip():
+    def _canonicalize(self, smiles: str) -> Optional[str]:
+        mol = Chem.MolFromSmiles(smiles)  # type: ignore[reportPossiblyUnboundVariable]
+        if mol is None:
             return None
+        return Chem.MolToSmiles(mol, canonical=True)  # type: ignore[reportPossiblyUnboundVariable]
 
-        normalized_name = self._normalize_chemical_name(chemical_name)
-
-        if normalized_name in self._name_cache:
-            self._cache_hits += 1
-            return self._name_cache[normalized_name]
-
-        self._cache_misses += 1
-
+    def _fetch_from_pubchem(self, identifier: str) -> Optional[str]:
+        url = _PUBCHEM_URL.format(identifier=quote(identifier))
         try:
-            mol = Chem.MolFromSmiles(chemical_name)  # type: ignore [reportPossiblyUnboundVariable]
-            if mol is not None:
-                canonical_smiles = Chem.MolToSmiles(mol, canonical=True)  # type: ignore [reportPossiblyUnboundVariable]
-                self._name_cache[normalized_name] = canonical_smiles
-                return canonical_smiles
-
-            self._name_cache[normalized_name] = None
-            return None
-
+            time.sleep(_PUBCHEM_DELAY)
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200:
+                props = response.json()["PropertyTable"]["Properties"][0]
+                raw_smiles = props.get("CanonicalSMILES") or props.get("ConnectivitySMILES") or props.get("SMILES")
+                if raw_smiles:
+                    return self._canonicalize(raw_smiles) or raw_smiles
+            logger.debug(f"PubChem returned {response.status_code} for '{identifier}'")
         except Exception as e:
-            logger.debug(f"Failed to extract SMILES from name '{chemical_name}': {e}")
-            self._name_cache[normalized_name] = None
-            return None
+            logger.debug(f"PubChem lookup failed for '{identifier}': {e}")
+        return None
 
     def _smiles_from_cas(self, cas_number: str) -> Optional[str]:
         if pd.isna(cas_number) or not cas_number.strip():
             return None
 
-        normalized_cas = self._normalize_cas_number(cas_number)
-
-        if normalized_cas in self._cas_cache:
+        normalized = self._normalize_cas_number(cas_number)
+        if normalized in self._cas_cache:
             self._cache_hits += 1
-            return self._cas_cache[normalized_cas]
+            return self._cas_cache[normalized]
 
         self._cache_misses += 1
+        smiles = self._fetch_from_pubchem(cas_number.strip())
+        self._cas_cache[normalized] = smiles
+        return smiles
 
-        # CAS number to SMILES conversion requires external databases
-        # This would typically integrate with PubChem, ChemSpider, or other chemical databases
-        # For now, return None because this is a placeholder for future implementation
-        logger.debug(f"CAS to SMILES conversion not yet implemented for: {cas_number}")
-        self._cas_cache[normalized_cas] = None
-        return None
-
-    def extract_smiles(
-        self,
-        identifier: str,
-        identifier_type: str = "name",
-    ) -> Optional[str]:
-        """Extract canonical SMILES from a chemical identifier.
+    def extract_smiles(self, cas_number: str) -> Optional[str]:
+        """Extract canonical SMILES for a chemical from its CAS number via PubChem.
 
         Args:
-            identifier (str): Chemical name or CAS number
-            identifier_type (str): Type of identifier ("name" or "cas")
+            cas_number (str): CAS registry number (e.g., "7439-92-1").
 
         Returns:
-            Optional[str]: Canonical SMILES string if successful, None otherwise
+            Optional[str]: Canonical SMILES string if found, None otherwise.
         """
-        if identifier_type == "name":
-            return self._smiles_from_name(identifier)
-        elif identifier_type == "cas":
-            return self._smiles_from_cas(identifier)
-        else:
-            logger.warning(f"Unknown identifier type: {identifier_type}")
-            return None
+        return self._smiles_from_cas(cas_number)
 
     def _initialize_smiles_column(self, df: pd.DataFrame) -> pd.DataFrame:
         df_copy = df.copy()
         df_copy["canonical_smiles"] = None
         return df_copy
 
-    def _extract_smiles_from_chemical_names(self, df: pd.DataFrame) -> pd.DataFrame:
-        if "chemical_name" not in df.columns:
-            return df
-
-        logger.info("Extracting SMILES from chemical names")
-        df_copy = df.copy()
-
-        for idx in df_copy.index:
-            chemical_name = df_copy.at[idx, "chemical_name"]
-            if pd.notna(chemical_name):
-                smiles = self.extract_smiles(str(chemical_name), "name")
-                if smiles:
-                    df_copy.at[idx, "canonical_smiles"] = smiles
-
-        return df_copy
-
-    def _extract_smiles_from_cas_numbers(self, df: pd.DataFrame) -> pd.DataFrame:
+    def _fill_smiles_from_cas(self, df: pd.DataFrame) -> pd.DataFrame:
         if "cas_number" not in df.columns:
             return df
 
-        logger.info("Extracting SMILES from CAS numbers for remaining records")
         df_copy = df.copy()
-
-        # Only process records that don't have SMILES yet
-        mask = df_copy["canonical_smiles"].isna()
-        records_to_process = df_copy[mask]
-
-        for idx in records_to_process.index:
+        for idx in df_copy.index:
             cas_number = df_copy.at[idx, "cas_number"]
             if pd.notna(cas_number):
-                smiles = self.extract_smiles(str(cas_number), "cas")
+                smiles = self._smiles_from_cas(str(cas_number))
                 if smiles:
                     df_copy.at[idx, "canonical_smiles"] = smiles
 
         return df_copy
 
     def _log_extraction_results(self, df: pd.DataFrame) -> None:
-        successful_extractions = df["canonical_smiles"].notna().sum()
-        total_records = len(df)
-        cache_hit_rate = (
-            self._cache_hits / (self._cache_hits + self._cache_misses) * 100
-            if (self._cache_hits + self._cache_misses) > 0
-            else 0
-        )
-
-        logger.info(f"Successfully extracted SMILES for {successful_extractions}/{total_records} chemicals")
-        logger.info(f"Cache statistics: {self._cache_hits} hits, {self._cache_misses} misses, {cache_hit_rate:.1f}% hit rate")
+        successful = df["canonical_smiles"].notna().sum()
+        total = len(df)
+        hits_misses = self._cache_hits + self._cache_misses
+        hit_rate = self._cache_hits / hits_misses * 100 if hits_misses > 0 else 0
+        logger.info(f"Successfully extracted SMILES for {successful}/{total} chemicals")
+        logger.info(f"Cache: {self._cache_hits} hits, {self._cache_misses} misses, {hit_rate:.1f}% hit rate")
 
     def process_chemicals_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Process a DataFrame to add canonical SMILES column.
+        """Process a DataFrame to add canonical SMILES via PubChem CAS lookup.
 
         Args:
-            df (pd.DataFrame): DataFrame containing chemical_name and/or cas_number columns
+            df (pd.DataFrame): DataFrame containing a cas_number column.
 
         Returns:
-            pd.DataFrame: DataFrame with added canonical_smiles column
+            pd.DataFrame: DataFrame with added canonical_smiles column.
         """
         logger.info("Processing chemicals DataFrame for SMILES extraction")
-
-        # Initialize SMILES column
-        df_with_smiles_col = self._initialize_smiles_column(df)
-
-        # Extract SMILES from chemical names first
-        df_with_name_smiles = self._extract_smiles_from_chemical_names(df_with_smiles_col)
-
-        # Extract SMILES from CAS numbers for remaining records
-        df_final = self._extract_smiles_from_cas_numbers(df_with_name_smiles)
-
-        # Log results
+        df_init = self._initialize_smiles_column(df)
+        df_final = self._fill_smiles_from_cas(df_init)
         self._log_extraction_results(df_final)
-
         return df_final

@@ -147,6 +147,45 @@ which pyright-langserver
 
 Insert that path to plugin config in your IDE as path to executable
 
+## ETL Pipeline
+
+### Running the pipeline
+
+```bash
+# All steps for a single year
+python -m src.knowledge_graph.main --years 2022
+
+# Multiple years
+python -m src.knowledge_graph.main --years 2022 2023 2024
+
+# Specific steps only
+python -m src.knowledge_graph.main --years 2022 --steps extract transform
+python -m src.knowledge_graph.main --years 2022 --steps load
+```
+
+### Available steps
+
+| Step | Description |
+|------|-------------|
+| `extract` | Downloads raw TRI CSV files from the EPA website |
+| `transform` | Cleans, enriches (NAICS titles, canonical SMILES), and saves processed CSVs |
+| `load` | Bulk-upserts nodes and relationships into Neo4j and populates vector embeddings |
+
+### Year tracking
+
+Completed steps are recorded in `ancillary/tri/processed_years.json`. Re-running
+the same year and step is a no-op unless the entry is removed from that file.
+
+### Testing with 2022 data
+
+```bash
+# Start Neo4j first
+docker-compose up neo4j -d
+
+# Run the full pipeline for 2022
+python -m src.knowledge_graph.main --years 2022
+```
+
 ## Documentation Style
 
 The project follows the Google style to document the code. The pre-commit hooks are configured to check this style.

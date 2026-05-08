@@ -34,12 +34,14 @@ class BaseTriTransformer(ABC):
         """Initialize the transformer with file type configuration.
 
         Args:
-            file_type: The TRI file type (e.g., '1a', '1b', '2a')
+            file_type (str): The TRI file type (e.g., '1a', '1b', '2a').
         """
         self.file_type = file_type
         self.config = ConfigManager().config
         self.file_config = self._get_file_config()
         self.kg_config = self.config["KNOWLEDGE_GRAPH"]
+        self._string_id_cols: List[str] = self.config["TRI_FILE_TYPES"]["STRING_ID_COLUMNS"]
+        self._integer_id_cols: List[str] = self.config["TRI_FILE_TYPES"]["INTEGER_ID_COLUMNS"]
 
     def _get_file_config(self) -> Dict:
         for file_cfg in self.config["TRI_FILE_TYPES"]["FILE_TYPES"]:
@@ -48,7 +50,7 @@ class BaseTriTransformer(ABC):
         raise ValueError(f"File type {self.file_type} not found in configuration")
 
     def _get_columns_to_use(self) -> List[str]:
-        return self.file_config["COLUMNS_TO_USE"]
+        return self.file_config["COLUMNS_TO_USE"]  # type: ignore[no-any-return]
 
     def _filter_columns(self, df: pd.DataFrame) -> pd.DataFrame:
         columns_to_use = self._get_columns_to_use()
@@ -60,35 +62,46 @@ class BaseTriTransformer(ABC):
 
         return cast(pd.DataFrame, df.loc[:, available_columns].copy())
 
+    def _cast_id_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+        df_copy = df.copy()
+        for col in self._string_id_cols:
+            if col in df_copy.columns:
+                df_copy[col] = df_copy[col].astype(str).str.strip()
+        for col in self._integer_id_cols:
+            if col in df_copy.columns:
+                df_copy[col] = pd.to_numeric(df_copy[col], errors="coerce").astype("Int64")  # type: ignore[union-attr]
+        return df_copy
+
     def load_raw_data(self, year: str) -> pd.DataFrame:
         """Load raw TRI data for specified year and file type.
 
         Args:
-            year: The reporting year
+            year (str): The reporting year.
 
         Returns:
-            Raw DataFrame from CSV file
+            pd.DataFrame: Raw DataFrame from CSV file.
 
         Raises:
-            FileNotFoundError: If the raw data file doesn't exist
+            FileNotFoundError: If the raw data file doesn't exist.
         """
         file_path = RAW_DATA_DIR / f"tri_{self.file_type}_{year}.csv"
         if not file_path.exists():
             raise FileNotFoundError(f"Raw data file not found: {file_path}")
 
         logger.info(f"Loading raw data from {file_path}")
-        return pd.read_csv(file_path, low_memory=False)
+        dtype_map = dict.fromkeys(self._string_id_cols + self._integer_id_cols, str)
+        return pd.read_csv(file_path, low_memory=False, dtype=dtype_map)  # type: ignore[call-overload]
 
     def save_intermediary_data(self, df: pd.DataFrame, year: str, suffix: str = "") -> pathlib.Path:
         """Save intermediary transformed data.
 
         Args:
-            df: DataFrame to save
-            year: The reporting year
-            suffix: Optional suffix for the filename
+            df (pd.DataFrame): DataFrame to save.
+            year (str): The reporting year.
+            suffix (str): Optional suffix for the filename.
 
         Returns:
-            Path to saved file
+            pathlib.Path: Path to saved file.
         """
         INTERMEDIARY_DATA_DIR.mkdir(parents=True, exist_ok=True)
         filename = f"tri_{self.file_type}_{year}_transformed"
@@ -106,10 +119,10 @@ class BaseTriTransformer(ABC):
         """Transform the input DataFrame according to file type rules.
 
         Args:
-            df: Input DataFrame with raw TRI data
+            df (pd.DataFrame): Input DataFrame with raw TRI data.
 
         Returns:
-            Transformed DataFrame ready for knowledge graph loading
+            pd.DataFrame: Transformed DataFrame ready for knowledge graph loading.
         """
         pass
 
@@ -117,10 +130,10 @@ class BaseTriTransformer(ABC):
         """Validate that input DataFrame has required columns.
 
         Args:
-            df: Input DataFrame to validate
+            df (pd.DataFrame): Input DataFrame to validate.
 
         Returns:
-            True if valid, False otherwise
+            bool: True if valid, False otherwise.
         """
         required_columns = self._get_columns_to_use()
         missing_columns = set(required_columns) - set(df.columns)
@@ -135,28 +148,22 @@ class BaseTriTransformer(ABC):
         """Complete transformation pipeline for a given year.
 
         Args:
-            year: The reporting year to process
+            year (str): The reporting year to process.
 
         Returns:
-            Path to the saved transformed data
+            pathlib.Path: Path to the saved transformed data.
         """
         logger.info(f"Processing {self.file_type} data for year {year}")
 
-        # Load raw data
         raw_df = self.load_raw_data(year)
 
-        # Validate input
         if not self.validate_input(raw_df):
             raise ValueError(f"Invalid input data for {self.file_type} year {year}")
 
-        # Filter columns
         filtered_df = self._filter_columns(raw_df)
+        casted_df = self._cast_id_columns(filtered_df)
+        transformed_df = self.transform(casted_df)
 
-        # Apply transformation
-        transformed_df = self.transform(filtered_df)
-
-        # Save intermediary data
         output_path = self.save_intermediary_data(transformed_df, year)
-
         logger.info(f"Completed processing {self.file_type} for year {year}. Output: {output_path}")
         return output_path

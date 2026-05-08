@@ -98,7 +98,7 @@ class TRIScrapper:
 
             with open(file_path, "rb") as f:
                 inf_chardet = chardet.detect(f.read())
-            inf_encoding = inf_chardet.get("encoding", "utf-8")
+            inf_encoding = (inf_chardet or {}).get("encoding", "utf-8")
             with open(file_path, "r", encoding=inf_encoding) as file:
                 self._tri_file_columns_dictionary[file_type] = [line.rstrip().replace("\n", "") for line in file.readlines()]
 

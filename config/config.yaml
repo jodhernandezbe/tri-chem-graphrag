@@ -1,7 +1,7 @@
 ---
 DUMMY_NEO4J_CONFIG:
   NEO4J_URI: bolt://localhost:7687
-  NEO4J_USER: tri_neo4j_user
+  NEO4J_USER: neo4j
   NEO4J_PASSWORD: tri_neo4j_password
 WEB_SITES:
   TRI:
@@ -23,6 +23,12 @@ WEB_SITES:
 TRI_FILE_TYPES:
   NAICS_COLUMN: primary_naics_code
   CAS_NUMBER_COLUMN: cas_number
+  STRING_ID_COLUMNS:
+    - cas_number
+    - tri_chem_id
+  INTEGER_ID_COLUMNS:
+    - document_control_number
+    - primary_naics_code
   SOURCE_REDUCTION_CODES_CONSIDERED:
     - R1
     - R2
@@ -118,6 +124,7 @@ TRI_FILE_TYPES:
         - document_control_number
         - cas_number
         - chemical_name
+        - tri_chem_id
         - maximum_amount_on_site
     - FILE_TYPE: "1b"
       DESCRIPTION: "Chemical Activity and Use"
@@ -246,6 +253,7 @@ RAG_GRAPH:
     - EMBEDDING_TYPE: MolDeBERTa
       PROPERTIES:
         - MODEL_NAME: "SaeedLab/MolDeBERTa-base-123M-mtr"
+          MAX_LENGTH: 128
     - EMBEDDING_TYPE: NAICSEmbeddings
       PROPERTIES:
         - MODEL_NAME: "sentence-transformers/all-MiniLM-L6-v2"

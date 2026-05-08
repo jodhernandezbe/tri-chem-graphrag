@@ -20,6 +20,20 @@
 - **Public functions/methods/classes**: Full docstrings with Args/Returns
 - **Private methods**: No documentation unless complex logic
 - **Module headers**: Include purpose, author, date
+- **Docstring style**: Google style with types in parentheses — follow this exact format:
+  ```python
+  def method(self, param: Type) -> ReturnType:
+      """One-line summary.
+
+      Args:
+          param (Type): Description of param.
+
+      Returns:
+          ReturnType: Description of return value.
+      """
+  ```
+  - Omit `Returns` section when the return type is `None`
+  - Omit `Args` section when the method takes no parameters beyond `self`
 
 ## Code Conventions
 - **Functions**: Max 16 lines, single responsibility principle
