@@ -13,7 +13,7 @@ Date: 2026-05-02
 import argparse
 import logging
 import sys
-from typing import List
+from typing import Any, List
 
 from .extract.tri_scrapper import TRIScrapper
 from .load import GraphLoader
@@ -23,6 +23,7 @@ from .transform.tri_2a_transformer import Tri2aTransformer
 from .year_tracker import YearTracker
 
 PIPELINE_STEPS: List[str] = ["extract", "transform", "load"]
+MAX_RETRIES: int = 3
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +41,32 @@ class KnowledgeGraphPipeline:
         }
         self._graph_loader = GraphLoader()
         self._tracker = YearTracker()
+
+    def _transform_file_type(self, file_type: str, transformer: Any, year: str) -> None:
+        for attempt in range(MAX_RETRIES):
+            try:
+                transformer.process_year(year)
+                logger.info(f"Successfully transformed {file_type} for year {year}")
+                return
+            except FileNotFoundError as e:
+                logger.warning(f"Raw data file not found for {file_type} year {year}: {e}")
+                return
+            except Exception as e:
+                if attempt < MAX_RETRIES - 1:
+                    logger.warning(f"Retrying {file_type} transform for year {year} (attempt {attempt + 2}): {e}")
+                else:
+                    logger.error(f"Error transforming {file_type} for year {year}: {e}")
+
+    def _load_year_with_retry(self, year: str) -> None:
+        for attempt in range(MAX_RETRIES):
+            try:
+                self._graph_loader.load(year)
+                return
+            except Exception as e:
+                if attempt < MAX_RETRIES - 1:
+                    logger.warning(f"Retrying load for year {year} (attempt {attempt + 2}): {e}")
+                else:
+                    raise
 
     def extract(self) -> None:
         """Extract raw TRI data files for all configured years."""
@@ -64,13 +91,7 @@ class KnowledgeGraphPipeline:
                 logger.info(f"Year {year} transform already completed — skipping")
                 continue
             for file_type, transformer in self.transformers.items():
-                try:
-                    transformer.process_year(year)
-                    logger.info(f"Successfully transformed {file_type} for year {year}")
-                except FileNotFoundError as e:
-                    logger.warning(f"Raw data file not found for {file_type} year {year}: {e}")
-                except Exception as e:
-                    logger.error(f"Error transforming {file_type} for year {year}: {e}")
+                self._transform_file_type(file_type, transformer, year)
             self._tracker.mark_step_done(year, "transform")
         logger.info(f"Completed data transformation for {len(self.years)} years")
 
@@ -82,7 +103,7 @@ class KnowledgeGraphPipeline:
                 logger.info(f"Year {year} load already completed — skipping")
                 continue
             try:
-                self._graph_loader.load(year)
+                self._load_year_with_retry(year)
                 self._tracker.mark_step_done(year, "load")
                 logger.info(f"Successfully loaded data for year {year}")
             except Exception as e:

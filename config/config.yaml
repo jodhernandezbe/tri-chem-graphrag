@@ -12,6 +12,7 @@ WEB_SITES:
     BASE_URL: "https://api.census.gov/data"
     DATASET: "timeseries/intltrade/exports/naics"
     MAX_CONCURRENT_REQUESTS: 10
+    MAX_RETRIES: 3
     PARAMETERS:
       GET:
         - "NAICS_SDESC"

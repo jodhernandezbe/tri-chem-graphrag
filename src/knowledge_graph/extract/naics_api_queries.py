@@ -25,6 +25,8 @@ from src.config_manager import ConfigManager
 
 logger = logging.getLogger(__name__)
 
+_TRANSIENT_ERRORS = (aiohttp.ServerDisconnectedError, aiohttp.ClientConnectionError, asyncio.TimeoutError)
+
 
 class NaicsDataFetcher:
     """Singleton class for fetching NAICS code descriptions from the Census API with caching."""
@@ -40,7 +42,7 @@ class NaicsDataFetcher:
         self.us_spending_cfg = ConfigManager().config["WEB_SITES"]["US_SPENDING_API"]
         self.census_api_key = self._load_api_key()
         self.base_url = f"{self.census_cfg['BASE_URL']}/{self.census_cfg['DATASET']}"
-        self.semaphore = asyncio.Semaphore(self.census_cfg["MAX_CONCURRENT_REQUESTS"])
+        self.max_retries: int = self.census_cfg["MAX_RETRIES"]
         self.time = f"{datetime.now().year}-01"
         self._naics_cache: Dict[str, Optional[str]] = {}
 
@@ -68,49 +70,55 @@ class NaicsDataFetcher:
                 logger.error(f"Failed to fetch data for NAICS code {naics_code}: {response.status}")
                 return None
 
+    async def _fetch_with_retry(
+        self,
+        naics_code: str,
+        full_url: str,
+        session: aiohttp.ClientSession,
+    ) -> Optional[str]:
+        for attempt in range(self.max_retries):
+            try:
+                async with session.get(full_url) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        return data[1][0].capitalize() if len(data) > 1 else None
+                    return await self._fetch_from_auxiliar_endpoint(naics_code, session)
+            except _TRANSIENT_ERRORS as e:
+                if attempt < self.max_retries - 1:
+                    await asyncio.sleep(2**attempt)
+                    logger.warning(f"Retry {attempt + 2}/{self.max_retries} for NAICS {naics_code}: {e}")
+                else:
+                    logger.error(f"NAICS {naics_code} failed after {self.max_retries} attempts: {e}")
+                    raise
+
     async def _fetch_single_naics_data(
         self,
         naics_code: str,
         session: aiohttp.ClientSession,
+        semaphore: asyncio.Semaphore,
     ) -> Dict[str, Optional[str]]:
         if naics_title := self._naics_cache.get(naics_code):
             return {"naics_code": naics_code, "naics_title": naics_title}
 
         parameters = self.census_cfg["PARAMETERS"]
-        get_param = parameters["GET"]
-        naics_code_param = parameters["NAICS_CODE"]
-
         full_url = (
             f"{self.base_url}"
-            f"?get={"&".join(get_param).format(time=self.time)}"
-            f"&{naics_code_param.format(naics_code=naics_code)}"
+            f"?get={"&".join(parameters['GET']).format(time=self.time)}"
+            f"&{parameters['NAICS_CODE'].format(naics_code=naics_code)}"
             f"&key={self.census_api_key}"
         )
-
-        async with self.semaphore:
-            async with session.get(full_url) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    naics_title = data[1][0].capitalize() if len(data) > 1 else None
-                    if naics_title is None:
-                        naics_title = await self._fetch_from_auxiliar_endpoint(
-                            naics_code,
-                            session,
-                        )
-                else:
-                    naics_title = await self._fetch_from_auxiliar_endpoint(
-                        naics_code,
-                        session,
-                    )
-                self._naics_cache[naics_code] = naics_title
-                return {"naics_code": naics_code, "naics_title": naics_title}
+        async with semaphore:
+            naics_title = await self._fetch_with_retry(naics_code, full_url, session)
+        self._naics_cache[naics_code] = naics_title
+        return {"naics_code": naics_code, "naics_title": naics_title}
 
     async def _fetch_all_naics_data(
         self,
         naics_codes: List[str],
     ) -> List[Dict[str, Optional[str]]]:
-        async with aiohttp.ClientSession() as session:  # Shared session for all requests
-            tasks = [self._fetch_single_naics_data(code, session) for code in naics_codes]
+        semaphore = asyncio.Semaphore(self.census_cfg["MAX_CONCURRENT_REQUESTS"])
+        async with aiohttp.ClientSession() as session:
+            tasks = [self._fetch_single_naics_data(code, session, semaphore) for code in naics_codes]
             return await asyncio.gather(*tasks)
 
     def process_naics_codes(

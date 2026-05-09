@@ -169,5 +169,7 @@ data/raw/tri_*.csv
 # Intermediary data
 data/processed/tri_*_transformed.csv
 
+# Claude Code runtime files
+.claude/scheduled_tasks.lock
 
 *.dump
