@@ -246,6 +246,14 @@ KNOWLEDGE_GRAPH:
       TO_NODE_TYPE: Activity
       PROPERTIES: []
 RAG_GRAPH:
+  RETRIEVAL:
+    TOP_K: 5
+    MAX_CONTEXT_CHARS: 8000
+    GRAPH_CONTEXT_LIMIT: 50
+  GENERATION:
+    MODEL: "llama3.1"
+    BASE_URL: "http://localhost:11434"
+    TEMPERATURE: 0.0
   EMBEDDINGS:
     - EMBEDDING_TYPE: MorganFingerprint
       PROPERTIES:

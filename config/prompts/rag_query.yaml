@@ -1,0 +1,9 @@
+---
+version: "1.0.0"
+query_prompt: |
+  Based on the TRI knowledge graph context provided, answer the following question precisely
+  and factually. Cite specific chemicals, facilities, sectors, or years referenced in the context.
+
+  Question: {query}
+
+  Answer:
