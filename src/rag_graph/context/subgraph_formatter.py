@@ -78,9 +78,29 @@ def format_sector_subgraph(subgraph: Dict[str, Any]) -> str:
     return header + body
 
 
+def format_cross_entity_subgraph(subgraph: Dict[str, Any]) -> str:
+    """Render a Chemical × Sector intersection subgraph dict as a text block.
+
+    Args:
+        subgraph (Dict[str, Any]): Subgraph returned by ``CrossEntityRetriever.traverse_cross``.
+
+    Returns:
+        str: Human-readable text block for prompt injection.
+    """
+    name = subgraph.get("name", "Unknown")
+    cas = subgraph.get("cas_number", "N/A")
+    smiles = subgraph.get("smiles", "N/A")
+    sector_code = subgraph.get("sector_code", "N/A")
+    sector_title = subgraph.get("sector_title", "Unknown")
+    header = f"[Chemical × Sector] {name} | CAS {cas} | SMILES {smiles} | Sector {sector_code} — {sector_title}\n"
+    body = _fmt_records(subgraph.get("reports", []), "Reports")
+    return header + body
+
+
 FORMATTERS = {
     "Chemical": format_chemical_subgraph,
     "Sector": format_sector_subgraph,
+    "Chemical_Sector": format_cross_entity_subgraph,
 }
 
 

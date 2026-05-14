@@ -4,13 +4,13 @@
 """Entry point for the TRI Chemical GraphRAG query pipeline.
 
 Exposes the LangGraph RAG pipeline via argparse so it can be invoked from the
-command line. The caller must supply a natural-language question, a retrieval
-query appropriate for the chosen embedding type (SMILES for chemical embeddings
-or a sector title for NAICS embeddings), and the desired embedding type.
+command line. The caller supplies a natural-language question; the pipeline's
+query planner automatically extracts the chemical identifier and sector from the
+question. A SMILES string can be passed explicitly via --chemical-smiles to
+bypass the planner's chemical extraction and SMILES resolution steps.
 
 Author: Jose D. Hernandez-Betancur
 Date: 2026-05-09
-
 """
 
 import argparse
@@ -18,13 +18,6 @@ import logging
 import sys
 
 from .generation.rag_pipeline import RAGPipeline
-
-SUPPORTED_EMBEDDING_TYPES = [
-    "MorganFingerprint",
-    "MolDeBERTa",
-    "Hybrid",
-    "NAICSEmbeddings",
-]
 
 logger = logging.getLogger(__name__)
 
@@ -38,26 +31,19 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         "--query",
         required=True,
         metavar="TEXT",
-        help="Natural language question to answer (passed to the LLM for generation).",
+        help="Natural language question to answer.",
     )
     parser.add_argument(
-        "--retrieval-query",
-        required=True,
-        dest="retrieval_query",
-        metavar="TEXT",
-        help=(
-            "String to embed for vector search. "
-            "Use a SMILES string for chemical embedding types (MorganFingerprint, MolDeBERTa, Hybrid) "
-            "or a sector title for NAICSEmbeddings."
-        ),
-    )
-    parser.add_argument(
-        "--embedding-type",
+        "--chemical-smiles",
         required=False,
-        dest="embedding_type",
-        default="MolDeBERTa",
-        choices=SUPPORTED_EMBEDDING_TYPES,
-        help="Embedding type that determines which Neo4j vector index is queried (default: MolDeBERTa).",
+        dest="chemical_smiles",
+        default="",
+        metavar="SMILES",
+        help=(
+            "Optional SMILES string for chemical similarity retrieval. "
+            "If omitted, the query planner extracts the chemical identifier from --query "
+            "and resolves it to SMILES via the knowledge graph."
+        ),
     )
     return parser.parse_args(argv)
 
@@ -76,15 +62,14 @@ def main(argv: list[str] | None = None) -> None:
 
     args = _parse_args(argv if argv is not None else sys.argv[1:])
 
-    logger.info(f"Embedding type : {args.embedding_type}")
-    logger.info(f"Retrieval query: {args.retrieval_query}")
     logger.info(f"Query          : {args.query}")
+    if args.chemical_smiles:
+        logger.info(f"Chemical SMILES: {args.chemical_smiles}")
 
     pipeline = RAGPipeline()
     answer = pipeline.run(
         query=args.query,
-        retrieval_query=args.retrieval_query,
-        embedding_type=args.embedding_type,
+        chemical_smiles=args.chemical_smiles,
     )
 
     print("\n" + "=" * 60)

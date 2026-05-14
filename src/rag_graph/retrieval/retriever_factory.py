@@ -13,7 +13,7 @@ Date: 2026-05-09
 
 import logging
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Mapping, Tuple, cast
 
 from langchain_neo4j import Neo4jVector
 
@@ -25,7 +25,7 @@ from src.rag_graph.embedding import (
     NAICSEmbeddings,
 )
 
-from .graph_retriever import GraphRetriever
+from .graph_retriever import CrossEntityRetriever, GraphRetriever
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +61,28 @@ INDEX_MAP: Dict[str, Dict[str, Any]] = {
 
 # Node properties that hold embedding vectors — excluded from the node dict
 # passed to the graph traverser to avoid sending megabyte-scale arrays around.
-_EMBEDDING_PROPS = {"morgan_fp_embedding", "moldeberta_embedding", "hybrid_embedding", "naics_title_embedding"}
+_EMBEDDING_PROPS = {
+    "morgan_fp_embedding",
+    "moldeberta_embedding",
+    "hybrid_embedding",
+    "naics_title_embedding",
+}
+
+
+def _node_from_metadata(metadata: Mapping[str, Any]) -> Dict[str, Any]:
+    return {k: v for k, v in metadata.items() if k not in _EMBEDDING_PROPS}
+
+
+def _vector_hit(doc: Any, score: float) -> Dict[str, Any]:
+    return {
+        "node": _node_from_metadata(cast(Mapping[str, Any], doc.metadata)),
+        "content": doc.page_content,
+        "score": float(score),
+    }
+
+
+def _seed_nodes(retrieved_nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    return [cast(Dict[str, Any], hit["node"]) for hit in retrieved_nodes]
 
 
 class RetrieverFactory:
@@ -88,6 +109,7 @@ class RetrieverFactory:
         self._emb_cfg = emb_cfg
         self._vector_stores: Dict[str, Neo4jVector] = {}
         self._graph_retrievers: Dict[str, GraphRetriever] = {}
+        self._cross_retriever: CrossEntityRetriever | None = None
         self._initialized = True
 
     def _build_embedder(self, embedding_type: str) -> Any:
@@ -160,6 +182,81 @@ class RetrieverFactory:
             logger.info(f"Built GraphRetriever for node label '{node_label}'")
         return self._graph_retrievers[node_label]
 
+    def get_cross_retriever(self) -> CrossEntityRetriever:
+        """Return a cached ``CrossEntityRetriever``.
+
+        Returns:
+            CrossEntityRetriever: Configured for SMILES resolution and cross-entity traversal.
+        """
+        if self._cross_retriever is None:
+            self._cross_retriever = CrossEntityRetriever(self._graph_limit)
+            logger.info("Built CrossEntityRetriever")
+        return self._cross_retriever
+
+    def retrieve_multi(
+        self,
+        chemical_smiles: str = "",
+        sector_query: str = "",
+    ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        """Run parallel chemical and sector retrieval, intersecting via graph traversal.
+
+        Chemical retrieval uses the MolDeBERTa index (SMILES embedding). Sector
+        retrieval uses the NAICS title index (text embedding). When both return
+        results, a cross-entity Cypher query finds reports at their intersection.
+        Falls back to individual traversals if the intersection is empty.
+
+        Args:
+            chemical_smiles (str): SMILES string for chemical similarity search.
+            sector_query (str): Sector description text for NAICS embedding search.
+
+        Returns:
+            Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]: ``(retrieved_nodes, subgraphs)``.
+        """
+        retrieved_nodes: List[Dict[str, Any]] = []
+        cas_numbers: List[str] = []
+        naics_codes: List[str] = []
+
+        if chemical_smiles:
+            vector_store = self.get_vector_store("MolDeBERTa")
+            hits = vector_store.similarity_search_with_score(chemical_smiles, k=self._top_k)
+            for doc, score in hits:
+                hit = _vector_hit(doc, score)
+                node = hit["node"]
+                retrieved_nodes.append(hit)
+                if "cas_number" in node:
+                    cas_numbers.append(node["cas_number"])
+
+        if sector_query:
+            vector_store = self.get_vector_store("NAICSEmbeddings")
+            hits = vector_store.similarity_search_with_score(sector_query, k=self._top_k)
+            for doc, score in hits:
+                hit = _vector_hit(doc, score)
+                node = hit["node"]
+                retrieved_nodes.append(hit)
+                if "naics_code" in node:
+                    naics_codes.append(node["naics_code"])
+
+        cross = self.get_cross_retriever()
+        if cas_numbers and naics_codes:
+            subgraphs = cross.traverse_cross(cas_numbers, naics_codes)
+            if not subgraphs:
+                logger.warning("Cross-entity traversal empty; falling back to individual traversals")
+                chem_nodes = _seed_nodes([r for r in retrieved_nodes if "cas_number" in r["node"]])
+                sector_nodes = _seed_nodes([r for r in retrieved_nodes if "naics_code" in r["node"]])
+                subgraphs = self.get_graph_retriever("MolDeBERTa").traverse_all(chem_nodes) + self.get_graph_retriever(
+                    "NAICSEmbeddings"
+                ).traverse_all(sector_nodes)
+        elif cas_numbers:
+            chem_nodes = _seed_nodes([r for r in retrieved_nodes if "cas_number" in r["node"]])
+            subgraphs = self.get_graph_retriever("MolDeBERTa").traverse_all(chem_nodes)
+        elif naics_codes:
+            sector_nodes = _seed_nodes([r for r in retrieved_nodes if "naics_code" in r["node"]])
+            subgraphs = self.get_graph_retriever("NAICSEmbeddings").traverse_all(sector_nodes)
+        else:
+            subgraphs = []
+
+        return retrieved_nodes, subgraphs
+
     def retrieve(
         self,
         embedding_type: str,
@@ -179,14 +276,7 @@ class RetrieverFactory:
         """
         vector_store = self.get_vector_store(embedding_type)
         hits = vector_store.similarity_search_with_score(retrieval_query, k=self._top_k)
-        retrieved_nodes = [
-            {
-                "node": {k: v for k, v in doc.metadata.items() if k not in _EMBEDDING_PROPS},
-                "content": doc.page_content,
-                "score": float(score),
-            }
-            for doc, score in hits
-        ]
+        retrieved_nodes = [_vector_hit(doc, score) for doc, score in hits]
         graph_ret = self.get_graph_retriever(embedding_type)
-        subgraphs = graph_ret.traverse_all([r["node"] for r in retrieved_nodes])
+        subgraphs = graph_ret.traverse_all(_seed_nodes(retrieved_nodes))
         return retrieved_nodes, subgraphs

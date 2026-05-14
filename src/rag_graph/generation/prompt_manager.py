@@ -31,7 +31,10 @@ class PromptManager:
         return cls._instance
 
     def __init__(self) -> None:
+        if hasattr(self, "_initialized"):
+            return
         self._cache: Dict[str, Dict[str, Any]] = {}
+        self._initialized = True
 
     def _load(self, prompt_file: str) -> Dict[str, Any]:
         if prompt_file not in self._cache:

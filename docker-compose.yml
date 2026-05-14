@@ -45,8 +45,10 @@ services:
       - /app/docker-compose*
       - ~/.cache/huggingface:/root/.cache/huggingface
       - venv_dev:/app/.venv
+    ports:
+      - "8000:8000"
     working_dir: /app
-    command: tail -f /dev/null
+    command: bash /app/entrypoint.sh
 
   app-prod:
     build:

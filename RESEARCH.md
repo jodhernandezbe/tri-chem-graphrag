@@ -141,6 +141,25 @@ knowledge graph adds beyond plain vector search.
 
 ---
 
+## Evaluation Module Design (`src/rag_graph/evaluation/`)
+
+Four files need to be created:
+
+| File | Responsibility |
+|------|---------------|
+| `anchor_builder.py` | Pairwise Tanimoto matrix → graded relevance (0/1/2) for all 529 chemicals; behavioural anchors from KG (co-reporting, shared source reduction codes) |
+| `embedding_metrics.py` | Intrinsic: Silhouette, Davies-Bouldin, Spearman ρ (embedding distance vs Tanimoto), UMAP/t-SNE projections |
+| `retrieval_metrics.py` | Extrinsic: nDCG@k, Recall@k, MRR against Tanimoto anchor; Wilcoxon signed-rank significance test between embedding types |
+| `ragas_evaluator.py` | End-to-end: loads frozen QA benchmark, runs full `RAGPipeline` per embedding type, reports RAGAS faithfulness / answer relevancy / context precision / context recall |
+
+**Important — do not delete `RetrieverFactory.retrieve()`.**
+The production pipeline uses `retrieve_multi()`, which hardcodes MolDeBERTa for chemicals
+and NAICSEmbeddings for sectors. The ablation study (Morgan-only, MolDeBERTa-only, Hybrid,
+NAICS-only, no-graph-traversal) requires calling `RetrieverFactory.retrieve(embedding_type, query)`
+directly with each type. That method is the evaluation entry point and must be kept.
+
+---
+
 ## Notes
 
 - Anchor thresholds (Tanimoto 0.4 / 0.8) and k values (5, 10, 20) are fixed here and

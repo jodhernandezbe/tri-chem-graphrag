@@ -1,0 +1,13 @@
+---
+version: "1.0.0"
+plan_prompt: |
+  Extract retrieval parameters from the question below.
+  Return ONLY a valid JSON object with these optional fields:
+  - "chemical_query": chemical identifier if a specific chemical is mentioned — use the SMILES string if present, otherwise the CAS number or chemical name
+  - "sector_query": industry or sector description if a sector or industry is mentioned
+
+  Omit any field that is not clearly referenced in the question. Do not add explanation or extra text.
+
+  Question: {query}
+
+  JSON:
