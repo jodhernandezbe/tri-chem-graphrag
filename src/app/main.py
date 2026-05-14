@@ -67,7 +67,7 @@ async def query(request: QueryRequest) -> QueryResponse:
             query=request.query,
             chemical_smiles=request.chemical_smiles,
         )
-        return QueryResponse(answer=result["answer"], table=result["table"])
+        return QueryResponse(answer=result["answer"], records=result["records"])
     except Exception as exc:
         logger.error(f"Pipeline error: {exc}")
         raise HTTPException(status_code=500, detail=str(exc)) from exc

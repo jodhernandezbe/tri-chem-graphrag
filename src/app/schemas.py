@@ -7,6 +7,8 @@ Author: Jose D. Hernandez-Betancur
 Date: 2026-05-13
 """
 
+from typing import Any, Dict, List
+
 from pydantic import BaseModel, Field
 
 
@@ -27,4 +29,7 @@ class QueryResponse(BaseModel):
     """Structured response from the RAG pipeline."""
 
     answer: str = Field(..., description="LLM-generated narrative answer.")
-    table: str = Field(default="", description="Markdown table of top-10 promising source reduction records.")
+    records: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Top-10 promising source reduction records sorted by similarity score.",
+    )

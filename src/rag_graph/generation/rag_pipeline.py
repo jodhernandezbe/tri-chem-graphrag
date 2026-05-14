@@ -53,7 +53,7 @@ class RAGState(TypedDict):
     subgraphs: List[Dict[str, Any]]
     context: str
     answer: str
-    table: str
+    records: List[Dict[str, Any]]
 
 
 class RAGPipeline:
@@ -95,26 +95,36 @@ class RAGPipeline:
             "subgraphs": [],
             "context": "",
             "answer": "",
-            "table": "",
+            "records": [],
         }
         result = self._graph.invoke(initial_state)
         answer = str(result["answer"])
-        table = str(result.get("table", ""))
-        return f"{answer}\n\n{table}".strip() if table else answer
+        records: List[Dict[str, Any]] = result.get("records", [])
+        if not records:
+            return answer
+        header = "| Chemical | CAS | Similarity | Sector | Reduction Activity | Year | State |"
+        separator = "|---|---|---|---|---|---|---|"
+        lines = ["\n**Top-10 Promising Source Reduction Records:**\n", header, separator]
+        for r in records:
+            lines.append(
+                f"| {r['Chemical']} | {r['CAS']} | {r['Similarity']} "
+                f"| {r['Sector']} | {r['Reduction Activity']} | {r['Year']} | {r['State']} |"
+            )
+        return f"{answer}\n\n" + "\n".join(lines)
 
     def run_structured(
         self,
         query: str,
         chemical_smiles: str = "",
-    ) -> Dict[str, str]:
-        """Execute the pipeline and return answer and table separately.
+    ) -> Dict[str, Any]:
+        """Execute the pipeline and return answer and records separately.
 
         Args:
             query (str): Natural language question for the LLM.
             chemical_smiles (str): Optional SMILES string override.
 
         Returns:
-            Dict[str, str]: Keys ``answer`` and ``table``.
+            Dict[str, Any]: Keys ``answer`` (str) and ``records`` (list of dicts).
         """
         initial_state: RAGState = {
             "query": query,
@@ -125,12 +135,12 @@ class RAGPipeline:
             "subgraphs": [],
             "context": "",
             "answer": "",
-            "table": "",
+            "records": [],
         }
         result = self._graph.invoke(initial_state)
         return {
             "answer": str(result["answer"]),
-            "table": str(result.get("table", "")),
+            "records": result.get("records", []),
         }
 
     def _plan(self, state: RAGState) -> Dict[str, Any]:
@@ -215,28 +225,18 @@ class RAGPipeline:
                     )
 
         if not rows:
-            return {"table": ""}
+            return {"records": []}
 
         rows.sort(key=lambda r: r["Similarity"], reverse=True)
-        # deduplicate
         seen: set = set()
-        unique_rows = []
+        unique_rows: List[Dict[str, Any]] = []
         for r in rows:
             key = (r["Chemical"], r["Reduction Activity"], r["Year"], r["State"])
             if key not in seen:
                 seen.add(key)
                 unique_rows.append(r)
 
-        header = "| Chemical | CAS | Similarity | Sector | Reduction Activity | Year | State |"
-        separator = "|---|---|---|---|---|---|---|"
-        lines = [header, separator]
-        for r in unique_rows:
-            lines.append(
-                f"| {r['Chemical']} | {r['CAS']} | {r['Similarity']} "
-                f"| {r['Sector']} | {r['Reduction Activity']} | {r['Year']} | {r['State']} |"
-            )
-        table = "\n**Top-10 Promising Source Reduction Records:**\n\n" + "\n".join(lines[:12])
-        return {"table": table}
+        return {"records": unique_rows[:10]}
 
     def _build_context(self, state: RAGState) -> Dict[str, Any]:
         context = ContextBuilder().build(state["subgraphs"])
