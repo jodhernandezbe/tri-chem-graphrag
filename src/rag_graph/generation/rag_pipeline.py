@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_ollama import ChatOllama
 from langgraph.graph import END, START, StateGraph
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 from typing_extensions import TypedDict
 
 from src.config_manager import ConfigManager
