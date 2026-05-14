@@ -8,6 +8,7 @@ A Python application for TRI chemical knowledge graph retrieval-augmented genera
 - Poetry for dependency management
 - Docker and Docker Compose for containerized environments
 - Neo4j database (provided via Docker)
+- Ollama LLM models platform (provided via Docker)
 
 ## Quick Start
 
