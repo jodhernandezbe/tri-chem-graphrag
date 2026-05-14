@@ -13,7 +13,7 @@ Date: 2026-05-13
 
 import logging
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
+from typing import AsyncGenerator
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     """Load the RAG pipeline (and embedding models) once at startup."""
     logger.info("Loading RAG pipeline and embedding models...")
     RAGPipeline()
@@ -60,7 +60,7 @@ async def query(request: QueryRequest) -> QueryResponse:
         request (QueryRequest): Query payload with NL question and optional SMILES.
 
     Returns:
-        QueryResponse: Narrative answer and markdown table of top source reduction records.
+        QueryResponse: Narrative answer and top-10 source reduction records as a list of dicts.
     """
     try:
         result = RAGPipeline().run_structured(
