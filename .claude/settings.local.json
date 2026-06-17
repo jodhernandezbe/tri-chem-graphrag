@@ -18,7 +18,9 @@
       "Bash(.venv/bin/python -c \"from ragas import RunConfig; print\\('RunConfig import OK'\\)\")",
       "Bash(nohup .venv/bin/python -m src.validation.main --steps ragas --max-ragas-pairs 4)",
       "Bash(.venv/bin/flake8 --extend-ignore=E704,E741 src/validation/ragas_evaluator.py src/validation/main.py src/knowledge_graph/load/vector_index_manager.py src/rag_graph/retrieval/retriever_factory.py)",
-      "Bash(.venv/bin/pyright src/validation/ragas_evaluator.py src/validation/main.py src/validation/retrieval_metrics.py src/knowledge_graph/load/vector_index_manager.py src/rag_graph/retrieval/retriever_factory.py)"
+      "Bash(.venv/bin/pyright src/validation/ragas_evaluator.py src/validation/main.py src/validation/retrieval_metrics.py src/knowledge_graph/load/vector_index_manager.py src/rag_graph/retrieval/retriever_factory.py)",
+      "Bash(.venv/bin/pyright)",
+      "Bash(.venv/bin/pre-commit run *)"
     ]
   }
 }
