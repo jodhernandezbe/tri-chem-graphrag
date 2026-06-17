@@ -250,10 +250,23 @@ RAG_GRAPH:
     TOP_K: 5
     MAX_CONTEXT_CHARS: 8000
     GRAPH_CONTEXT_LIMIT: 50
+    # Chemical embedding index used for SMILES similarity at inference. Must match an
+    # EMBEDDING_TYPE below. Defaults to the best evaluated performer (see docs/RESULTS.md);
+    # MolDeBERTa was the prior hardcoded value and the weakest performer.
+    CHEMICAL_EMBEDDING_TYPE: Hybrid
   GENERATION:
     MODEL: "llama3.1"
     BASE_URL: "http://localhost:11434"
     TEMPERATURE: 0.0
+  RAGAS:
+    # Judge model for RAGAS scoring, kept separate from the generator. A stronger
+    # instruct model than the generator gives more reliable faithfulness/precision/recall.
+    JUDGE_MODEL: "granite3.3:8b"
+    # Local Ollama serves requests with little concurrency, so RAGAS' default parallel
+    # executor times out most judge calls. Serialize (max_workers=1) and allow generous
+    # per-call time so the local judge actually completes.
+    MAX_WORKERS: 2
+    JUDGE_TIMEOUT: 600
   EMBEDDINGS:
     - EMBEDDING_TYPE: MorganFingerprint
       PROPERTIES:
@@ -263,7 +276,46 @@ RAG_GRAPH:
       PROPERTIES:
         - MODEL_NAME: "SaeedLab/MolDeBERTa-base-123M-mtr"
           MAX_LENGTH: 128
+    - EMBEDDING_TYPE: Hybrid
+      PROPERTIES:
+        - MODEL_NAME: "SaeedLab/MolDeBERTa-base-123M-mtr"
+          MAX_LENGTH: 128
     - EMBEDDING_TYPE: NAICSEmbeddings
       PROPERTIES:
         - MODEL_NAME: "sentence-transformers/all-MiniLM-L6-v2"
           MAX_LENGTH: 512
+TRI_SOURCE_REDUCTION_GROUPS:
+  - NAME: "Material Substitutions and Modifications "
+    CODES:
+      - S01
+      - S02
+      - S03
+      - S04
+      - S05
+      - S06
+  - NAME: "Product Modifications"
+    CODES:
+      - S11
+      - S12
+      - S13
+      - S14
+  - NAME: "Process and Equipment Modifications"
+    CODES:
+      - S21
+      - S22
+      - S23
+      - S24
+      - S25
+  - NAME: "Inventory and Material Management"
+    CODES:
+      - S31
+      - S32
+      - S33
+      - S34
+      - S35
+  - NAME: "Operating Practices and Training"
+    CODES:
+      - S41
+      - S42
+      - S43
+      - S44

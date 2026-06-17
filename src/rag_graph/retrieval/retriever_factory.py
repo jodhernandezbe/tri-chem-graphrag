@@ -106,11 +106,13 @@ class RetrieverFactory:
         self._password: str = os.getenv("NEO4J_PASSWORD", neo4j_cfg["NEO4J_PASSWORD"])
         self._top_k: int = rag_cfg["RETRIEVAL"]["TOP_K"]
         self._graph_limit: int = rag_cfg["RETRIEVAL"]["GRAPH_CONTEXT_LIMIT"]
+        self._chem_embedding_type: str = rag_cfg["RETRIEVAL"].get("CHEMICAL_EMBEDDING_TYPE", "MolDeBERTa")
         self._emb_cfg = emb_cfg
         self._vector_stores: Dict[str, Neo4jVector] = {}
         self._graph_retrievers: Dict[str, GraphRetriever] = {}
         self._cross_retriever: CrossEntityRetriever | None = None
         self._initialized = True
+        logger.info(f"RetrieverFactory using chemical embedding '{self._chem_embedding_type}' for retrieval")
 
     def _build_embedder(self, embedding_type: str) -> Any:
         for spec in self._emb_cfg:
@@ -200,10 +202,11 @@ class RetrieverFactory:
     ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """Run parallel chemical and sector retrieval, intersecting via graph traversal.
 
-        Chemical retrieval uses the MolDeBERTa index (SMILES embedding). Sector
-        retrieval uses the NAICS title index (text embedding). When both return
-        results, a cross-entity Cypher query finds reports at their intersection.
-        Falls back to individual traversals if the intersection is empty.
+        Chemical retrieval uses the configured chemical index (SMILES embedding;
+        ``RAG_GRAPH.RETRIEVAL.CHEMICAL_EMBEDDING_TYPE``). Sector retrieval uses the
+        NAICS title index (text embedding). When both return results, a cross-entity
+        Cypher query finds reports at their intersection. Falls back to individual
+        traversals if the intersection is empty.
 
         Args:
             chemical_smiles (str): SMILES string for chemical similarity search.
@@ -217,7 +220,7 @@ class RetrieverFactory:
         naics_codes: List[str] = []
 
         if chemical_smiles:
-            vector_store = self.get_vector_store("MolDeBERTa")
+            vector_store = self.get_vector_store(self._chem_embedding_type)
             hits = vector_store.similarity_search_with_score(chemical_smiles, k=self._top_k)
             for doc, score in hits:
                 hit = _vector_hit(doc, score)
@@ -243,12 +246,12 @@ class RetrieverFactory:
                 logger.warning("Cross-entity traversal empty; falling back to individual traversals")
                 chem_nodes = _seed_nodes([r for r in retrieved_nodes if "cas_number" in r["node"]])
                 sector_nodes = _seed_nodes([r for r in retrieved_nodes if "naics_code" in r["node"]])
-                subgraphs = self.get_graph_retriever("MolDeBERTa").traverse_all(chem_nodes) + self.get_graph_retriever(
-                    "NAICSEmbeddings"
-                ).traverse_all(sector_nodes)
+                subgraphs = self.get_graph_retriever(self._chem_embedding_type).traverse_all(
+                    chem_nodes
+                ) + self.get_graph_retriever("NAICSEmbeddings").traverse_all(sector_nodes)
         elif cas_numbers:
             chem_nodes = _seed_nodes([r for r in retrieved_nodes if "cas_number" in r["node"]])
-            subgraphs = self.get_graph_retriever("MolDeBERTa").traverse_all(chem_nodes)
+            subgraphs = self.get_graph_retriever(self._chem_embedding_type).traverse_all(chem_nodes)
         elif naics_codes:
             sector_nodes = _seed_nodes([r for r in retrieved_nodes if "naics_code" in r["node"]])
             subgraphs = self.get_graph_retriever("NAICSEmbeddings").traverse_all(sector_nodes)

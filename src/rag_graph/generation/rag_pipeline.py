@@ -33,6 +33,75 @@ from .prompt_manager import PromptManager
 logger = logging.getLogger(__name__)
 
 
+def tabulate_records(
+    retrieved_nodes: List[Dict[str, Any]],
+    subgraphs: List[Dict[str, Any]],
+    limit: int = 10,
+) -> List[Dict[str, Any]]:
+    """Rank and de-duplicate source-reduction records from retrieved subgraphs.
+
+    Shared by the production pipeline (``RAGPipeline._tabulate``) and the offline
+    recommendation evaluator so both score the identical ranking. Records carry the
+    raw ``ReductionCode`` (for evaluation) alongside the display fields.
+
+    Args:
+        retrieved_nodes (List[Dict[str, Any]]): Vector search hits with similarity scores.
+        subgraphs (List[Dict[str, Any]]): Traversed subgraph dicts from retrieval.
+        limit (int): Maximum number of unique records to return, ranked by similarity.
+
+    Returns:
+        List[Dict[str, Any]]: Unique source-reduction records sorted by similarity.
+    """
+    scores: Dict[str, float] = {}
+    for hit in retrieved_nodes:
+        node = hit.get("node", {})
+        cas = node.get("cas_number")
+        if cas:
+            scores[cas] = max(scores.get(cas, 0.0), hit.get("score", 0.0))
+
+    rows: List[Dict[str, Any]] = []
+    for sg in subgraphs:
+        if sg.get("node_type", "") not in ("Chemical", "Chemical_Sector"):
+            continue
+        cas = sg.get("cas_number", "")
+        name = sg.get("name", "N/A")
+        similarity = scores.get(cas, 0.0)
+        sector = (
+            f"{sg.get('sector_code', sg.get('naics_code', 'N/A'))} — " f"{sg.get('sector_title', sg.get('naics_title', 'N/A'))}"
+        )
+        for rep in sg.get("reports", []):
+            code = rep.get("reduction_code")
+            reduction = rep.get("reduction_name") or code
+            if not reduction:
+                continue
+            rows.append(
+                {
+                    "Chemical": name,
+                    "CAS": cas or "N/A",
+                    "Similarity": round(similarity, 4),
+                    "Sector": sector,
+                    "Reduction Activity": reduction,
+                    "ReductionCode": code,
+                    "Year": rep.get("year", "N/A"),
+                    "State": rep.get("state", "N/A"),
+                }
+            )
+
+    if not rows:
+        return []
+
+    rows.sort(key=lambda r: r["Similarity"], reverse=True)
+    seen: set = set()
+    unique_rows: List[Dict[str, Any]] = []
+    for r in rows:
+        key = (r["Chemical"], r["Reduction Activity"], r["Year"], r["State"])
+        if key not in seen:
+            seen.add(key)
+            unique_rows.append(r)
+
+    return unique_rows[:limit]
+
+
 class QueryPlan(BaseModel):
     """Validated output of the LLM query planner."""
 
@@ -189,54 +258,8 @@ class RAGPipeline:
         }
 
     def _tabulate(self, state: RAGState) -> Dict[str, Any]:
-        # Build similarity score lookup: cas_number → score
-        scores: Dict[str, float] = {}
-        for hit in state.get("retrieved_nodes", []):
-            node = hit.get("node", {})
-            cas = node.get("cas_number")
-            if cas:
-                scores[cas] = max(scores.get(cas, 0.0), hit.get("score", 0.0))
-
-        rows: List[Dict[str, Any]] = []
-        for sg in state.get("subgraphs", []):
-            node_type = sg.get("node_type", "")
-            cas = sg.get("cas_number", "")
-            name = sg.get("name", "N/A")
-            similarity = scores.get(cas, 0.0)
-            sector = (
-                f"{sg.get('sector_code', sg.get('naics_code', 'N/A'))} — {sg.get('sector_title', sg.get('naics_title', 'N/A'))}"
-            )
-
-            if node_type in ("Chemical", "Chemical_Sector"):
-                for rep in sg.get("reports", []):
-                    reduction = rep.get("reduction_name") or rep.get("reduction_code")
-                    if not reduction:
-                        continue
-                    rows.append(
-                        {
-                            "Chemical": name,
-                            "CAS": cas or "N/A",
-                            "Similarity": round(similarity, 4),
-                            "Sector": sector,
-                            "Reduction Activity": reduction,
-                            "Year": rep.get("year", "N/A"),
-                            "State": rep.get("state", "N/A"),
-                        }
-                    )
-
-        if not rows:
-            return {"records": []}
-
-        rows.sort(key=lambda r: r["Similarity"], reverse=True)
-        seen: set = set()
-        unique_rows: List[Dict[str, Any]] = []
-        for r in rows:
-            key = (r["Chemical"], r["Reduction Activity"], r["Year"], r["State"])
-            if key not in seen:
-                seen.add(key)
-                unique_rows.append(r)
-
-        return {"records": unique_rows[:10]}
+        records = tabulate_records(state.get("retrieved_nodes", []), state.get("subgraphs", []))
+        return {"records": records}
 
     def _build_context(self, state: RAGState) -> Dict[str, Any]:
         context = ContextBuilder().build(state["subgraphs"])

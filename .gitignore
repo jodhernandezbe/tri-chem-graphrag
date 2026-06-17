@@ -169,6 +169,9 @@ data/raw/tri_*.csv
 # Intermediary data
 data/processed/tri_*_transformed.csv
 
+# Generated QA benchmark (ground truth is TRI-derived — do not commit)
+data/qa_benchmark.json
+
 # Claude Code runtime files
 .claude/scheduled_tasks.lock
 
