@@ -14,9 +14,11 @@ repos:
       - id: pyright
         name: pyright
         entry: pyright
-        always_run: true
         pass_filenames: true
-        files: '^.+\.pyi?$'
+        # Scope to src/ (matches [tool.pyright] include) and run only on staged src
+        # files. Without this, always_run + a bare pyright invocation scans the whole
+        # repo and flags pre-existing torch-stub false positives in the excluded tests.
+        files: '^src/.+\.pyi?$'
         language: system
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0

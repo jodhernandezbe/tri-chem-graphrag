@@ -2,7 +2,23 @@
   "permissions": {
     "allow": [
       "Bash(poetry run *)",
-      "Bash(docker exec python-app-dev *)"
+      "Bash(docker exec python-app-dev *)",
+      "Bash(rm -f images/*.png images/*.svg)",
+      "Bash(OLLAMA_BASE_URL=http://localhost:11435 .venv/bin/python -m src.validation.main --steps anchors embedding retrieval --no-tsne)",
+      "Bash(python -c \"import sys; print\\(sys.prefix\\)\")",
+      "Bash(.venv/bin/python -c \"from src.rag_graph.retrieval import RetrieverFactory; from src.validation.retrieval_metrics import CHEMICAL_EMBEDDING_TYPES; print\\('import OK; types =', CHEMICAL_EMBEDDING_TYPES\\)\")",
+      "Bash(.venv/bin/python -m pytest -q)",
+      "Bash(.venv/bin/python -m py_compile src/validation/ragas_evaluator.py src/validation/main.py)",
+      "Bash(.venv/bin/black --line-length 128 --target-version py312 -q src/validation/ragas_evaluator.py src/validation/main.py)",
+      "Bash(.venv/bin/python -c \"from src.validation.ragas_evaluator import _judge_model; print\\('judge model =', _judge_model\\(\\)\\)\")",
+      "Bash(curl -s --max-time 5 http://localhost:11434/api/tags)",
+      "Bash(python -c \"import sys,json; print\\('granite3.3:8b' in [m['name'] for m in json.load\\(sys.stdin\\)['models']]\\)\")",
+      "Bash(.venv/bin/python -m py_compile src/validation/ragas_evaluator.py)",
+      "Bash(.venv/bin/black --line-length 128 --target-version py312 -q src/validation/ragas_evaluator.py)",
+      "Bash(.venv/bin/python -c \"from ragas import RunConfig; print\\('RunConfig import OK'\\)\")",
+      "Bash(nohup .venv/bin/python -m src.validation.main --steps ragas --max-ragas-pairs 4)",
+      "Bash(.venv/bin/flake8 --extend-ignore=E704,E741 src/validation/ragas_evaluator.py src/validation/main.py src/knowledge_graph/load/vector_index_manager.py src/rag_graph/retrieval/retriever_factory.py)",
+      "Bash(.venv/bin/pyright src/validation/ragas_evaluator.py src/validation/main.py src/validation/retrieval_metrics.py src/knowledge_graph/load/vector_index_manager.py src/rag_graph/retrieval/retriever_factory.py)"
     ]
   }
 }
