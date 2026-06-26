@@ -62,6 +62,15 @@ CALL {{
 }} IN TRANSACTIONS OF {BATCH_SIZE} ROWS
 """
 
+_CANDIDATE_QUERY = f"""
+UNWIND $rows AS row
+CALL {{
+    WITH row
+    MERGE (c:Candidate {{cas_number: row.cas_number}})
+    SET c += {{name: row.chemical_name, chemical_type: row.chemical_type, source: row.source}}
+}} IN TRANSACTIONS OF {BATCH_SIZE} ROWS
+"""
+
 _REDUCTION_QUERY = f"""
 UNWIND $rows AS row
 CALL {{
@@ -145,6 +154,25 @@ class NodeLoader(BaseLoader):
         records = [r for r in records if r.get("chemical_activity")]
         count = self._bulk_write(_ACTIVITY_QUERY, records)
         logger.info(f"Bulk-upserted {count} Activity nodes")
+        return count
+
+    def load_candidates(self, df: pd.DataFrame) -> int:
+        """Bulk-upsert Candidate nodes (category members not directly reported in TRI).
+
+        Args:
+            df (pd.DataFrame): DataFrame with columns cas_number, chemical_name,
+                chemical_type, source.
+
+        Returns:
+            int: Number of records submitted.
+        """
+        records = self._to_records(
+            df,
+            ["cas_number", "chemical_name", "chemical_type", "source"],
+            key_cols=["cas_number"],
+        )
+        count = self._bulk_write(_CANDIDATE_QUERY, records)
+        logger.info(f"Bulk-upserted {count} Candidate nodes")
         return count
 
     def load_reductions(self, df: pd.DataFrame) -> int:

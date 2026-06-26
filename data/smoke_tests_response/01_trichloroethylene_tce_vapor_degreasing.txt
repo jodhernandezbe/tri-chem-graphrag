@@ -1,0 +1,27 @@
+CASE: Trichloroethylene (TCE) — vapor degreasing
+================================================================================
+SMILES           : ClC=C(Cl)Cl
+Industry sector  : —
+Condition of use : Vapor degreasing of fabricated metal parts
+EPA scenario     : Vapor degreasing, a primary industrial use; EPA found TCE presents unreasonable risk under its conditions of use.
+EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-trichloroethylene-tce-0
+Query            : What source reduction activities have historically been effective for this chemical?
+needs_clarification: False
+records returned : 1
+--------------------------------------------------------------------------------
+ANSWER:
+According to the TRI knowledge graph context, one source-reduction activity that has been reported as effective is:
+
+* REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT |
+  - Reported for: Tetrachloroethylene (CAS 127-18-4) with a Similarity of 0.9929 to the query chemical ClC=C(Cl)Cl
+  - Sector: N/A — N/A
+  - Year: 2019
+  - State: CA
+
+This activity was reported for Tetrachloroethylene, which is structurally very similar (Similarity = 0.9929) to the query chemical.
+--------------------------------------------------------------------------------
+DISTINCT SOURCE CHEMICALS (1) — cross-chemical recommendations by SMILES similarity:
+  sim=0.9929  Tetrachloroethylene (CAS 127-18-4)
+
+RECORDS (ranked / interleaved):
+  [0.9929] Tetrachloroethylene (CAS 127-18-4) | REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT | N/A — N/A | 2019 | CA

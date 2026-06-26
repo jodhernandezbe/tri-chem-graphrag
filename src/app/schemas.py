@@ -20,8 +20,16 @@ class QueryRequest(BaseModel):
         default="",
         description=(
             "Optional SMILES string for chemical similarity retrieval. "
-            "If omitted, the query planner extracts the chemical identifier from query."
+            "If omitted, the extractor/planner derives the chemical identifier from query."
         ),
+    )
+    industry_sector: str = Field(
+        default="",
+        description="Optional industry/sector name for NAICS-title semantic retrieval.",
+    )
+    condition_of_use: str = Field(
+        default="",
+        description="Optional condition-of-use text for Activity semantic retrieval.",
     )
 
 
@@ -32,4 +40,12 @@ class QueryResponse(BaseModel):
     records: List[Dict[str, Any]] = Field(
         default_factory=list,
         description="Top-10 promising source reduction records sorted by similarity score.",
+    )
+    needs_clarification: bool = Field(
+        default=False,
+        description="True when extraction/validation failed and the answer is a clarification request.",
+    )
+    clarification: str = Field(
+        default="",
+        description="Clarification message when needs_clarification is True; empty otherwise.",
     )

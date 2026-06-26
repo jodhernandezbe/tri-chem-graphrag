@@ -108,6 +108,16 @@ class KnowledgeGraphPipeline:
                 logger.info(f"Successfully loaded data for year {year}")
             except Exception as e:
                 logger.error(f"Error loading year {year}: {e}")
+        # Ancillary category → Candidate expansion runs once, after every category
+        # Chemical exists. Structural only; SMILES resolution + embeddings are separate
+        # post-load scripts (resolve_candidate_smiles.py, embed_candidates.py).
+        if not self._tracker.is_step_done("ancillary", "candidates"):
+            try:
+                self._graph_loader.load_candidates()
+                self._tracker.mark_step_done("ancillary", "candidates")
+                logger.info("Loaded category → Candidate expansion")
+            except Exception as e:
+                logger.error(f"Error loading candidates: {e}")
         logger.info(f"Completed data loading for {len(self.years)} years")
 
     def run(self) -> None:

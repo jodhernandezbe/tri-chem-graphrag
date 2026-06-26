@@ -1,0 +1,12 @@
+---
+version: "1.0.0"
+extract_prompt: |
+  Extract structured fields from the user input below. Return only the fields that
+  are explicitly present; leave any field empty if it is not clearly stated.
+  - smiles: the chemical SMILES string, copied verbatim
+  - industry_sector: free-text industry or sector name, if mentioned
+  - condition_of_use: described condition of use / activity context, if mentioned
+
+  Do not invent values. Do not add explanation.
+
+  User input: {input}

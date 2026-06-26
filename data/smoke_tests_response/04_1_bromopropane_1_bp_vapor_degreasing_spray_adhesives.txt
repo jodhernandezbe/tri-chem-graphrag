@@ -1,0 +1,35 @@
+CASE: 1-Bromopropane (1-BP) — vapor degreasing / spray adhesives
+================================================================================
+SMILES           : CCCBr
+Industry sector  : —
+Condition of use : Vapor degreasing and spray adhesive application
+EPA scenario     : Vapor degreasing and spray-adhesive use, industrial conditions of use; 1-BP presents unreasonable risk under its conditions of use.
+EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-1-bromopropane-1-bp
+Query            : What source reduction activities have historically been effective for this chemical?
+needs_clarification: False
+records returned : 10
+--------------------------------------------------------------------------------
+ANSWER:
+Based on the TRI knowledge graph context, the query chemical is 1-Bromopropane (CAS 106-94-5) with a similarity score of 1.0. The following source reduction activities have been reported as effective for this chemical:
+
+* SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL (Sector N/A — N/A | Year 2021 | State WA)
+* DEVELOPED A NEW CHEMICAL PRODUCT TO REPLACE PREVIOUS CHEMICAL PRODUCT (Sector N/A — N/A | Year 2020 | State WA)
+
+These activities were reported for the query chemical itself, indicating their effectiveness.
+--------------------------------------------------------------------------------
+DISTINCT SOURCE CHEMICALS (3) — cross-chemical recommendations by SMILES similarity:
+  sim=1.0000  1-Bromopropane (CAS 106-94-5)
+  sim=0.9830  n-Hexane (CAS 110-54-3)
+  sim=0.9725  Certain glycol ethers (CAS N230)  ← category reached via member Ethane, 1,2-dimethoxy- (CAS 110-71-4)
+
+RECORDS (ranked / interleaved):
+  [1.0] 1-Bromopropane (CAS 106-94-5) | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | N/A — N/A | 2021 | WA
+  [0.983] n-Hexane (CAS 110-54-3) | INSTITUTED RECIRCULATION WITHIN A PROCESS | N/A — N/A | 2024 | GA
+  [0.9725] Certain glycol ethers (CAS N230) [via Ethane, 1,2-dimethoxy- (CAS 110-71-4)] | OTHER IMPROVEMENTS TO OPERATING PRACTICES AND TRAINING | N/A — N/A | 2024 | TN
+  [1.0] 1-Bromopropane (CAS 106-94-5) | OTHER CHANGES IN OPERATING PRACTICES | N/A — N/A | 2020 | MD
+  [0.983] n-Hexane (CAS 110-54-3) | SUBSTITUTED AN ORGANIC SOLVENT | N/A — N/A | 2024 | IL
+  [0.9725] Certain glycol ethers (CAS N230) [via Ethane, 1,2-dimethoxy- (CAS 110-71-4)] | SUBSTITUTED AN ORGANIC SOLVENT | N/A — N/A | 2024 | NC
+  [1.0] 1-Bromopropane (CAS 106-94-5) | DEVELOPED A NEW CHEMICAL PRODUCT TO REPLACE PREVIOUS CHEMICAL PRODUCT | N/A — N/A | 2020 | WA
+  [0.983] n-Hexane (CAS 110-54-3) | SUBSTITUTED AN ORGANIC SOLVENT | N/A — N/A | 2023 | IL
+  [0.9725] Certain glycol ethers (CAS N230) [via Ethane, 1,2-dimethoxy- (CAS 110-71-4)] | MODIFIED OR UPDATED EQUIPMENT OR LAYOUT | N/A — N/A | 2023 | TX
+  [1.0] 1-Bromopropane (CAS 106-94-5) | OTHER CHANGES IN OPERATING PRACTICES | N/A — N/A | 2019 | MD

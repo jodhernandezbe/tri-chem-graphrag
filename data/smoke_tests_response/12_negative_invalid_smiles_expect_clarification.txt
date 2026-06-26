@@ -1,0 +1,18 @@
+CASE: NEGATIVE — invalid SMILES (expect clarification)
+================================================================================
+SMILES           : ClC=C(Cl
+Industry sector  : —
+Condition of use : Vapor degreasing
+EPA scenario     : Input-validation control (deliberately malformed structure).
+EPA reference    : —
+Query            : What source reduction activities have historically been effective for this chemical?
+needs_clarification: True
+records returned : 0
+--------------------------------------------------------------------------------
+ANSWER:
+The provided SMILES string 'ClC=C(Cl' is not a valid chemical structure. Please provide a valid SMILES string.
+--------------------------------------------------------------------------------
+RECORDS: (none)
+--------------------------------------------------------------------------------
+CLARIFICATION:
+The provided SMILES string 'ClC=C(Cl' is not a valid chemical structure. Please provide a valid SMILES string.

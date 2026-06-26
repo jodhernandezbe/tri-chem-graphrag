@@ -38,7 +38,7 @@ graph covering TRI reports from 2014 to 2024.
 | Knowledge graph | Neo4j 5.x, TRI 2014–2024 |
 | Orchestration | LangGraph + LangChain |
 | Generator LLM | Ollama (llama3.1) |
-| RAGAS judge LLM | Ollama (granite3.3:8b) — configurable via `RAG_GRAPH.RAGAS.JUDGE_MODEL`, kept separate from the generator |
+| RAGAS judge LLM | Ollama (qwen2.5:7b) — configurable via `RAG_GRAPH.RAGAS.JUDGE_MODEL`, kept separate from the generator; chosen for reliable JSON-schema adherence (granite3.3:8b emitted unparseable output → NaN faithfulness/recall) |
 
 ### Embedding Types
 
@@ -51,6 +51,30 @@ graph covering TRI reports from 2014 to 2024.
 The three types are the single source of truth in `CHEMICAL_EMBEDDING_TYPES`
 (`src/validation/retrieval_metrics.py`). The pipeline **skips** any embedding whose
 Neo4j index or model cannot be loaded and logs a warning, rather than aborting the run.
+
+> **Note (descriptive, not scored).** The live graph also carries text vector indices on
+> `Sector.naics_title` (`sector_naics_title_index`) and `Activity.name`
+> (`activity_name_index`), both 384-dim MiniLM. These support optional industry-sector and
+> condition-of-use semantic retrieval in the production pipeline. They are **not** part of any
+> scored metric here: the evaluation harness calls `retrieve_multi(smiles)` only, so the
+> condition-of-use / sector filters default off and the results below are unaffected.
+>
+> The condition-of-use filter traverses `Report-[:RECORDS]->Activity` per the canonical
+> ontology (`graph_model.svg`), so a matched activity is tied to the *same* Report as the
+> chemical and reduction it was filed with (report-level, not facility-level). Because the
+> harness passes no condition-of-use, this filter is a Cypher no-op
+> (`size($activity_names) = 0`) and the scored §2 / §2b / §3 results are unchanged by the
+> RECORDS edge being report-anchored.
+>
+> The graph also carries `Candidate` nodes (TRI category members that are *not* themselves
+> reported, e.g. constituents of "Nickel compounds") with the same three chemical
+> embeddings (`candidate_morgan_fp_index` / `_moldeberta_index` / `_hybrid_index`) and a
+> `Chemical (category) ─[:CONTAINS]→ Candidate` edge. In production, `retrieve_multi(...,
+> include_candidates=True)` expands a query SMILES through these to reach no-SMILES category
+> Chemicals (one row per category at its closest member's score). This is **not** scored:
+> the §2b shipped-recommender harness calls `retrieve_multi` with `include_candidates=False`
+> (the default), so every scored query matches `(:Chemical)` only and the results are
+> unaffected by the `Candidate` subgraph.
 
 ---
 
@@ -350,9 +374,23 @@ Implemented in `src/validation/retrieval_metrics.py → RetrievalMetrics.evaluat
 | Context recall ↑ | Retrieved context contains the needed information |
 
 Conditions: MorganFingerprint, MolDeBERTa, Hybrid, Flat RAG (no graph traversal).
-Benchmark: frozen `data/qa_benchmark.json` (100 questions, 25 per type, generated
-once from graph facts).  The `chemical_sector_reduction` question type directly tests
-the production task: "What source reduction activities were applied to [chemical] in
+Benchmark: `data/qa_benchmark.json` (100 questions, 25 per type, generated from graph
+facts).  Because retrieval is **SMILES-mandatory** (sector and condition-of-use are
+optional *additional* context), every question is **chemical-anchored** — it targets a
+specific chemical that has a SMILES, so it exercises the actual retrieval path.  The
+four types are:
+
+| Type | Shape | Context dimension |
+|------|-------|-------------------|
+| `chemical_sector_reduction` | reductions for a chemical in a sector/year | sector |
+| `sector_chemical_reduction` | reductions for a chemical in a sector/year (paraphrase) | sector |
+| `facility_count` | facility count for a chemical in a state/year | state |
+| `chemical_reduction` | reductions for a chemical in a year | none |
+
+Earlier reverse-lookup phrasings ("*which chemicals* had reductions in sector X / under
+code Y?") were re-anchored onto a chemical, because a SMILES-anchored retriever has no
+chemical to embed for them.  The `chemical_sector_reduction` type directly tests the
+production task: "What source reduction activities were applied to [chemical] in
 [sector] in [year]?"
 
 Implemented in `src/validation/ragas_evaluator.py → RAGASEvaluator.evaluate_all()`.

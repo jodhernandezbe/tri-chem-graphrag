@@ -1,0 +1,15 @@
+CASE: Perchloroethylene (PCE) — dry cleaning
+================================================================================
+SMILES           : ClC(Cl)=C(Cl)Cl
+Industry sector  : Dry cleaning and laundry services
+Condition of use : —
+EPA scenario     : Commercial dry cleaning, a condition of use; 60 of 61 conditions of use contribute to the unreasonable-risk determination.
+EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-perchloroethylene-pce
+Query            : What source reduction activities have historically been effective for this chemical?
+needs_clarification: False
+records returned : 0
+--------------------------------------------------------------------------------
+ANSWER:
+No source-reduction records were found for ClC(Cl)=C(Cl)Cl in the 'Dry cleaning and laundry services' sector. No facilities reported source-reduction activities for this chemical or its structurally similar analogues under the specified context in the TRI data (1987–2024).
+--------------------------------------------------------------------------------
+RECORDS: (none)

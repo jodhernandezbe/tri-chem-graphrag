@@ -242,7 +242,7 @@ KNOWLEDGE_GRAPH:
       TO_NODE_TYPE: Facility
       PROPERTIES: []
     - EDGE_TYPE: RECORDS
-      FROM_NODE_TYPE: Facility
+      FROM_NODE_TYPE: Report
       TO_NODE_TYPE: Activity
       PROPERTIES: []
 RAG_GRAPH:
@@ -259,13 +259,18 @@ RAG_GRAPH:
     BASE_URL: "http://localhost:11434"
     TEMPERATURE: 0.0
   RAGAS:
-    # Judge model for RAGAS scoring, kept separate from the generator. A stronger
-    # instruct model than the generator gives more reliable faithfulness/precision/recall.
-    JUDGE_MODEL: "granite3.3:8b"
-    # Local Ollama serves requests with little concurrency, so RAGAS' default parallel
-    # executor times out most judge calls. Serialize (max_workers=1) and allow generous
-    # per-call time so the local judge actually completes.
-    MAX_WORKERS: 2
+    # Judge for RAGAS scoring, kept separate from the generator. RAGAS' list-structured
+    # faithfulness/recall prompts need a GPT-4-class judge — local 7-14B judges emit the wrong
+    # schema (→ NaN) and the smallest local model that can (qwen2.5:32b) is too slow.
+    # Select where the judge runs; the chosen provider's key is checked loudly at startup.
+    #   openai       → ChatOpenAI (needs OPENAI_API_KEY); JUDGE_MODEL e.g. gpt-4o-mini
+    #   ollama_cloud → hosted open model (needs OLLAMA_API_KEY); JUDGE_MODEL e.g. gpt-oss:120b-cloud
+    #   ollama_local → local Ollama (JUDGE_MODEL e.g. qwen2.5:7b); precision-only — faith/recall NaN
+    JUDGE_PROVIDER: "ollama_cloud"
+    JUDGE_MODEL: "gpt-oss:120b-cloud"
+    # OpenAI handles concurrency well, so a few parallel workers speed up scoring; the
+    # generous per-call timeout is a safety margin (cloud calls return in seconds).
+    MAX_WORKERS: 4
     JUDGE_TIMEOUT: 600
   EMBEDDINGS:
     - EMBEDDING_TYPE: MorganFingerprint
@@ -281,6 +286,10 @@ RAG_GRAPH:
         - MODEL_NAME: "SaeedLab/MolDeBERTa-base-123M-mtr"
           MAX_LENGTH: 128
     - EMBEDDING_TYPE: NAICSEmbeddings
+      PROPERTIES:
+        - MODEL_NAME: "sentence-transformers/all-MiniLM-L6-v2"
+          MAX_LENGTH: 512
+    - EMBEDDING_TYPE: ActivityEmbeddings
       PROPERTIES:
         - MODEL_NAME: "sentence-transformers/all-MiniLM-L6-v2"
           MAX_LENGTH: 512

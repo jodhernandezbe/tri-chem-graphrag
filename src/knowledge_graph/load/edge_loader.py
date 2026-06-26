@@ -49,14 +49,15 @@ CALL {{
 }} IN TRANSACTIONS OF {BATCH_SIZE} ROWS
 """
 
-# Traverses FILED_BY to reach the Facility without requiring trifid in the 1b data.
+# Per the canonical ontology (graph_model.svg), RECORDS originates from the Report,
+# which co-locates the condition-of-use Activity with the report's chemical and reduction.
 _RECORDS_QUERY = f"""
 UNWIND $rows AS row
 CALL {{
     WITH row
-    MATCH (r:Report {{document_control_number: row.document_control_number}})-[:FILED_BY]->(f:Facility)
+    MATCH (r:Report {{document_control_number: row.document_control_number}})
     MATCH (a:Activity {{name: row.chemical_activity}})
-    MERGE (f)-[:RECORDS]->(a)
+    MERGE (r)-[:RECORDS]->(a)
 }} IN TRANSACTIONS OF {BATCH_SIZE} ROWS
 """
 
@@ -68,6 +69,18 @@ CALL {{
     MATCH (rd:Reduction {{code: row.source_reduction_code}})
     MERGE (r)-[rel:DOCUMENTS]->(rd)
     SET rel += {{annual_reduction: row.annual_reduction}}
+}} IN TRANSACTIONS OF {BATCH_SIZE} ROWS
+"""
+
+# Connects an existing TRI-reported category Chemical to its non-reported member
+# Candidate, per the ontology (Chemical category → CONTAINS → Candidate).
+_CONTAINS_QUERY = f"""
+UNWIND $rows AS row
+CALL {{
+    WITH row
+    MATCH (cat:Chemical {{cas_number: row.category_code}})
+    MATCH (m:Candidate {{cas_number: row.cas_number}})
+    MERGE (cat)-[:CONTAINS]->(m)
 }} IN TRANSACTIONS OF {BATCH_SIZE} ROWS
 """
 
@@ -127,10 +140,11 @@ class EdgeLoader(BaseLoader):
         return count
 
     def load_records(self, df: pd.DataFrame) -> int:
-        """Bulk-upsert RECORDS edges (Facility → Activity).
+        """Bulk-upsert RECORDS edges (Report → Activity).
 
-        Resolves the Facility via an existing FILED_BY relationship, so
-        FILED_BY edges must be loaded before calling this method.
+        Attaches the condition-of-use Activity to its originating Report, matching
+        the canonical ontology so the activity shares a Report with the chemical
+        and reduction it was filed alongside.
 
         Args:
             df (pd.DataFrame): DataFrame with columns document_control_number,
@@ -167,4 +181,18 @@ class EdgeLoader(BaseLoader):
         records = [r for r in records if r.get("source_reduction_code")]
         count = self._bulk_write(_DOCUMENTS_QUERY, records)
         logger.info(f"Bulk-upserted {count} DOCUMENTS relationships")
+        return count
+
+    def load_contains(self, df: pd.DataFrame) -> int:
+        """Bulk-upsert CONTAINS edges (Chemical category → Candidate).
+
+        Args:
+            df (pd.DataFrame): DataFrame with columns category_code, cas_number.
+
+        Returns:
+            int: Number of records submitted.
+        """
+        records = self._to_records(df, ["category_code", "cas_number"], key_cols=["category_code", "cas_number"])
+        count = self._bulk_write(_CONTAINS_QUERY, records)
+        logger.info(f"Bulk-upserted {count} CONTAINS relationships")
         return count

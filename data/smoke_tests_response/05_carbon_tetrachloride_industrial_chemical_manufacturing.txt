@@ -1,0 +1,25 @@
+CASE: Carbon tetrachloride — industrial chemical manufacturing
+================================================================================
+SMILES           : ClC(Cl)(Cl)Cl
+Industry sector  : —
+Condition of use : Industrial processing and use in chemical manufacturing
+EPA scenario     : Industrial processing/use in chemical manufacturing; 13 of 15 conditions of use present unreasonable risk to workers.
+EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/final-risk-evaluation-carbon-tetrachloride
+Query            : What source reduction activities have historically been effective for this chemical?
+needs_clarification: False
+records returned : 1
+--------------------------------------------------------------------------------
+ANSWER:
+According to the TRI knowledge graph context, one source-reduction activity that has been reported as implemented is:
+
+* IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS (reported for Carbon tetrachloride | CAS 56-23-5 | Similarity 1.0 — QUERY CHEMICAL)
+
+This activity was reported in the state of Louisiana (LA) in 2022.
+
+Note that this is the only specific source-reduction activity mentioned in the context for the query chemical and its structurally most similar chemicals.
+--------------------------------------------------------------------------------
+DISTINCT SOURCE CHEMICALS (1) — cross-chemical recommendations by SMILES similarity:
+  sim=1.0000  Carbon tetrachloride (CAS 56-23-5)
+
+RECORDS (ranked / interleaved):
+  [1.0] Carbon tetrachloride (CAS 56-23-5) | IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS | N/A — N/A | 2022 | LA

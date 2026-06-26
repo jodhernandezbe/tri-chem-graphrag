@@ -18,6 +18,7 @@ import pandas as pd
 
 from src.config_manager import ConfigManager
 from src.rag_graph.embedding import (
+    ActivityEmbeddings,
     HybridMolecularEmbeddings,
     MolDeBERTaEmbeddings,
     MorganFingerprintEmbeddings,
@@ -33,6 +34,7 @@ MORGAN_FP_DIMS: int = 2048  # MorganFingerprintEmbeddings(n_bits=2048) from conf
 MOLDEBERTA_DIMS: int = 768  # SaeedLab/MolDeBERTa-base-123M-mtr hidden size
 HYBRID_DIMS: int = 1792  # HybridMolecularEmbeddings: Morgan(n_bits=1024) + MolDeBERTa(768)
 NAICS_TITLE_DIMS: int = 384  # sentence-transformers/all-MiniLM-L6-v2
+ACTIVITY_NAME_DIMS: int = 384  # sentence-transformers/all-MiniLM-L6-v2 (Activity / condition-of-use)
 
 # Smaller batch for transformer inference to stay within GPU/CPU memory limits.
 EMBEDDING_BATCH_SIZE: int = 100
@@ -43,6 +45,14 @@ _CHEMICAL_INDEX_SPECS: List[Tuple[str, str, int]] = [
     ("chemical_hybrid_index", "hybrid_embedding", HYBRID_DIMS),
 ]
 _SECTOR_INDEX_SPEC: Tuple[str, str, int] = ("sector_naics_title_index", "naics_title_embedding", NAICS_TITLE_DIMS)
+_ACTIVITY_INDEX_SPEC: Tuple[str, str, int] = ("activity_name_index", "activity_name_embedding", ACTIVITY_NAME_DIMS)
+# Candidate nodes carry the same three chemical embeddings as Chemical so a no-SMILES
+# category can be reached via a structurally-similar member.
+_CANDIDATE_INDEX_SPECS: List[Tuple[str, str, int]] = [
+    ("candidate_morgan_fp_index", "morgan_fp_embedding", MORGAN_FP_DIMS),
+    ("candidate_moldeberta_index", "moldeberta_embedding", MOLDEBERTA_DIMS),
+    ("candidate_hybrid_index", "hybrid_embedding", HYBRID_DIMS),
+]
 
 _CONSTRAINTS: List[Tuple[str, str, str]] = [
     ("chemical_cas_unique", "Chemical", "cas_number"),
@@ -51,6 +61,7 @@ _CONSTRAINTS: List[Tuple[str, str, str]] = [
     ("report_dcn_unique", "Report", "document_control_number"),
     ("activity_name_unique", "Activity", "name"),
     ("reduction_code_unique", "Reduction", "code"),
+    ("candidate_cas_unique", "Candidate", "cas_number"),
 ]
 
 _STORE_MORGAN_QUERY = f"""
@@ -89,6 +100,42 @@ CALL {{
 }} IN TRANSACTIONS OF {BATCH_SIZE} ROWS
 """
 
+_STORE_ACTIVITY_QUERY = f"""
+UNWIND $rows AS row
+CALL {{
+    WITH row
+    MATCH (a:Activity {{name: row.name}})
+    SET a.activity_name_embedding = row.embedding
+}} IN TRANSACTIONS OF {BATCH_SIZE} ROWS
+"""
+
+_STORE_CANDIDATE_MORGAN_QUERY = f"""
+UNWIND $rows AS row
+CALL {{
+    WITH row
+    MATCH (c:Candidate {{cas_number: row.cas_number}})
+    SET c.morgan_fp_embedding = row.embedding
+}} IN TRANSACTIONS OF {BATCH_SIZE} ROWS
+"""
+
+_STORE_CANDIDATE_DEBERTA_QUERY = f"""
+UNWIND $rows AS row
+CALL {{
+    WITH row
+    MATCH (c:Candidate {{cas_number: row.cas_number}})
+    SET c.moldeberta_embedding = row.embedding
+}} IN TRANSACTIONS OF {BATCH_SIZE} ROWS
+"""
+
+_STORE_CANDIDATE_HYBRID_QUERY = f"""
+UNWIND $rows AS row
+CALL {{
+    WITH row
+    MATCH (c:Candidate {{cas_number: row.cas_number}})
+    SET c.hybrid_embedding = row.embedding
+}} IN TRANSACTIONS OF {BATCH_SIZE} ROWS
+"""
+
 
 class VectorIndexManager(BaseLoader):
     """Manages vector indices and embedding population for the TRI Knowledge Graph."""
@@ -99,6 +146,7 @@ class VectorIndexManager(BaseLoader):
         self._morgan_params = self._load_morgan_params(rag_embeddings)
         self._moldeberta_params = self._load_transformer_params(rag_embeddings, "MolDeBERTa")
         self._naics_params = self._load_naics_params(rag_embeddings)
+        self._activity_params = self._load_text_params(rag_embeddings, "ActivityEmbeddings")
 
     def _load_morgan_params(self, cfg: List[Dict[str, Any]]) -> Dict[str, int]:
         for emb in cfg:
@@ -115,8 +163,11 @@ class VectorIndexManager(BaseLoader):
         return {"model_name": "", "max_length": 512}
 
     def _load_naics_params(self, cfg: List[Dict[str, Any]]) -> Dict[str, Any]:
+        return self._load_text_params(cfg, "NAICSEmbeddings")
+
+    def _load_text_params(self, cfg: List[Dict[str, Any]], emb_type: str) -> Dict[str, Any]:
         for emb in cfg:
-            if emb["EMBEDDING_TYPE"] == "NAICSEmbeddings":
+            if emb["EMBEDDING_TYPE"] == emb_type:
                 props = emb["PROPERTIES"][0]
                 return {"model_name": props["MODEL_NAME"], "max_length": props.get("MAX_LENGTH", 512)}
         return {"model_name": "sentence-transformers/all-MiniLM-L6-v2", "max_length": 512}
@@ -171,11 +222,13 @@ class VectorIndexManager(BaseLoader):
             self._create_constraint(name, label, prop)
 
     def create_all_indices(self) -> None:
-        """Create all vector indices for Chemical (×3) and Sector (×1) nodes (idempotent)."""
+        """Create all vector indices for Chemical (×3), Sector (×1), and Activity (×1) nodes (idempotent)."""
         for index_name, prop, dims in _CHEMICAL_INDEX_SPECS:
             self._create_vector_index(index_name, "Chemical", prop, dims)
-        idx_name, prop, dims = _SECTOR_INDEX_SPEC
-        self._create_vector_index(idx_name, "Sector", prop, dims)
+        sector_idx, sector_prop, sector_dims = _SECTOR_INDEX_SPEC
+        self._create_vector_index(sector_idx, "Sector", sector_prop, sector_dims)
+        activity_idx, activity_prop, activity_dims = _ACTIVITY_INDEX_SPEC
+        self._create_vector_index(activity_idx, "Activity", activity_prop, activity_dims)
 
     def setup_schema(self) -> None:
         """Create uniqueness constraints and all vector indices in one call (idempotent).
@@ -206,6 +259,31 @@ class VectorIndexManager(BaseLoader):
         n_hybrid = self._embed_and_store(smiles_chems, hybrid, "canonical_smiles", "cas_number", _STORE_HYBRID_QUERY)
         logger.info(f"Chemical embeddings stored — morgan: {n_morgan}, moldeberta: {n_deberta}, hybrid: {n_hybrid}")
 
+    def create_candidate_indices(self) -> None:
+        """Create the three Candidate vector indices (idempotent)."""
+        for index_name, prop, dims in _CANDIDATE_INDEX_SPECS:
+            self._create_vector_index(index_name, "Candidate", prop, dims)
+
+    def embed_candidates(self, df: pd.DataFrame) -> None:
+        """Compute and store Morgan FP, MolDeBERTa, and Hybrid embeddings for Candidate nodes.
+
+        Only candidates with a resolved canonical_smiles are embedded (all three
+        embeddings derive from SMILES). Mirrors ``embed_chemicals`` against the
+        ``:Candidate`` label so categories can be reached by structural similarity.
+
+        Args:
+            df (pd.DataFrame): DataFrame with columns cas_number and canonical_smiles.
+        """
+        records = self._prepare_chemical_records(df, require_smiles=True)
+        morgan = MorganFingerprintEmbeddings(**self._morgan_params)
+        deberta = MolDeBERTaEmbeddings(**self._moldeberta_params)
+        hybrid = HybridMolecularEmbeddings(**self._moldeberta_params)
+
+        n_m = self._embed_and_store(records, morgan, "canonical_smiles", "cas_number", _STORE_CANDIDATE_MORGAN_QUERY)
+        n_d = self._embed_and_store(records, deberta, "canonical_smiles", "cas_number", _STORE_CANDIDATE_DEBERTA_QUERY)
+        n_h = self._embed_and_store(records, hybrid, "canonical_smiles", "cas_number", _STORE_CANDIDATE_HYBRID_QUERY)
+        logger.info(f"Candidate embeddings stored — morgan: {n_m}, moldeberta: {n_d}, hybrid: {n_h}")
+
     def embed_sectors(self, df: pd.DataFrame) -> None:
         """Compute and store NAICS title embeddings for Sector nodes.
 
@@ -221,3 +299,18 @@ class VectorIndexManager(BaseLoader):
         model = NAICSEmbeddings(**self._naics_params)
         count = self._embed_and_store(records, model, "naics_title", "naics_code", _STORE_NAICS_QUERY)
         logger.info(f"Stored NAICS title embeddings for {count} Sector nodes")
+
+    def embed_activities(self, df: pd.DataFrame) -> None:
+        """Compute and store activity-name embeddings for Activity (condition-of-use) nodes.
+
+        Args:
+            df (pd.DataFrame): DataFrame with a ``chemical_activity`` column (from the 1b transformer).
+        """
+        if "chemical_activity" not in df.columns:
+            logger.warning("No 'chemical_activity' column found — skipping Activity embeddings")
+            return
+        subset = df[["chemical_activity"]].drop_duplicates().dropna(subset=["chemical_activity"])  # type: ignore[call-overload]
+        records = [{"name": str(r["chemical_activity"])} for r in subset.to_dict("records")]
+        model = ActivityEmbeddings(**self._activity_params)
+        count = self._embed_and_store(records, model, "name", "name", _STORE_ACTIVITY_QUERY)
+        logger.info(f"Stored activity-name embeddings for {count} Activity nodes")

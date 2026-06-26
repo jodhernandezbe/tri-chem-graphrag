@@ -28,11 +28,15 @@ class ContextBuilder:
     def __init__(self) -> None:
         self._max_chars: int = ConfigManager().config["RAG_GRAPH"]["RETRIEVAL"]["MAX_CONTEXT_CHARS"]
 
-    def build(self, subgraphs: List[Dict[str, Any]]) -> str:
+    def build(self, subgraphs: List[Dict[str, Any]], query_smiles: str = "") -> str:
         """Format and concatenate subgraphs up to the character budget.
 
         Args:
             subgraphs (List[Dict[str, Any]]): Subgraph dicts from ``GraphRetriever``.
+                A ``similarity`` key, when present, is rendered in each block header so
+                the LLM can treat close structural analogues as transferable.
+            query_smiles (str): SMILES of the query chemical; when provided, a short
+                header orients the LLM to the query and its similar chemicals.
 
         Returns:
             str: Combined context ready for prompt injection. Empty string if no
@@ -49,4 +53,12 @@ class ContextBuilder:
                 break
             blocks.append(block)
             total += len(block)
-        return SEPARATOR.join(blocks)
+        body = SEPARATOR.join(blocks)
+        if query_smiles and body:
+            header = (
+                f"Query chemical SMILES: {query_smiles}\n"
+                "The blocks below are the query chemical and its structurally most similar chemicals "
+                "(each header shows the structural Similarity to the query; 1.0 marks the query chemical itself).\n"
+            )
+            return header + SEPARATOR + body
+        return body

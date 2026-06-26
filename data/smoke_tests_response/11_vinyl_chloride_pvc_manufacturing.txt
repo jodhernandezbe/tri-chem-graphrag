@@ -1,0 +1,35 @@
+CASE: Vinyl chloride — PVC manufacturing
+================================================================================
+SMILES           : C=CCl
+Industry sector  : Polyvinyl chloride (PVC) and plastics resin manufacturing
+Condition of use : —
+EPA scenario     : Manufacturing/processing as the monomer in polyvinyl chloride (PVC) production; within the risk-evaluation scope.
+EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-vinyl-chloride
+Query            : What source reduction activities have historically been effective for this chemical?
+needs_clarification: False
+records returned : 3
+--------------------------------------------------------------------------------
+ANSWER:
+According to the TRI knowledge graph context, the query chemical is Allyl chloride (CAS 107-05-1) with a structural similarity of 0.9854.
+
+Historically, the following source reduction activity has been reported as effective:
+
+* OTHER PROCESS MODIFICATIONS MADE | Sector 325211.0 — Plastics materials & resins | Year 2024 | State TX
+
+This activity was reported for Allyl chloride (CAS 107-05-1) itself, with a structural similarity of 1.0.
+
+Additionally, since Allyl chloride has close structural analogues, we can also consider the following activities:
+
+* OTHER PROCESS MODIFICATIONS MADE | Sector 326199.0 — All other plastics products | Year 2022 | State NE (reported for Copper compounds, CAS N100, with a similarity of 0.9585)
+
+These activities are transferable candidate recommendations for Allyl chloride due to their structural similarity and reported effectiveness across facilities and sectors.
+--------------------------------------------------------------------------------
+DISTINCT SOURCE CHEMICALS (3) — cross-chemical recommendations by SMILES similarity:
+  sim=0.9854  Allyl chloride (CAS 107-05-1)
+  sim=0.9585  Copper compounds (CAS N100)  ← category reached via member Copper chloride (CuCl2) (CAS 7447-39-4)
+  sim=0.9578  Nickel compounds (CAS N495)  ← category reached via member Nickel(II) chloride (CAS 7718-54-9)
+
+RECORDS (ranked / interleaved):
+  [0.9854] Allyl chloride (CAS 107-05-1) | OTHER PROCESS MODIFICATIONS MADE | 325211.0 — Plastics materials & resins | 2024 | TX
+  [0.9585] Copper compounds (CAS N100) [via Copper chloride (CuCl2) (CAS 7447-39-4)] | OTHER PROCESS MODIFICATIONS MADE | 326199.0 — All other plastics products | 2022 | NE
+  [0.9578] Nickel compounds (CAS N495) [via Nickel(II) chloride (CAS 7718-54-9)] | OTHER IMPROVEMENTS TO INVENTORY AND MATERIAL MANAGEMENT | 326199.0 — All other plastics products | 2022 | OH

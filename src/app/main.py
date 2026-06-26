@@ -66,8 +66,15 @@ async def query(request: QueryRequest) -> QueryResponse:
         result = RAGPipeline().run_structured(
             query=request.query,
             chemical_smiles=request.chemical_smiles,
+            industry_sector=request.industry_sector,
+            condition_of_use=request.condition_of_use,
         )
-        return QueryResponse(answer=result["answer"], records=result["records"])
+        return QueryResponse(
+            answer=result["answer"],
+            records=result["records"],
+            needs_clarification=result["needs_clarification"],
+            clarification=result["clarification"],
+        )
     except Exception as exc:
         logger.error(f"Pipeline error: {exc}")
         raise HTTPException(status_code=500, detail=str(exc)) from exc

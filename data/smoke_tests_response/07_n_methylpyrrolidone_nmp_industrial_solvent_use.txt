@@ -1,0 +1,45 @@
+CASE: N-Methylpyrrolidone (NMP) — industrial solvent use
+================================================================================
+SMILES           : CN1CCCC1=O
+Industry sector  : —
+Condition of use : Industrial use as a solvent
+EPA scenario     : Industrial/commercial use as a solvent (dermal exposure); NMP whole chemical presents unreasonable risk (29 of 37 conditions of use drive the determination).
+EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-n-methylpyrrolidone-nmp-0
+Query            : What source reduction activities have historically been effective for this chemical?
+needs_clarification: False
+records returned : 10
+--------------------------------------------------------------------------------
+ANSWER:
+Based on the TRI knowledge graph context, the query chemical is CN1CCCC1=O (N-Methyl-2-pyrrolidone). The most promising source reduction activities reported for this chemical and its structurally similar analogues are:
+
+1. **SUBSTITUTED AN ORGANIC SOLVENT** (Similarity: 1.0 — QUERY CHEMICAL)
+	* Reported for: N-Methyl-2-pyrrolidone | CAS 872-50-4
+	* Sector: N/A — N/A
+	* Year: 2023 | State MA
+2. **SUBSTITUTED RAW MATERIALS, FEEDSTOCK, OR REACTANT CHEMICAL** (Similarity: 0.9815)
+	* Reported for: N,N-Dimethylformamide | CAS 68-12-2
+	* Sector: N/A — N/A
+	* Year: 2024 | State RI
+
+These activities have been reported effective in reducing the use of organic solvents and substituting raw materials, feedstock, or reactant chemicals.
+--------------------------------------------------------------------------------
+DISTINCT SOURCE CHEMICALS (7) — cross-chemical recommendations by SMILES similarity:
+  sim=1.0000  N-Methyl-2-pyrrolidone (CAS 872-50-4)
+  sim=0.9815  N,N-Dimethylformamide (CAS 68-12-2)
+  sim=0.9773  sec-Butyl alcohol (CAS 78-92-2)
+  sim=0.9769  Methyl methacrylate (CAS 80-62-6)
+  sim=0.9739  Lead compounds (CAS N420)  ← category reached via member Cyclohexanecarboxylic acid, lead salt (1:?) (CAS 50825-29-1)
+  sim=0.9729  Certain glycol ethers (CAS N230)  ← category reached via member Ethanol, 2-(1-methylethoxy)-, acetate (CAS 19234-20-9)
+  sim=0.9727  Silver compounds (CAS N740)  ← category reached via member 2,5-Pyrrolidinedione, silver(1+) salt (1:1) (CAS 55047-82-0)
+
+RECORDS (ranked / interleaved):
+  [1.0] N-Methyl-2-pyrrolidone (CAS 872-50-4) | IMPROVED CONTAINMENT OR MATERIAL HANDLING OPERATIONS | N/A — N/A | 2024 | IA
+  [0.9815] N,N-Dimethylformamide (CAS 68-12-2) | SUBSTITUTED RAW MATERIALS, FEEDSTOCK, OR REACTANT CHEMICAL | N/A — N/A | 2024 | RI
+  [0.9773] sec-Butyl alcohol (CAS 78-92-2) | REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT | N/A — N/A | 2018 | KS
+  [0.9769] Methyl methacrylate (CAS 80-62-6) | OPTIMIZED PROCESS CONDITIONS TO INCREASE EFFICIENCY | N/A — N/A | 2024 | FL
+  [0.9739] Lead compounds (CAS N420) [via Cyclohexanecarboxylic acid, lead salt (1:?) (CAS 50825-29-1)] | SUBSTITUTED RAW MATERIALS, FEEDSTOCK, OR REACTANT CHEMICAL | N/A — N/A | 2024 | MO
+  [0.9729] Certain glycol ethers (CAS N230) [via Ethanol, 2-(1-methylethoxy)-, acetate (CAS 19234-20-9)] | OTHER IMPROVEMENTS TO OPERATING PRACTICES AND TRAINING | N/A — N/A | 2024 | TN
+  [0.9727] Silver compounds (CAS N740) [via 2,5-Pyrrolidinedione, silver(1+) salt (1:1) (CAS 55047-82-0)] | OPTIMIZED PROCESS CONDITIONS TO INCREASE EFFICIENCY | N/A — N/A | 2023 | RI
+  [1.0] N-Methyl-2-pyrrolidone (CAS 872-50-4) | SUBSTITUTED AN ORGANIC SOLVENT | N/A — N/A | 2023 | MA
+  [0.9815] N,N-Dimethylformamide (CAS 68-12-2) | IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS | N/A — N/A | 2024 | MA
+  [0.9773] sec-Butyl alcohol (CAS 78-92-2) | OTHER PROCESS MODIFICATIONS | N/A — N/A | 2015 | NY

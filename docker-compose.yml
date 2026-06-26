@@ -23,6 +23,11 @@ services:
       - ollama_data:/root/.ollama
     environment:
       - OLLAMA_HOST=0.0.0.0
+      # Keep a single model resident at a time so the generator (llama3.1) and the
+      # RAGAS judge (granite3.3:8b) swap instead of stacking — both ~5 GB models do
+      # not fit together in the constrained Docker VM.
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_KEEP_ALIVE=30s
     restart: unless-stopped
 
   app-dev:

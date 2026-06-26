@@ -1,0 +1,33 @@
+CASE: 1,3-Butadiene — synthetic rubber / plastics manufacturing
+================================================================================
+SMILES           : C=CC=C
+Industry sector  : Synthetic rubber and plastics material manufacturing
+Condition of use : —
+EPA scenario     : Monomer used in polymerization for synthetic rubber, plastic, and resin manufacturing; industrial inhalation exposure presents unreasonable risk.
+EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-13-butadiene
+Query            : What source reduction activities have historically been effective for this chemical?
+needs_clarification: False
+records returned : 2
+--------------------------------------------------------------------------------
+ANSWER:
+According to the TRI knowledge graph context, two source-reduction activities have been reported as effective for 1,3-Butadiene (C=CC=C):
+
+1. OTHER SPILL OR LEAK PREVENTION
+	* Reported for: 1,3-Butadiene (Similarity 1.0)
+	* Sector: Synthetic rubber (vulcanizable elastomers) (325212.0)
+	* Year: 2015
+	* State: KY
+2. OTHER IMPROVEMENTS TO OPERATING PRACTICES AND TRAINING
+	* Reported for: 1,3-Butadiene (Similarity 1.0)
+	* Sector: Plastics materials & resins (325211.0)
+	* Year: 2022
+	* State: MI
+
+These activities have been reported as effective in reducing emissions or releases of this chemical at specific facilities and sectors over the years.
+--------------------------------------------------------------------------------
+DISTINCT SOURCE CHEMICALS (1) — cross-chemical recommendations by SMILES similarity:
+  sim=1.0000  1,3-Butadiene (CAS 106-99-0)
+
+RECORDS (ranked / interleaved):
+  [1.0] 1,3-Butadiene (CAS 106-99-0) | OTHER SPILL OR LEAK PREVENTION | 325212.0 — Synthetic rubber (vulcanizable elastomers) | 2015 | KY
+  [1.0] 1,3-Butadiene (CAS 106-99-0) | OTHER IMPROVEMENTS TO OPERATING PRACTICES AND TRAINING | 325211.0 — Plastics materials & resins | 2022 | MI

@@ -170,10 +170,16 @@ and operational family-level (Jaccard on activity families) distance matrices.
 
 | Condition | Faithfulness ↑ | Ctx. Precision ↑ | Ctx. Recall ↑ | n scored | attempted | failed |
 |-----------|---------------|-----------------|---------------|----------|-----------|--------|
-| MorganFingerprint | — | 0.5667 | — | 3 | 4 | 1 |
-| MolDeBERTa | 0.7500 | 0.3347 | 0.0833 | 4 | 4 | 0 |
-| Hybrid | 1.0000 | 0.4125 | 0.0000 | 4 | 4 | 0 |
-| flat | 0.7917 | 0.0000 | 0.0000 | 4 | 4 | 0 |
+| MorganFingerprint | 0.5642 | 0.4375 | 0.3750 | 8 | 8 | 0 |
+| MolDeBERTa | 0.7340 | 0.1562 | 0.1250 | 8 | 8 | 0 |
+| Hybrid | 0.4205 | 0.3750 | 0.5000 | 8 | 8 | 0 |
+| flat | 0.5000 | 0.0000 | 0.0000 | 8 | 8 | 0 |
+
+**How to read this table.** Every condition runs the full RAG pipeline end-to-end and is scored by an LLM judge. *Faithfulness* asks whether the generated answer is grounded in the retrieved context (anti-hallucination); *context precision* whether the retrieved context is relevant and well-ranked; *context recall* whether retrieval surfaced everything the reference answer needs. The **flat** row is the ablation baseline — vector retrieval with **no graph traversal** — so the gap between each GraphRAG condition and `flat` is the graph's contribution. `flat` scoring 0 precision / 0 recall while every GraphRAG condition is positive on both is the intended "graph context helps" signal; structural (Morgan) and Hybrid retrieval beat pure-semantic MolDeBERTa, consistent with §2–§6 where MolDeBERTa is the weakest retriever. Because scores are end-to-end and **judge-dependent**, absolute values are not comparable across judge models (a stronger judge lowers precision roughly uniformly) and n is small — read the table for *relative ordering*, not absolute magnitudes.
+
+**Strongest embedding & decision implications.** Across the operationally-relevant metrics — sector coverage (§3, all NAICS levels), operational/activity retrieval (§6), and cluster quality (§4) — **Hybrid (Morgan ‖ MolDeBERTa) is strongest**; **Morgan** leads only on the structural anchor (§5, which is definitionally Tanimoto-based) and on §7 precision, while **MolDeBERTa** alone is the weakest retriever. This matters because the two error types are not symmetric. *Context precision* governs **false positives** — recommending a source-reduction activity that is not actually applicable, costing wasted engineering assessment and capital, but bounded and caught during expert review. *Context recall / coverage* governs **false negatives** — missing a reduction that would have worked, i.e. a forgone prevention opportunity and continued, avoidable emissions; environmentally that error is costlier and effectively irreversible. So for the research question *"is there a useful source reduction for this chemical?"* — a screening / discovery task with an expert validating candidates downstream — the priority is to **minimize false negatives**: optimize **recall / coverage**, where **Hybrid** is best (best §7 recall and §3/§6 coverage). Prefer **Morgan** only when the goal is high-precision structural-analogue search and false positives are the costlier error (e.g. fully automated recommendation with no human in the loop). See [`DECISION_FRAMEWORK.md`](DECISION_FRAMEWORK.md) for the full hypothesis-testing treatment (Type I/II errors, precision/recall, and the faithfulness hallucination guardrail).
+
+RAGAS judge: **ollama_cloud / gpt-oss:120b-cloud** (answer generator: llama3.1). Faithfulness and context-recall require a GPT-4-class judge — local 7-14B judges emit the wrong schema (→ NaN) and qwen2.5:32b is too slow; a hosted cloud model recovers all three metrics.
 
 ---
 
@@ -183,4 +189,8 @@ and operational family-level (Jaccard on activity families) distance matrices.
 - Structural Tanimoto thresholds (0.4 / 0.8) and k values (5, 10, 20) are pre-registered and unchanged.
 - Operational anchor uses Jaccard ≥ 0.7 AND NAICS co-occ ≥ 3 for grade-2 (pre-registered).
 - NAICS grouping: 6-digit (National Industry).
-- RAGAS judge: granite3.3:8b via Ollama (answer generator: llama3.1).
+- RAGAS judge: ollama_cloud / gpt-oss:120b-cloud (provider / model; answer generator: llama3.1 via Ollama).
+  Faithfulness and context-recall need a GPT-4-class judge — local 7-14B Ollama judges emit
+  the wrong schema (→ NaN) and qwen2.5:32b is too slow within the timeout, so the judge runs
+  on a hosted cloud model. Selectable via `RAG_GRAPH.RAGAS.JUDGE_PROVIDER` / `JUDGE_MODEL`
+  (or `--judge-provider` / `--judge-model`): openai, ollama_cloud, or ollama_local.

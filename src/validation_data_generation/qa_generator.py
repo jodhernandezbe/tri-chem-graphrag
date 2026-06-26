@@ -24,10 +24,12 @@ logger = logging.getLogger(__name__)
 TEST_SPLIT_START: int = 2021
 TEST_SPLIT_END: int = 2024
 
+# All question types anchor on a chemical that has a SMILES, because retrieval is
+# SMILES-mandatory (sector and condition-of-use are optional additional context).
 _CHEMICAL_SECTOR_REDUCTIONS = """
 MATCH (c:Chemical)<-[:REPORTS_ON]-(r:Report)-[:FILED_BY]->(f:Facility)-[:CLASSIFIED_AS]->(s:Sector)
 MATCH (r)-[:DOCUMENTS]->(red:Reduction)
-WHERE r.reporting_year >= $start AND r.reporting_year <= $end
+WHERE r.reporting_year >= $start AND r.reporting_year <= $end AND c.canonical_smiles IS NOT NULL
 WITH c, s, r.reporting_year AS year, collect(DISTINCT red.name) AS reductions
 WHERE size(reductions) > 0
 RETURN c.name AS chemical, c.cas_number AS cas_number,
@@ -41,7 +43,7 @@ _FACILITY_COUNT_BY_CHEMICAL_STATE = """
 MATCH (c:Chemical)<-[:REPORTS_ON]-(r:Report)-[:FILED_BY]->(f:Facility)
 MATCH (r)-[:DOCUMENTS]->(:Reduction)
 WHERE r.reporting_year >= $start AND r.reporting_year <= $end
-  AND f.state IS NOT NULL
+  AND f.state IS NOT NULL AND c.canonical_smiles IS NOT NULL
 WITH c, f.state AS state, r.reporting_year AS year, count(DISTINCT f.trifid) AS n
 WHERE n >= 2
 RETURN c.name AS chemical, c.cas_number AS cas_number,
@@ -50,25 +52,12 @@ ORDER BY rand()
 LIMIT $limit
 """
 
-_SECTOR_CHEMICALS_BY_YEAR = """
-MATCH (c:Chemical)<-[:REPORTS_ON]-(r:Report)-[:FILED_BY]->(f:Facility)-[:CLASSIFIED_AS]->(s:Sector)
-MATCH (r)-[:DOCUMENTS]->(:Reduction)
-WHERE r.reporting_year >= $start AND r.reporting_year <= $end
-WITH s, r.reporting_year AS year, collect(DISTINCT c.name) AS chemicals
-WHERE size(chemicals) >= 2
-RETURN s.naics_title AS sector_title, s.naics_code AS naics_code,
-       year, chemicals
-ORDER BY rand()
-LIMIT $limit
-"""
-
-_REDUCTION_CODE_CHEMICALS = """
+_CHEMICAL_REDUCTIONS_BY_YEAR = """
 MATCH (c:Chemical)<-[:REPORTS_ON]-(r:Report)-[:DOCUMENTS]->(red:Reduction)
-WHERE r.reporting_year >= $start AND r.reporting_year <= $end
-WITH red.code AS code, red.name AS name, r.reporting_year AS year,
-     collect(DISTINCT c.name) AS chemicals
-WHERE size(chemicals) >= 2
-RETURN code AS reduction_code, name AS reduction_name, year, chemicals
+WHERE r.reporting_year >= $start AND r.reporting_year <= $end AND c.canonical_smiles IS NOT NULL
+WITH c, r.reporting_year AS year, collect(DISTINCT red.name) AS reductions
+WHERE size(reductions) > 0
+RETURN c.name AS chemical, c.cas_number AS cas_number, year, reductions
 ORDER BY rand()
 LIMIT $limit
 """
@@ -124,27 +113,25 @@ class QAGenerator:
         return [
             {
                 "question": (
-                    f"Which chemicals had source reduction activities in the " f"{r['sector_title']} sector in {r['year']}?"
+                    f"What source reduction activities were applied to {r['chemical']} "
+                    f"in the {r['sector_title']} sector in {r['year']}?"
                 ),
-                "ground_truth": ", ".join(sorted(r["chemicals"])),
-                "question_type": "sector_chemicals",
-                "metadata": {"naics_code": r["naics_code"], "year": r["year"]},
+                "ground_truth": ", ".join(sorted(r["reductions"])),
+                "question_type": "sector_chemical_reduction",
+                "metadata": {"cas_number": r["cas_number"], "naics_code": r["naics_code"], "year": r["year"]},
             }
-            for r in self._run(_SECTOR_CHEMICALS_BY_YEAR, n)
+            for r in self._run(_CHEMICAL_SECTOR_REDUCTIONS, n)
         ]
 
     def _reduction_code_pairs(self, n: int) -> List[Dict[str, Any]]:
         return [
             {
-                "question": (
-                    f"Which chemicals were reported with source reduction code "
-                    f"{r['reduction_code']} ({r['reduction_name']}) in {r['year']}?"
-                ),
-                "ground_truth": ", ".join(sorted(r["chemicals"])),
-                "question_type": "reduction_code_chemicals",
-                "metadata": {"reduction_code": r["reduction_code"], "year": r["year"]},
+                "question": f"What source reduction activities were applied to {r['chemical']} in {r['year']}?",
+                "ground_truth": ", ".join(sorted(r["reductions"])),
+                "question_type": "chemical_reduction",
+                "metadata": {"cas_number": r["cas_number"], "year": r["year"]},
             }
-            for r in self._run(_REDUCTION_CODE_CHEMICALS, n)
+            for r in self._run(_CHEMICAL_REDUCTIONS_BY_YEAR, n)
         ]
 
     def generate(
@@ -154,9 +141,11 @@ class QAGenerator:
     ) -> List[Dict[str, Any]]:
         """Generate and optionally freeze a synthetic QA benchmark from KG facts.
 
-        Produces four question types: chemical-sector-reduction, facility count,
-        sector chemicals, and reduction-code chemicals. Call this once before any
-        system tuning begins, passing output_path to persist the frozen benchmark.
+        Produces four chemical-anchored question types: chemical-sector-reduction,
+        facility count, sector-chemical-reduction, and chemical-reduction. Every
+        question targets a chemical with a SMILES, since retrieval is SMILES-mandatory.
+        Call this once before any system tuning begins, passing output_path to persist
+        the frozen benchmark.
 
         Args:
             n_per_type (int): Number of QA pairs to generate per question type.

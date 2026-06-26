@@ -1,0 +1,47 @@
+CASE: Formaldehyde — manufacturing / resin production
+================================================================================
+SMILES           : C=O
+Industry sector  : Synthetic resin and adhesive manufacturing
+Condition of use : —
+EPA scenario     : Worker inhalation during manufacturing, processing, or use (e.g., resin production); formaldehyde presents unreasonable risk.
+EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-formaldehyde
+Query            : What source reduction activities have historically been effective for this chemical?
+needs_clarification: False
+records returned : 10
+--------------------------------------------------------------------------------
+ANSWER:
+Based on the TRI knowledge graph context, the query chemical is Formaldehyde (CAS 50-00-0) with a structural similarity of 1.0 to itself.
+
+Historically effective source reduction activities reported for Formaldehyde include:
+
+* OTHER MATERIAL MODIFICATIONS MADE | Sector 325211.0 — Plastics materials & resins | Year 2023 | State OH
+* OPTIMIZED REACTION CONDITIONS OR OTHERWISE INCREASED EFFICIENCY OF SYNTHESIS | Sector 325211.0 — Plastics materials & resins | Year 2019 | State NC
+* MODIFIED EQUIPMENT, LAYOUT, OR PIPING | Sector 325211.0 — Plastics materials & resins | Year 2016 | State NY
+* OTHER SPILL OR LEAK PREVENTION | Sector 325211.0 — Plastics materials & resins | Year 2015 | State OH
+* MODIFIED OR UPDATED EQUIPMENT OR LAYOUT | Sector 325211.0 — Plastics materials & resins | Year 2022 | State CT
+
+These activities have been reported effective for Formaldehyde in various facilities and sectors across different years.
+
+Additionally, since Ethylene (CAS 74-85-1) is a structurally similar analogue with a similarity of 0.9692, the following activity has also been reported effective:
+
+* INSTITUTED RECIRCULATION WITHIN A PROCESS | Sector 325211.0 — Plastics materials & resins | Year 2020 | State TX
+
+This activity was reported for Ethylene in 2020 and may be a transferable candidate recommendation for Formaldehyde due to their structural similarity.
+--------------------------------------------------------------------------------
+DISTINCT SOURCE CHEMICALS (4) — cross-chemical recommendations by SMILES similarity:
+  sim=1.0000  Formaldehyde (CAS 50-00-0)
+  sim=0.9692  Ethylene (CAS 74-85-1)
+  sim=0.9583  Cobalt compounds (CAS N096)  ← category reached via member Cobalt(II) oxide (CAS 1307-96-6)
+  sim=0.9573  Manganese compounds (CAS N450)  ← category reached via member Manganese(II) oxide (CAS 1344-43-0)
+
+RECORDS (ranked / interleaved):
+  [1.0] Formaldehyde (CAS 50-00-0) | OTHER MATERIAL MODIFICATIONS MADE | 325211.0 — Plastics materials & resins | 2023 | OH
+  [0.9692] Ethylene (CAS 74-85-1) | INSTITUTED RECIRCULATION WITHIN A PROCESS | 325211.0 — Plastics materials & resins | 2020 | TX
+  [0.9583] Cobalt compounds (CAS N096) [via Cobalt(II) oxide (CAS 1307-96-6)] | MODIFIED PACKAGING | 325211.0 — Plastics materials & resins | 2019 | IN
+  [0.9573] Manganese compounds (CAS N450) [via Manganese(II) oxide (CAS 1344-43-0)] | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | 325211.0 — Plastics materials & resins | 2022 | TX
+  [1.0] Formaldehyde (CAS 50-00-0) | OPTIMIZED REACTION CONDITIONS OR OTHERWISE INCREASED EFFICIENCY OF SYNTHESIS | 325211.0 — Plastics materials & resins | 2019 | NC
+  [0.9692] Ethylene (CAS 74-85-1) | INSTITUTED RECIRCULATION WITHIN A PROCESS | 325211.0 — Plastics materials & resins | 2019 | TX
+  [1.0] Formaldehyde (CAS 50-00-0) | MODIFIED EQUIPMENT, LAYOUT, OR PIPING | 325211.0 — Plastics materials & resins | 2016 | NY
+  [0.9692] Ethylene (CAS 74-85-1) | IMPLEMENTED INSPECTION OR MONITORING PROGRAM OF POTENTIAL SPILL OR LEAK SOURCES | 325211.0 — Plastics materials & resins | 2015 | TX
+  [1.0] Formaldehyde (CAS 50-00-0) | OTHER SPILL OR LEAK PREVENTION | 325211.0 — Plastics materials & resins | 2015 | OH
+  [1.0] Formaldehyde (CAS 50-00-0) | MODIFIED OR UPDATED EQUIPMENT OR LAYOUT | 325211.0 — Plastics materials & resins | 2022 | CT

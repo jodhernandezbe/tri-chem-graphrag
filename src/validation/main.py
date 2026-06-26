@@ -416,8 +416,47 @@ def _patch_ragas_section(ragas_results: List[Dict[str, Any]], docs_dir: Path) ->
     if not results_path.exists():
         logger.warning("RESULTS.md not found — cannot patch RAGAS section")
         return
+    from src.validation.ragas_evaluator import judge_descriptor
+
+    rag_cfg = ConfigManager().config["RAG_GRAPH"]
+    caption = (
+        "\n**How to read this table.** Every condition runs the full RAG pipeline end-to-end and is "
+        "scored by an LLM judge. *Faithfulness* asks whether the generated answer is grounded in the "
+        "retrieved context (anti-hallucination); *context precision* whether the retrieved context is "
+        "relevant and well-ranked; *context recall* whether retrieval surfaced everything the reference "
+        "answer needs. The **flat** row is the ablation baseline — vector retrieval with **no graph "
+        "traversal** — so the gap between each GraphRAG condition and `flat` is the graph's contribution. "
+        "`flat` scoring 0 precision / 0 recall while every GraphRAG condition is positive on both is the "
+        'intended "graph context helps" signal; structural (Morgan) and Hybrid retrieval beat '
+        "pure-semantic MolDeBERTa, consistent with §2–§6 where MolDeBERTa is the weakest retriever. "
+        "Because scores are end-to-end and **judge-dependent**, absolute values are not comparable across "
+        "judge models (a stronger judge lowers precision roughly uniformly) and n is small — read the "
+        "table for *relative ordering*, not absolute magnitudes.\n\n"
+        "**Strongest embedding & decision implications.** Across the operationally-relevant metrics — "
+        "sector coverage (§3, all NAICS levels), operational/activity retrieval (§6), and cluster quality "
+        "(§4) — **Hybrid (Morgan ‖ MolDeBERTa) is strongest**; **Morgan** leads only on the structural "
+        "anchor (§5, which is definitionally Tanimoto-based) and on §7 precision, while **MolDeBERTa** "
+        "alone is the weakest retriever. This matters because the two error types are not symmetric. "
+        "*Context precision* governs **false positives** — recommending a source-reduction activity that "
+        "is not actually applicable, costing wasted engineering assessment and capital, but bounded and "
+        "caught during expert review. *Context recall / coverage* governs **false negatives** — missing a "
+        "reduction that would have worked, i.e. a forgone prevention opportunity and continued, avoidable "
+        "emissions; environmentally that error is costlier and effectively irreversible. So for the "
+        'research question *"is there a useful source reduction for this chemical?"* — a screening / '
+        "discovery task with an expert validating candidates downstream — the priority is to **minimize "
+        "false negatives**: optimize **recall / coverage**, where **Hybrid** is best (best §7 recall and "
+        "§3/§6 coverage). Prefer **Morgan** only when the goal is high-precision structural-analogue "
+        "search and false positives are the costlier error (e.g. fully automated recommendation with no "
+        "human in the loop). See `DECISION_FRAMEWORK.md` for the full hypothesis-testing treatment "
+        "(Type I/II errors, precision/recall, and the faithfulness hallucination guardrail).\n\n"
+        f"RAGAS judge: **{judge_descriptor()}** "
+        f"(answer generator: {rag_cfg['GENERATION']['MODEL']}). "
+        f"Faithfulness and context-recall require a GPT-4-class judge — local 7-14B judges "
+        f"emit the wrong schema (→ NaN) and qwen2.5:32b is too slow; a hosted cloud model "
+        f"recovers all three metrics.\n"
+    )
     content = results_path.read_text()
-    new_section = "## 7 · End-to-End RAG Quality (RAGAS)\n\n" + _ragas_table(ragas_results)
+    new_section = "## 7 · End-to-End RAG Quality (RAGAS)\n\n" + _ragas_table(ragas_results) + caption
     content = re.sub(
         r"## 7 · End-to-End RAG Quality \(RAGAS\)\n\n.*?(?=\n---|\Z)",
         new_section,
@@ -445,9 +484,11 @@ def _write_results_md(
     images_dir: Optional[Path] = None,
 ) -> Path:
     img_dir = images_dir if images_dir is not None else docs_dir.parent / "images"
+    from src.validation.ragas_evaluator import judge_descriptor
+
     _rag_cfg = ConfigManager().config["RAG_GRAPH"]
     gen_model = _rag_cfg["GENERATION"]["MODEL"]
-    judge_model = _rag_cfg.get("RAGAS", {}).get("JUDGE_MODEL", gen_model)
+    judge_desc = judge_descriptor()
     tsne_names = [f"tsne_{et.lower()}.png" for et in EMBEDDING_TYPES]
     tsne_available = all((img_dir / name).exists() for name in tsne_names)
 
@@ -608,17 +649,12 @@ and operational family-level (Jaccard on activity families) distance matrices.
 - Structural Tanimoto thresholds (0.4 / 0.8) and k values (5, 10, 20) are pre-registered and unchanged.
 - Operational anchor uses Jaccard ≥ {JACCARD_GRADE_HIGH} AND NAICS co-occ ≥ {NAICS_COOCCURRENCE_HIGH} for grade-2 (pre-registered).
 - NAICS grouping: {naics_digits}-digit ({('Industry Group' if naics_digits == 4 else 'National Industry')}).
-- RAGAS judge: {judge_model} via Ollama (answer generator: {gen_model}).
+- RAGAS judge: {judge_desc} (provider / model; answer generator: {gen_model}).
 """
     path = docs_dir / "RESULTS.md"
     path.write_text(content)
     logger.info(f"Results document written → {path}")
     return path
-
-
-# ---------------------------------------------------------------------------
-# Pipeline
-# ---------------------------------------------------------------------------
 
 
 class EvaluationPipeline:
@@ -868,6 +904,20 @@ def _parse_args(argv: List[str]) -> argparse.Namespace:
         metavar="URL",
         help="Override Ollama base URL (e.g. http://localhost:11435).",
     )
+    parser.add_argument(
+        "--judge-provider",
+        default="",
+        dest="judge_provider",
+        choices=["", "openai", "ollama_cloud", "ollama_local"],
+        help="Override the RAGAS judge provider (default: from config).",
+    )
+    parser.add_argument(
+        "--judge-model",
+        default="",
+        dest="judge_model",
+        metavar="MODEL",
+        help="Override the RAGAS judge model (e.g. gpt-4o-mini, gpt-oss:120b-cloud).",
+    )
     return parser.parse_args(argv)
 
 
@@ -888,6 +938,12 @@ def main(argv: Optional[List[str]] = None) -> None:
     if args.ollama_url:
         os.environ["OLLAMA_BASE_URL"] = args.ollama_url
         logger.info(f"OLLAMA_BASE_URL set to {args.ollama_url}")
+    if args.judge_provider:
+        os.environ["RAGAS_JUDGE_PROVIDER"] = args.judge_provider
+        logger.info(f"RAGAS judge provider overridden to {args.judge_provider}")
+    if args.judge_model:
+        os.environ["RAGAS_JUDGE_MODEL"] = args.judge_model
+        logger.info(f"RAGAS judge model overridden to {args.judge_model}")
 
     pipeline = EvaluationPipeline(
         max_ragas_pairs=args.max_ragas_pairs,

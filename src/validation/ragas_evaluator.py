@@ -19,6 +19,8 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from dotenv import load_dotenv
+from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_ollama import ChatOllama
 
@@ -28,6 +30,8 @@ from src.rag_graph.context import ContextBuilder
 from src.rag_graph.context.subgraph_formatter import format_subgraph
 from src.rag_graph.generation.prompt_manager import PromptManager
 from src.rag_graph.retrieval import RetrieverFactory
+from src.rag_graph.retrieval.retriever_factory import guarded_search
+from src.validation.llm_json import clean_json_text
 
 logger = logging.getLogger(__name__)
 
@@ -57,17 +61,77 @@ def _build_llm() -> ChatOllama:
     )
 
 
+_OLLAMA_CLOUD_URL = "https://ollama.com"
+_VALID_JUDGE_PROVIDERS = ("openai", "ollama_cloud", "ollama_local")
+
+
 def _judge_model() -> str:
-    """Return the configured RAGAS judge model (falls back to the generator model)."""
+    """Return the judge model — env override ``RAGAS_JUDGE_MODEL`` wins over config."""
     rag = ConfigManager().config["RAG_GRAPH"]
-    return rag.get("RAGAS", {}).get("JUDGE_MODEL", rag["GENERATION"]["MODEL"])
+    return os.getenv("RAGAS_JUDGE_MODEL") or rag.get("RAGAS", {}).get("JUDGE_MODEL", rag["GENERATION"]["MODEL"])
 
 
-def _build_judge_llm() -> ChatOllama:
-    """Build the RAGAS judge LLM, kept separate from the answer generator."""
+def _judge_provider() -> str:
+    """Return the judge provider (openai | ollama_cloud | ollama_local).
+
+    Env override ``RAGAS_JUDGE_PROVIDER`` wins over config so it can be passed on the CLI.
+    """
+    rag = ConfigManager().config["RAG_GRAPH"]
+    return str(os.getenv("RAGAS_JUDGE_PROVIDER") or rag.get("RAGAS", {}).get("JUDGE_PROVIDER", "ollama_local")).lower()
+
+
+def judge_descriptor() -> str:
+    """Return a 'provider / model' string for the active judge (honors CLI/env overrides)."""
+    return f"{_judge_provider()} / {_judge_model()}"
+
+
+def ensure_judge_available() -> None:
+    """Fail loudly before a RAGAS run if the configured judge cannot be used.
+
+    RAGAS' faithfulness/recall prompts need a GPT-4-class judge (local 7-14B judges emit the
+    wrong schema → NaN). The provider selects where that judge runs; the cloud providers need
+    an API key. Raise a clear error up front rather than collecting samples (slow) and only
+    then failing.
+    """
+    provider = _judge_provider()
+    if provider not in _VALID_JUDGE_PROVIDERS:
+        raise RuntimeError(f"Unknown RAG_GRAPH.RAGAS.JUDGE_PROVIDER '{provider}'. Use one of {_VALID_JUDGE_PROVIDERS}.")
+    load_dotenv()
+    required_key = {"openai": "OPENAI_API_KEY", "ollama_cloud": "OLLAMA_API_KEY"}.get(provider)
+    if required_key and not os.getenv(required_key):
+        raise RuntimeError(
+            f"RAGAS judge provider is '{provider}' (model '{_judge_model()}'), but {required_key} is not set. "
+            f"Add {required_key} to your .env (or environment) before running RAGAS."
+        )
+
+
+def _build_judge_llm() -> BaseChatModel:
+    """Build the RAGAS judge LLM (separate from the generator) for the configured provider.
+
+    - ``openai``: ChatOpenAI (e.g. gpt-4o-mini) — GPT-4-class, the reliable default.
+    - ``ollama_cloud``: ChatOllama against Ollama Cloud (e.g. gpt-oss:120b-cloud) — a hosted
+      open model, capable + fast, via ``OLLAMA_API_KEY``.
+    - ``ollama_local``: ChatOllama against a local Ollama — note local 7-14B judges cannot
+      score faithfulness/recall (context precision works); use only for quick/precision runs.
+    """
+    provider = _judge_provider()
+    model = _judge_model()
+    ensure_judge_available()
+
+    if provider == "openai":
+        from langchain_openai import ChatOpenAI
+
+        return ChatOpenAI(model=model, temperature=0.0)
+    if provider == "ollama_cloud":
+        return ChatOllama(
+            model=model,
+            base_url=_OLLAMA_CLOUD_URL,
+            temperature=0.0,
+            client_kwargs={"headers": {"Authorization": f"Bearer {os.getenv('OLLAMA_API_KEY')}"}},
+        )
     cfg = ConfigManager().config["RAG_GRAPH"]["GENERATION"]
     return ChatOllama(
-        model=_judge_model(),
+        model=model,
         base_url=os.getenv("OLLAMA_BASE_URL", cfg["BASE_URL"]),
         temperature=0.0,
     )
@@ -75,7 +139,7 @@ def _build_judge_llm() -> ChatOllama:
 
 def _generate_answer(context: str, question: str, llm: ChatOllama) -> str:
     pm = PromptManager()
-    system_text = pm.render("rag_system.yaml", "system_prompt", {"context": context})
+    system_text = pm.render("rag_system.yaml", "system_prompt", {"context": context, "condition_of_use": "not specified"})
     query_text = pm.render("rag_query.yaml", "query_prompt", {"query": question})
     response = llm.invoke([SystemMessage(content=system_text), HumanMessage(content=query_text)])
     return str(response.content)
@@ -134,7 +198,7 @@ class RAGASEvaluator:
 
     def _run_flat(self, embedding_type: str, retrieval_key: str, question: str, k: int = 5) -> tuple[str, List[str]]:
         vector_store = self._factory.get_vector_store(embedding_type)
-        hits = vector_store.similarity_search_with_score(retrieval_key, k=k)
+        hits = guarded_search(vector_store, retrieval_key, k)
         chem_names = [doc.page_content for doc, _ in hits]
         context = "\n".join(chem_names)
         llm = _build_llm()
@@ -222,6 +286,27 @@ class RAGASEvaluator:
         except ImportError as exc:
             raise ImportError(f"RAGAS >= 0.2 not installed: {exc}") from exc
 
+        class _CleaningJudge(LangchainLLMWrapper):  # type: ignore[misc, valid-type]
+            """Wrap the judge so each generation's text is cleaned before RAGAS parses it.
+
+            Defense-in-depth alongside JSON mode: strips markdown fences, fixes trailing
+            commas / smart quotes / missing commas that would otherwise yield NaN scores.
+            """
+
+            @staticmethod
+            def _scrub(result: Any) -> Any:
+                for gens in getattr(result, "generations", []):
+                    for gen in gens:
+                        if getattr(gen, "text", None):
+                            gen.text = clean_json_text(gen.text)
+                return result
+
+            def generate_text(self, *args: Any, **kwargs: Any) -> Any:
+                return self._scrub(super().generate_text(*args, **kwargs))
+
+            async def agenerate_text(self, *args: Any, **kwargs: Any) -> Any:
+                return self._scrub(await super().agenerate_text(*args, **kwargs))
+
         pairs = self._load_benchmark()
         samples, stats = self._collect_samples(condition, pairs, max_pairs=max_pairs)
 
@@ -229,7 +314,7 @@ class RAGASEvaluator:
             logger.error(f"No valid samples collected for condition '{condition}'")
             return {"condition": condition, "n_samples": 0, **stats}
 
-        judge_llm = LangchainLLMWrapper(_build_judge_llm())  # type: ignore[arg-type]
+        judge_llm = _CleaningJudge(_build_judge_llm())  # type: ignore[arg-type]
         metrics = [Faithfulness(llm=judge_llm), ContextPrecision(llm=judge_llm), ContextRecall(llm=judge_llm)]
         dataset = EvaluationDataset.from_list(samples)
         ragas_cfg = ConfigManager().config["RAG_GRAPH"].get("RAGAS", {})
@@ -254,4 +339,5 @@ class RAGASEvaluator:
         Returns:
             List[Dict[str, Any]]: RAGAS metric scores for each condition.
         """
+        ensure_judge_available()  # fail loudly before collecting samples if the judge is unusable
         return [self.evaluate(c, max_pairs=max_pairs) for c in _ABLATION_CONDITIONS]

@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 K_VALUES: Tuple[int, ...] = (5, 10, 20)
 NAICS_LEVELS: Tuple[int, ...] = (2, 3, 4, 6)
+
 # Single source of truth for the chemical embedding methods under evaluation.
 # Imported by main.py and recommendation_metrics.py so every table/chart stays in sync.
 CHEMICAL_EMBEDDING_TYPES: Tuple[str, ...] = (
@@ -35,6 +36,7 @@ CHEMICAL_EMBEDDING_TYPES: Tuple[str, ...] = (
     "MolDeBERTa",
     "Hybrid",
 )
+
 # Neighbour chemicals to pull before flattening to a ranked code list; large enough
 # that the top max(K_VALUES) distinct codes are always available.
 _CODE_POOL: int = 50

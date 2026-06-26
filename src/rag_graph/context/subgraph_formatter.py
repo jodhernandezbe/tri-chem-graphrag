@@ -14,6 +14,14 @@ Date: 2026-05-09
 from typing import Any, Dict, List
 
 
+def _similarity_suffix(subgraph: Dict[str, Any]) -> str:
+    sim = subgraph.get("similarity")
+    if sim is None:
+        return ""
+    tag = " — QUERY CHEMICAL" if float(sim) >= 0.99999 else ""
+    return f" | Similarity {sim}{tag}"
+
+
 def _fmt_record(record: Dict[str, Any]) -> str:
     parts = []
     if record.get("year"):
@@ -57,7 +65,7 @@ def format_chemical_subgraph(subgraph: Dict[str, Any]) -> str:
     name = subgraph.get("name", "Unknown")
     cas = subgraph.get("cas_number", "N/A")
     smiles = subgraph.get("smiles", "N/A")
-    header = f"[Chemical] {name} | CAS {cas} | SMILES {smiles}\n"
+    header = f"[Chemical] {name} | CAS {cas} | SMILES {smiles}{_similarity_suffix(subgraph)}\n"
     body = _fmt_records(subgraph.get("reports", []), "Reports")
     return header + body
 
@@ -92,7 +100,10 @@ def format_cross_entity_subgraph(subgraph: Dict[str, Any]) -> str:
     smiles = subgraph.get("smiles", "N/A")
     sector_code = subgraph.get("sector_code", "N/A")
     sector_title = subgraph.get("sector_title", "Unknown")
-    header = f"[Chemical × Sector] {name} | CAS {cas} | SMILES {smiles} | Sector {sector_code} — {sector_title}\n"
+    header = (
+        f"[Chemical × Sector] {name} | CAS {cas} | SMILES {smiles} | "
+        f"Sector {sector_code} — {sector_title}{_similarity_suffix(subgraph)}\n"
+    )
     body = _fmt_records(subgraph.get("reports", []), "Reports")
     return header + body
 

@@ -176,3 +176,7 @@ data/qa_benchmark.json
 .claude/scheduled_tasks.lock
 
 *.dump
+
+manuscript/
+
+.claude/settings.local.json

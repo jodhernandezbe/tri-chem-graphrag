@@ -13,7 +13,7 @@ Date: 2026-05-09
 
 import logging
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 
 from langchain_neo4j import Neo4jGraph
 
@@ -27,6 +27,8 @@ OPTIONAL MATCH (r:Report)-[:REPORTS_ON]->(c)
 OPTIONAL MATCH (r)-[:FILED_BY]->(f:Facility)
 OPTIONAL MATCH (f)-[:CLASSIFIED_AS]->(s:Sector)
 OPTIONAL MATCH (r)-[:DOCUMENTS]->(red:Reduction)
+WHERE size($activity_names) = 0
+   OR EXISTS { MATCH (r)-[:RECORDS]->(a:Activity) WHERE a.name IN $activity_names }
 WITH c,
      collect(DISTINCT {
          year:           r.reporting_year,
@@ -53,6 +55,8 @@ OPTIONAL MATCH (f:Facility)-[:CLASSIFIED_AS]->(s)
 OPTIONAL MATCH (r:Report)-[:FILED_BY]->(f)
 OPTIONAL MATCH (r)-[:REPORTS_ON]->(c:Chemical)
 OPTIONAL MATCH (r)-[:DOCUMENTS]->(red:Reduction)
+WHERE size($activity_names) = 0
+   OR EXISTS { MATCH (r)-[:RECORDS]->(a:Activity) WHERE a.name IN $activity_names }
 WITH s,
      collect(DISTINCT {
          facility:       f.trifid,
@@ -84,6 +88,8 @@ LIMIT 1
 CROSS_ENTITY_TRAVERSAL = """
 MATCH (c:Chemical)<-[:REPORTS_ON]-(r:Report)-[:FILED_BY]->(f:Facility)-[:CLASSIFIED_AS]->(s:Sector)
 WHERE c.cas_number IN $cas_numbers AND s.naics_code IN $naics_codes
+  AND (size($activity_names) = 0
+       OR EXISTS { MATCH (r)-[:RECORDS]->(a:Activity) WHERE a.name IN $activity_names })
 OPTIONAL MATCH (r)-[:DOCUMENTS]->(red:Reduction)
 WITH c, s,
      collect(DISTINCT {
@@ -102,6 +108,12 @@ RETURN {
     sector_title: s.naics_title,
     reports:      reports
 } AS subgraph
+"""
+
+CANDIDATE_CATEGORIES = """
+MATCH (cat:Chemical)-[:CONTAINS]->(m:Candidate)
+WHERE m.cas_number IN $cas_numbers
+RETURN m.cas_number AS member, m.name AS member_name, cat.cas_number AS category
 """
 
 NODE_KEY: Dict[str, str] = {
@@ -137,12 +149,15 @@ class GraphRetriever:
     def traverse(
         self,
         node: Dict[str, Any],
+        activity_names: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """Expand a seed node into a subgraph dict via Cypher.
 
         Args:
             node (Dict[str, Any]): Node properties dict containing the key field
                 (e.g. ``cas_number`` for Chemical, ``naics_code`` for Sector).
+            activity_names (Optional[List[str]]): Condition-of-use activity names to
+                restrict the traversal to. An empty/``None`` list disables the filter.
 
         Returns:
             Dict[str, Any]: Subgraph dictionary, or empty dict if no record found.
@@ -154,7 +169,10 @@ class GraphRetriever:
             return {}
 
         query = TRAVERSAL_QUERY[self.node_label]
-        results = self._graph.query(query, {"key": key_value, "limit": self.limit})
+        results = self._graph.query(
+            query,
+            {"key": key_value, "limit": self.limit, "activity_names": activity_names or []},
+        )
 
         if not results:
             return {}
@@ -164,16 +182,19 @@ class GraphRetriever:
     def traverse_all(
         self,
         nodes: List[Dict[str, Any]],
+        activity_names: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
         """Traverse all seed nodes and return their subgraphs.
 
         Args:
             nodes (List[Dict[str, Any]]): Seed node property dicts.
+            activity_names (Optional[List[str]]): Condition-of-use activity names to
+                restrict the traversal to. An empty/``None`` list disables the filter.
 
         Returns:
             List[Dict[str, Any]]: Non-empty subgraph dicts.
         """
-        return [sg for node in nodes if (sg := self.traverse(node))]
+        return [sg for node in nodes if (sg := self.traverse(node, activity_names))]
 
 
 class CrossEntityRetriever:
@@ -209,18 +230,41 @@ class CrossEntityRetriever:
         self,
         cas_numbers: List[str],
         naics_codes: List[str],
+        activity_names: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
         """Find subgraphs at the intersection of chemicals and sectors.
 
         Args:
             cas_numbers (List[str]): CAS numbers from chemical vector retrieval.
             naics_codes (List[str]): NAICS codes from sector vector retrieval.
+            activity_names (Optional[List[str]]): Condition-of-use activity names to
+                restrict the intersection to. An empty/``None`` list disables the filter.
 
         Returns:
             List[Dict[str, Any]]: Cross-entity subgraph dicts, empty if no intersection.
         """
         results = self._graph.query(
             CROSS_ENTITY_TRAVERSAL,
-            {"cas_numbers": cas_numbers, "naics_codes": naics_codes, "limit": self.limit},
+            {
+                "cas_numbers": cas_numbers,
+                "naics_codes": naics_codes,
+                "activity_names": activity_names or [],
+                "limit": self.limit,
+            },
         )
         return [dict(r["subgraph"]) for r in results if r.get("subgraph")]
+
+    def candidate_categories(self, cas_numbers: List[str]) -> Dict[str, Tuple[str, str]]:
+        """Map candidate CAS numbers to their containing category and the member's name.
+
+        Args:
+            cas_numbers (List[str]): Candidate CAS numbers from candidate vector search.
+
+        Returns:
+            Dict[str, Tuple[str, str]]: ``{candidate cas_number: (category cas_number,
+                member name)}`` for candidates that belong to a category in the graph.
+        """
+        if not cas_numbers:
+            return {}
+        results = self._graph.query(CANDIDATE_CATEGORIES, {"cas_numbers": cas_numbers})
+        return {r["member"]: (r["category"], r["member_name"]) for r in results}
