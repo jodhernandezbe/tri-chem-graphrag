@@ -104,4 +104,4 @@ stubPath = './typestubs'
 venv = '.'
 
 [tool.bandit]
-exclude_dirs = ["tests"]
+exclude_dirs = ["tests", "analysis"]

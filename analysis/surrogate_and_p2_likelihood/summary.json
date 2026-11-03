@@ -1,0 +1,55 @@
+{
+ "spearman": {
+  "Structural (Morgan Tanimoto)": [
+   -0.105,
+   2.559806293738457e-164
+  ],
+  "Physicochemical descriptors": [
+   0.151,
+   0.0
+  ],
+  "Industrial sector (NAICS)": [
+   0.466,
+   0.0
+  ],
+  "Condition of use (Form R Sec. 3)": [
+   0.489,
+   0.0
+  ],
+  "Context (NAICS+CoU)": [
+   0.543,
+   0.0
+  ],
+  "Structural+Context": [
+   0.477,
+   0.0
+  ]
+ },
+ "surrogate_experiment": {
+  "('Structural', 1)": 0.3132792980530074,
+  "('Structural', 5)": 0.33720567091791076,
+  "('Structural', 'opsim_top1')": 0.566585688234009,
+  "('Physicochemical', 1)": 0.28542989896826443,
+  "('Physicochemical', 5)": 0.34163041097270735,
+  "('Physicochemical', 'opsim_top1')": 0.5654899179687743,
+  "('Sector (NAICS)', 1)": 0.31480136292165894,
+  "('Sector (NAICS)', 5)": 0.37353672048056275,
+  "('Sector (NAICS)', 'opsim_top1')": 0.6598404187935997,
+  "('Condition of use', 1)": 0.3202088463594261,
+  "('Condition of use', 5)": 0.3613384597643958,
+  "('Condition of use', 'opsim_top1')": 0.6551661555501525,
+  "('Context (NAICS+CoU)', 1)": 0.3121283688994652,
+  "('Context (NAICS+CoU)', 5)": 0.37935662730094505,
+  "('Context (NAICS+CoU)', 'opsim_top1')": 0.6769179250140107,
+  "('Structural+Context', 1)": 0.33193690766408046,
+  "('Structural+Context', 5)": 0.3771105985784324,
+  "('Structural+Context', 'opsim_top1')": 0.6585935550597867,
+  "('Random', 1)": 0.2603845739973009,
+  "('Random', 5)": 0.3138588253878921,
+  "('Random', 'opsim_top1')": 0.47288602472985747,
+  "('Oracle (true P2 profile)', 1)": 0.4334657392582583,
+  "('Oracle (true P2 profile)', 5)": 0.47110969049831575,
+  "('Oracle (true P2 profile)', 'opsim_top1')": 0.854234074653737
+ },
+ "n_chemicals": 368
+}

@@ -1,0 +1,1265 @@
+{
+ "79-01-6": {
+  "name": "Trichloroethylene",
+  "in_panel": true,
+  "records": 4997,
+  "years": "1989-2024",
+  "facilities": 945,
+  "top_acts": [
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    860
+   ],
+   [
+    "CHANGED TO AQUEOUS CLEANERS (FROM SOLVENTS OR OTHER MATERIALS)",
+    543
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    482
+   ],
+   [
+    "OTHER CLEANING AND DEGREASING MODIFICATIONS",
+    375
+   ],
+   [
+    "MODIFIED EQUIPMENT, LAYOUT, OR PIPING",
+    312
+   ]
+  ],
+  "fam_share": {
+   "F3": 0.35,
+   "F5": 0.32,
+   "F1": 0.17,
+   "F4": 0.13,
+   "F2": 0.03
+  },
+  "est_n": 54,
+  "est_hit": 0.54,
+  "est_by_act": [
+   [
+    "IMPLEMENTED INSPECTION OR MONITORING PROGRAM OF POTENTIAL SPILL OR LEAK SOURCES",
+    3,
+    0.0
+   ],
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    4,
+    0.0
+   ],
+   [
+    "MODIFIED EQUIPMENT, LAYOUT, OR PIPING",
+    4,
+    0.5
+   ],
+   [
+    "MODIFIED STRIPPING/CLEANING EQUIPMENT",
+    4,
+    0.75
+   ],
+   [
+    "OTHER CLEANING AND DEGREASING MODIFICATIONS",
+    7,
+    0.86
+   ],
+   [
+    "REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT",
+    4,
+    1.0
+   ],
+   [
+    "SUBSTITUTED AN ORGANIC SOLVENT",
+    6,
+    0.83
+   ]
+  ],
+  "struct": [
+   [
+    "1,2-Dichloroethylene",
+    0.3,
+    0.52
+   ],
+   [
+    "Tetrachloroethylene",
+    0.3,
+    0.97
+   ],
+   [
+    "Chloroprene",
+    0.29,
+    0.36
+   ]
+  ],
+  "phys": [
+   [
+    "1,2-Dichloroethylene",
+    0.6,
+    0.52
+   ],
+   [
+    "Tetrachloroethylene",
+    0.6,
+    0.97
+   ],
+   [
+    "Vinylidene chloride",
+    0.6,
+    0.56
+   ]
+  ],
+  "ctx": [
+   [
+    "Dichloromethane",
+    0.9,
+    0.97
+   ],
+   [
+    "Tetrachloroethylene",
+    0.88,
+    0.97
+   ],
+   [
+    "Methyl isobutyl ketone",
+    0.85,
+    0.9
+   ]
+  ]
+ },
+ "127-18-4": {
+  "name": "Tetrachloroethylene",
+  "in_panel": true,
+  "records": 2913,
+  "years": "1988-2024",
+  "facilities": 559,
+  "top_acts": [
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    501
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    316
+   ],
+   [
+    "CHANGED TO AQUEOUS CLEANERS (FROM SOLVENTS OR OTHER MATERIALS)",
+    236
+   ],
+   [
+    "MODIFIED EQUIPMENT, LAYOUT, OR PIPING",
+    198
+   ],
+   [
+    "CHANGED PRODUCTION SCHEDULE TO MINIMIZE EQUIPMENT AND FEEDSTOCK CHANGEOVERS",
+    183
+   ]
+  ],
+  "fam_share": {
+   "F5": 0.34,
+   "F3": 0.26,
+   "F4": 0.2,
+   "F1": 0.17,
+   "F2": 0.03
+  },
+  "est_n": 30,
+  "est_hit": 0.47,
+  "est_by_act": [
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    5,
+    0.2
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    3,
+    0.33
+   ],
+   [
+    "REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT",
+    3,
+    0.33
+   ],
+   [
+    "SUBSTITUTED RAW MATERIALS",
+    3,
+    0.67
+   ]
+  ],
+  "struct": [
+   [
+    "Hexachloro-1,3-butadiene",
+    0.5,
+    0.4
+   ],
+   [
+    "Phosgene",
+    0.38,
+    0.48
+   ],
+   [
+    "Vinylidene chloride",
+    0.38,
+    0.61
+   ]
+  ],
+  "phys": [
+   [
+    "Trichloroethylene",
+    0.6,
+    0.97
+   ],
+   [
+    "1,2-Dichloroethylene",
+    0.43,
+    0.52
+   ],
+   [
+    "Vinylidene chloride",
+    0.43,
+    0.61
+   ]
+  ],
+  "ctx": [
+   [
+    "Dichloromethane",
+    0.89,
+    0.97
+   ],
+   [
+    "Trichloroethylene",
+    0.88,
+    0.97
+   ],
+   [
+    "Toluene",
+    0.87,
+    0.91
+   ]
+  ]
+ },
+ "75-09-2": {
+  "name": "Methylene chloride",
+  "in_panel": true,
+  "records": 6386,
+  "years": "1991-2024",
+  "facilities": 1248,
+  "top_acts": [
+   [
+    "SUBSTITUTED RAW MATERIALS",
+    790
+   ],
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    670
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    644
+   ],
+   [
+    "OTHER PROCESS MODIFICATIONS",
+    541
+   ],
+   [
+    "MODIFIED EQUIPMENT, LAYOUT, OR PIPING",
+    406
+   ]
+  ],
+  "fam_share": {
+   "F3": 0.32,
+   "F5": 0.26,
+   "F1": 0.21,
+   "F4": 0.17,
+   "F2": 0.05
+  },
+  "est_n": 121,
+  "est_hit": 0.25,
+  "est_by_act": [
+   [
+    "CHANGED PRODUCTION SCHEDULE TO MINIMIZE EQUIPMENT AND FEEDSTOCK CHANGEOVERS",
+    4,
+    0.0
+   ],
+   [
+    "CHANGED TO AQUEOUS CLEANERS (FROM SOLVENTS OR OTHER MATERIALS)",
+    3,
+    1.0
+   ],
+   [
+    "IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS",
+    4,
+    0.25
+   ],
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    11,
+    0.0
+   ],
+   [
+    "IMPROVED SCHEDULING, RECORD KEEPING, OR PROCEDURES FOR OPERATIONS, CLEANING, AND MAINTENANCE",
+    4,
+    0.75
+   ],
+   [
+    "INSTITUTED PROCEDURES TO ENSURE THAT MATERIALS DO NOT STAY IN INVENTORY BEYOND",
+    5,
+    0.0
+   ],
+   [
+    "MODIFIED EQUIPMENT, LAYOUT, OR PIPING",
+    12,
+    0.17
+   ],
+   [
+    "MODIFIED OR UPDATED EQUIPMENT OR LAYOUT",
+    6,
+    0.17
+   ],
+   [
+    "OPTIMIZED PROCESS CONDITIONS TO INCREASE EFFICIENCY",
+    4,
+    0.25
+   ],
+   [
+    "OPTIMIZED REACTION CONDITIONS OR OTHERWISE INCREASED EFFICIENCY OF SYNTHESIS",
+    5,
+    0.0
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    5,
+    0.2
+   ],
+   [
+    "OTHER CLEANING AND DEGREASING MODIFICATIONS",
+    3,
+    0.0
+   ],
+   [
+    "OTHER MATERIAL MODIFICATIONS MADE",
+    3,
+    0.0
+   ],
+   [
+    "OTHER PROCESS MODIFICATIONS",
+    14,
+    0.07
+   ],
+   [
+    "OTHER PRODUCT MODIFICATIONS",
+    3,
+    0.0
+   ],
+   [
+    "REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT",
+    5,
+    0.4
+   ],
+   [
+    "SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL",
+    5,
+    1.0
+   ],
+   [
+    "SUBSTITUTED RAW MATERIALS",
+    3,
+    0.67
+   ]
+  ],
+  "struct": [
+   [
+    "1,2-Dichloroethane",
+    0.5,
+    0.71
+   ],
+   [
+    "Chloroethane",
+    0.43,
+    0.53
+   ],
+   [
+    "1,1,2-Trichloroethane",
+    0.33,
+    0.68
+   ]
+  ],
+  "phys": [
+   [
+    "Ethylidene dichloride",
+    0.81,
+    0.28
+   ],
+   [
+    "1,2-Dichloroethane",
+    0.7,
+    0.71
+   ],
+   [
+    "1,2-Dichloropropane",
+    0.65,
+    0.46
+   ]
+  ],
+  "ctx": [
+   [
+    "Trichloroethylene",
+    0.9,
+    0.97
+   ],
+   [
+    "Tetrachloroethylene",
+    0.89,
+    0.97
+   ],
+   [
+    "Methyl isobutyl ketone",
+    0.87,
+    0.95
+   ]
+  ]
+ },
+ "106-94-5": {
+  "name": "1-Bromopropane",
+  "in_panel": true,
+  "records": 65,
+  "years": "2016-2024",
+  "facilities": 33,
+  "top_acts": [
+   [
+    "SUBSTITUTED AN ORGANIC SOLVENT",
+    9
+   ],
+   [
+    "CHANGED TO AQUEOUS CLEANERS (FROM SOLVENTS OR OTHER MATERIALS)",
+    6
+   ],
+   [
+    "SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL",
+    6
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    5
+   ],
+   [
+    "IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS",
+    5
+   ]
+  ],
+  "fam_share": {
+   "F1": 0.45,
+   "F3": 0.32,
+   "F2": 0.11,
+   "F5": 0.09,
+   "F4": 0.03
+  },
+  "est_n": 41,
+  "est_hit": 0.46,
+  "est_by_act": [
+   [
+    "CHANGED TO AQUEOUS CLEANERS (FROM SOLVENTS OR OTHER MATERIALS)",
+    5,
+    0.4
+   ],
+   [
+    "DEVELOPED A NEW CHEMICAL PRODUCT TO REPLACE PREVIOUS CHEMICAL PRODUCT",
+    3,
+    0.67
+   ],
+   [
+    "IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS",
+    3,
+    0.0
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    3,
+    1.0
+   ],
+   [
+    "OTHER CLEANING AND DEGREASING MODIFICATIONS",
+    3,
+    0.33
+   ],
+   [
+    "SUBSTITUTED AN ORGANIC SOLVENT",
+    4,
+    0.25
+   ],
+   [
+    "SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL",
+    4,
+    1.0
+   ]
+  ],
+  "struct": [
+   [
+    "1,2-Dibromoethane",
+    0.44,
+    0.23
+   ],
+   [
+    "n-Hexane",
+    0.36,
+    0.43
+   ],
+   [
+    "Triethylamine",
+    0.33,
+    0.36
+   ]
+  ],
+  "phys": [
+   [
+    "1,2-Dichloropropane",
+    0.64,
+    0.19
+   ],
+   [
+    "Methyl iodide",
+    0.63,
+    0.3
+   ],
+   [
+    "1,2-Dichloroethane",
+    0.62,
+    0.34
+   ]
+  ],
+  "ctx": [
+   [
+    "Trichloroethylene",
+    0.77,
+    0.54
+   ],
+   [
+    "Dichloromethane",
+    0.7,
+    0.5
+   ],
+   [
+    "N-Methyl-2-pyrrolidone",
+    0.69,
+    0.45
+   ]
+  ]
+ },
+ "56-23-5": {
+  "name": "Carbon tetrachloride",
+  "in_panel": true,
+  "records": 202,
+  "years": "1991-2022",
+  "facilities": 63,
+  "top_acts": [
+   [
+    "OTHER PROCESS MODIFICATIONS",
+    34
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    32
+   ],
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    29
+   ],
+   [
+    "IMPLEMENTED INSPECTION OR MONITORING PROGRAM OF POTENTIAL SPILL OR LEAK SOURCES",
+    26
+   ],
+   [
+    "MODIFIED EQUIPMENT, LAYOUT, OR PIPING",
+    17
+   ]
+  ],
+  "fam_share": {
+   "F3": 0.36,
+   "F5": 0.35,
+   "F4": 0.21,
+   "F1": 0.06,
+   "F2": 0.01
+  },
+  "est_n": 1,
+  "est_hit": 0.0,
+  "est_by_act": [],
+  "struct": [
+   [
+    "Hexachloroethane",
+    0.5,
+    0.73
+   ],
+   [
+    "Dichlorodifluoromethane (CFC-12)",
+    0.43,
+    0.81
+   ],
+   [
+    "Trichlorofluoromethane (CFC-11)",
+    0.43,
+    0.78
+   ]
+  ],
+  "phys": [
+   [
+    "1,1,1,2-Tetrachloroethane",
+    0.87,
+    0.71
+   ],
+   [
+    "Trichlorofluoromethane (CFC-11)",
+    0.85,
+    0.78
+   ],
+   [
+    "Bromochlorodifluoromethane (Halon 1211)",
+    0.84,
+    0.56
+   ]
+  ],
+  "ctx": [
+   [
+    "Chlorobenzene",
+    0.85,
+    0.8
+   ],
+   [
+    "1,2-Dichloroethane",
+    0.82,
+    0.87
+   ],
+   [
+    "Chloroform",
+    0.8,
+    0.82
+   ]
+  ]
+ },
+ "123-91-1": {
+  "name": "1,4-Dioxane",
+  "in_panel": true,
+  "records": 320,
+  "years": "1991-2024",
+  "facilities": 69,
+  "top_acts": [
+   [
+    "OTHER PROCESS MODIFICATIONS",
+    52
+   ],
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    33
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    29
+   ],
+   [
+    "MODIFIED EQUIPMENT, LAYOUT, OR PIPING",
+    27
+   ],
+   [
+    "CHANGED PRODUCTION SCHEDULE TO MINIMIZE EQUIPMENT AND FEEDSTOCK CHANGEOVERS",
+    15
+   ]
+  ],
+  "fam_share": {
+   "F3": 0.36,
+   "F4": 0.26,
+   "F5": 0.24,
+   "F1": 0.09,
+   "F2": 0.04
+  },
+  "est_n": 3,
+  "est_hit": 1.0,
+  "est_by_act": [],
+  "struct": [
+   [
+    "Ethylene oxide",
+    0.83,
+    0.83
+   ],
+   [
+    "Hydrogen fluoride",
+    0.17,
+    0.82
+   ],
+   [
+    "Propylene oxide",
+    0.15,
+    0.78
+   ]
+  ],
+  "phys": [
+   [
+    "Propylene oxide",
+    0.64,
+    0.78
+   ],
+   [
+    "Ethylene oxide",
+    0.61,
+    0.83
+   ],
+   [
+    "N-Methyl-2-pyrrolidone",
+    0.6,
+    0.81
+   ]
+  ],
+  "ctx": [
+   [
+    "2-Methoxyethanol",
+    0.85,
+    0.77
+   ],
+   [
+    "N,N-Dimethylformamide",
+    0.83,
+    0.84
+   ],
+   [
+    "sec-Butyl alcohol",
+    0.8,
+    0.86
+   ]
+  ]
+ },
+ "872-50-4": {
+  "name": "NMP",
+  "in_panel": true,
+  "records": 2537,
+  "years": "1995-2024",
+  "facilities": 379,
+  "top_acts": [
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    325
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    254
+   ],
+   [
+    "CHANGED PRODUCTION SCHEDULE TO MINIMIZE EQUIPMENT AND FEEDSTOCK CHANGEOVERS",
+    222
+   ],
+   [
+    "OTHER PROCESS MODIFICATIONS",
+    202
+   ],
+   [
+    "MODIFIED EQUIPMENT, LAYOUT, OR PIPING",
+    180
+   ]
+  ],
+  "fam_share": {
+   "F5": 0.33,
+   "F3": 0.28,
+   "F4": 0.22,
+   "F1": 0.12,
+   "F2": 0.05
+  },
+  "est_n": 102,
+  "est_hit": 0.25,
+  "est_by_act": [
+   [
+    "CHANGED PRODUCTION SCHEDULE TO MINIMIZE EQUIPMENT AND FEEDSTOCK CHANGEOVERS",
+    6,
+    0.0
+   ],
+   [
+    "IMPROVED APPLICATION TECHNIQUES",
+    3,
+    0.0
+   ],
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    9,
+    0.0
+   ],
+   [
+    "IMPROVED SCHEDULING, RECORD KEEPING, OR PROCEDURES FOR OPERATIONS, CLEANING, AND MAINTENANCE",
+    3,
+    0.0
+   ],
+   [
+    "INSTITUTED RECIRCULATION WITHIN A PROCESS",
+    3,
+    0.67
+   ],
+   [
+    "INTRODUCED AN IN-LINE PRODUCT QUALITY MONITORING OR OTHER PROCESS ANALYSIS SYSTEM",
+    3,
+    0.0
+   ],
+   [
+    "OPTIMIZED PROCESS CONDITIONS TO INCREASE EFFICIENCY",
+    8,
+    0.0
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    6,
+    0.33
+   ],
+   [
+    "OTHER CLEANING AND DEGREASING MODIFICATIONS",
+    3,
+    0.0
+   ],
+   [
+    "OTHER IMPROVEMENTS TO INVENTORY AND MATERIAL MANAGEMENT",
+    3,
+    0.33
+   ],
+   [
+    "OTHER PROCESS MODIFICATIONS",
+    5,
+    0.2
+   ],
+   [
+    "REFORMULATED OR DEVELOPED NEW PRODUCT LINE",
+    4,
+    0.75
+   ],
+   [
+    "SUBSTITUTED AN ORGANIC SOLVENT",
+    5,
+    0.6
+   ],
+   [
+    "SUBSTITUTED RAW MATERIALS",
+    6,
+    0.33
+   ]
+  ],
+  "struct": [
+   [
+    "Hexazinone",
+    0.2,
+    0.3
+   ],
+   [
+    "Dazomet",
+    0.19,
+    0.51
+   ],
+   [
+    "Dazomet, sodium salt",
+    0.18,
+    0.21
+   ]
+  ],
+  "phys": [
+   [
+    "Acetone",
+    0.63,
+    0.92
+   ],
+   [
+    "Isobutyraldehyde",
+    0.63,
+    0.57
+   ],
+   [
+    "Methyl ethyl ketone",
+    0.61,
+    0.93
+   ]
+  ],
+  "ctx": [
+   [
+    "Methyl isobutyl ketone",
+    0.88,
+    0.95
+   ],
+   [
+    "n-Butyl alcohol",
+    0.86,
+    0.96
+   ],
+   [
+    "Dichloromethane",
+    0.85,
+    0.95
+   ]
+  ]
+ },
+ "106-99-0": {
+  "name": "1,3-Butadiene",
+  "in_panel": true,
+  "records": 977,
+  "years": "1991-2024",
+  "facilities": 142,
+  "top_acts": [
+   [
+    "IMPLEMENTED INSPECTION OR MONITORING PROGRAM OF POTENTIAL SPILL OR LEAK SOURCES",
+    271
+   ],
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    155
+   ],
+   [
+    "OTHER SPILL OR LEAK PREVENTION",
+    131
+   ],
+   [
+    "MODIFIED EQUIPMENT, LAYOUT, OR PIPING",
+    106
+   ],
+   [
+    "OTHER PROCESS MODIFICATIONS",
+    97
+   ]
+  ],
+  "fam_share": {
+   "F4": 0.48,
+   "F3": 0.27,
+   "F5": 0.24,
+   "F1": 0.01,
+   "F2": 0.01
+  },
+  "est_n": 18,
+  "est_hit": 0.11,
+  "est_by_act": [],
+  "struct": [
+   [
+    "Acrolein",
+    0.44,
+    0.75
+   ],
+   [
+    "Propylene",
+    0.38,
+    0.92
+   ],
+   [
+    "Vinyl fluoride",
+    0.38,
+    0.47
+   ]
+  ],
+  "phys": [
+   [
+    "Ethylene",
+    0.64,
+    0.96
+   ],
+   [
+    "Isoprene",
+    0.64,
+    0.71
+   ],
+   [
+    "Chloroprene",
+    0.6,
+    0.65
+   ]
+  ],
+  "ctx": [
+   [
+    "Ethylene",
+    0.84,
+    0.96
+   ],
+   [
+    "Isoprene",
+    0.84,
+    0.71
+   ],
+   [
+    "Carbon disulfide",
+    0.8,
+    0.76
+   ]
+  ]
+ },
+ "50-00-0": {
+  "name": "Formaldehyde",
+  "in_panel": true,
+  "records": 3644,
+  "years": "1991-2024",
+  "facilities": 642,
+  "top_acts": [
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    526
+   ],
+   [
+    "OTHER PROCESS MODIFICATIONS",
+    330
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    304
+   ],
+   [
+    "SUBSTITUTED RAW MATERIALS",
+    259
+   ],
+   [
+    "CHANGED PRODUCTION SCHEDULE TO MINIMIZE EQUIPMENT AND FEEDSTOCK CHANGEOVERS",
+    249
+   ]
+  ],
+  "fam_share": {
+   "F5": 0.31,
+   "F3": 0.25,
+   "F4": 0.22,
+   "F1": 0.16,
+   "F2": 0.06
+  },
+  "est_n": 125,
+  "est_hit": 0.27,
+  "est_by_act": [
+   [
+    "CHANGED PRODUCTION SCHEDULE TO MINIMIZE EQUIPMENT AND FEEDSTOCK CHANGEOVERS",
+    6,
+    0.0
+   ],
+   [
+    "IMPLEMENTED INSPECTION OR MONITORING PROGRAM OF POTENTIAL SPILL OR LEAK SOURCES",
+    3,
+    0.33
+   ],
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    3,
+    0.33
+   ],
+   [
+    "INSTITUTED RECIRCULATION WITHIN A PROCESS",
+    3,
+    0.33
+   ],
+   [
+    "MODIFIED DESIGN OR COMPOSITION OF PRODUCT",
+    8,
+    0.38
+   ],
+   [
+    "MODIFIED EQUIPMENT, LAYOUT, OR PIPING",
+    7,
+    0.29
+   ],
+   [
+    "OPTIMIZED PROCESS CONDITIONS TO INCREASE EFFICIENCY",
+    7,
+    0.0
+   ],
+   [
+    "OPTIMIZED REACTION CONDITIONS OR OTHERWISE INCREASED EFFICIENCY OF SYNTHESIS",
+    5,
+    0.6
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    8,
+    0.38
+   ],
+   [
+    "OTHER IMPROVEMENTS TO INVENTORY AND MATERIAL MANAGEMENT",
+    3,
+    0.0
+   ],
+   [
+    "OTHER IMPROVEMENTS TO OPERATING PRACTICES AND TRAINING",
+    6,
+    0.33
+   ],
+   [
+    "OTHER PROCESS MODIFICATIONS",
+    10,
+    0.4
+   ],
+   [
+    "OTHER RAW MATERIAL MODIFICATIONS",
+    3,
+    0.33
+   ],
+   [
+    "OTHER SPILL OR LEAK PREVENTION",
+    3,
+    0.33
+   ],
+   [
+    "REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT",
+    3,
+    0.0
+   ],
+   [
+    "REFORMULATED OR DEVELOPED NEW PRODUCT LINE",
+    3,
+    1.0
+   ],
+   [
+    "SUBSTITUTED A FEEDSTOCK OR REAGENT CHEMICAL WITH A DIFFERENT CHEMICAL",
+    3,
+    0.0
+   ],
+   [
+    "SUBSTITUTED RAW MATERIALS",
+    6,
+    0.5
+   ],
+   [
+    "SUBSTITUTED RAW MATERIALS, FEEDSTOCK, OR REACTANT CHEMICAL",
+    7,
+    0.14
+   ]
+  ],
+  "struct": [
+   [
+    "Ethylene",
+    0.25,
+    0.71
+   ],
+   [
+    "Acrolein",
+    0.22,
+    0.6
+   ],
+   [
+    "Acrylic acid",
+    0.18,
+    0.81
+   ]
+  ],
+  "phys": [
+   [
+    "Hydrogen cyanide",
+    0.81,
+    0.59
+   ],
+   [
+    "Carbonyl sulfide",
+    0.66,
+    0.53
+   ],
+   [
+    "Acrylonitrile",
+    0.66,
+    0.83
+   ]
+  ],
+  "ctx": [
+   [
+    "Phenol",
+    0.88,
+    0.92
+   ],
+   [
+    "Sulfuric acid (acid aerosols including mists, vapors, gas, fog, and other airborne forms of any particle size)",
+    0.88,
+    0.89
+   ],
+   [
+    "Methanol",
+    0.87,
+    0.94
+   ]
+  ]
+ },
+ "115-96-8": {
+  "name": "TCEP",
+  "in_panel": false,
+  "records": 0,
+  "years": "",
+  "facilities": 0,
+  "top_acts": [],
+  "fam_share": {},
+  "est_n": 0,
+  "est_hit": null,
+  "est_by_act": []
+ },
+ "75-01-4": {
+  "name": "Vinyl chloride",
+  "in_panel": true,
+  "records": 206,
+  "years": "1991-2024",
+  "facilities": 39,
+  "top_acts": [
+   [
+    "OTHER PROCESS MODIFICATIONS",
+    42
+   ],
+   [
+    "OTHER CHANGES IN OPERATING PRACTICES",
+    35
+   ],
+   [
+    "IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES",
+    28
+   ],
+   [
+    "OTHER SPILL OR LEAK PREVENTION",
+    26
+   ],
+   [
+    "MODIFIED EQUIPMENT, LAYOUT, OR PIPING",
+    14
+   ]
+  ],
+  "fam_share": {
+   "F3": 0.36,
+   "F5": 0.32,
+   "F4": 0.25,
+   "F2": 0.04,
+   "F1": 0.03
+  },
+  "est_n": 2,
+  "est_hit": 0.0,
+  "est_by_act": [],
+  "struct": [
+   [
+    "1,2-Dichloroethylene",
+    0.38,
+    0.56
+   ],
+   [
+    "1,3-Butadiene",
+    0.38,
+    0.82
+   ],
+   [
+    "Allyl chloride",
+    0.36,
+    0.62
+   ]
+  ],
+  "phys": [
+   [
+    "Vinyl fluoride",
+    0.85,
+    0.39
+   ],
+   [
+    "Hydrochloric acid (acid aerosols including mists, vapors, gas, fog, and other airborne forms of any particle size)",
+    0.65,
+    0.69
+   ],
+   [
+    "Chloroprene",
+    0.64,
+    0.63
+   ]
+  ],
+  "ctx": [
+   [
+    "Carbon tetrachloride",
+    0.8,
+    0.8
+   ],
+   [
+    "Vinylidene chloride",
+    0.77,
+    0.79
+   ],
+   [
+    "1,1,2,2-Tetrachloroethane",
+    0.76,
+    0.72
+   ]
+  ]
+ }
+}
