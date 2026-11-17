@@ -3,6 +3,8 @@ CASE: 1-Bromopropane (1-BP) — vapor degreasing / spray adhesives
 SMILES           : CCCBr
 Industry sector  : —
 Condition of use : Vapor degreasing and spray adhesive application
+Matched uses     : Used as a chemical processing aid (0.6723); Used as a manufacturing aid (0.6364); P207 emulsifiers (0.632); used_as_a_chemical_processing_aid (0.6319); P208 surfactants (0.63); Z202 metalworking fluids (0.6299); Z201 process lubricants (0.6239); On site use of the chemical (0.6233); P209 lubricants (0.6208); p207_emulsifiers (0.6204)
+Matched sectors  : —  [* = at or above the sector threshold]
 EPA scenario     : Vapor degreasing and spray-adhesive use, industrial conditions of use; 1-BP presents unreasonable risk under its conditions of use.
 EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-1-bromopropane-1-bp
 Query            : What source reduction activities have historically been effective for this chemical?
@@ -10,26 +12,38 @@ needs_clarification: False
 records returned : 10
 --------------------------------------------------------------------------------
 ANSWER:
-Based on the TRI knowledge graph context, the query chemical is 1-Bromopropane (CAS 106-94-5) with a similarity score of 1.0. The following source reduction activities have been reported as effective for this chemical:
+Based on the provided knowledge graph context, the query chemical is identified by its SMILES ("CCCBr") but its name is not provided. However, we can analyze the activities reported for the query chemical and its structurally similar analogues.
 
-* SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL (Sector N/A — N/A | Year 2021 | State WA)
-* DEVELOPED A NEW CHEMICAL PRODUCT TO REPLACE PREVIOUS CHEMICAL PRODUCT (Sector N/A — N/A | Year 2020 | State WA)
+The query chemical has a similar structure to 1-Bromopropane (CAS 106-94-5, similarity 1.0), which is listed under the "Catch-all activity codes (less specific)" section. However, this is a catch-all code and less specific.
 
-These activities were reported for the query chemical itself, indicating their effectiveness.
+A more promising activity is reported for n-Hexane (CAS 110-54-3, similarity 0.983), which is listed under the "SUBSTITUTED RAW MATERIALS" and "MODIFIED EQUIPMENT, LAYOUT, OR PIPING" sections. This chemical is an analogue of the query chemical and has been reported to be effective in reducing emissions under the stated use.
+
+Specifically, n-Hexane (CAS 110-54-3, similarity 0.983) was used as a chemical processing aid in Sector 311942 — Spices & extracts in 2015 (State MI) and in Sector 311224 — Soybean oil & other oilseed in 2020 (State IL).
+
+Therefore, the source reduction activities that have historically been effective for this chemical are:
+
+1. Substituting raw materials (e.g., n-Hexane, CAS 110-54-3, similarity 0.983) in Sector 311942 — Spices & extracts in 2015 (State MI).
+2. Modifying equipment, layout, or piping (e.g., n-Hexane, CAS 110-54-3, similarity 0.983) in Sector 311224 — Soybean oil & other oilseed in 2020 (State IL).
+
+These activities are transferable candidate recommendations for the query chemical based on the reported effectiveness of its structurally similar analogues.
 --------------------------------------------------------------------------------
-DISTINCT SOURCE CHEMICALS (3) — cross-chemical recommendations by SMILES similarity:
+DISTINCT SOURCE CHEMICALS (5) — cross-chemical recommendations by SMILES similarity:
   sim=1.0000  1-Bromopropane (CAS 106-94-5)
   sim=0.9830  n-Hexane (CAS 110-54-3)
-  sim=0.9725  Certain glycol ethers (CAS N230)  ← category reached via member Ethane, 1,2-dimethoxy- (CAS 110-71-4)
+  sim=0.9794  n-Butyl alcohol (CAS 71-36-3)
+  sim=0.9765  Ethylbenzene (CAS 100-41-4)
+  sim=0.9748  Toluene (CAS 108-88-3)
 
 RECORDS (ranked / interleaved):
-  [1.0] 1-Bromopropane (CAS 106-94-5) | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | N/A — N/A | 2021 | WA
-  [0.983] n-Hexane (CAS 110-54-3) | INSTITUTED RECIRCULATION WITHIN A PROCESS | N/A — N/A | 2024 | GA
-  [0.9725] Certain glycol ethers (CAS N230) [via Ethane, 1,2-dimethoxy- (CAS 110-71-4)] | OTHER IMPROVEMENTS TO OPERATING PRACTICES AND TRAINING | N/A — N/A | 2024 | TN
-  [1.0] 1-Bromopropane (CAS 106-94-5) | OTHER CHANGES IN OPERATING PRACTICES | N/A — N/A | 2020 | MD
-  [0.983] n-Hexane (CAS 110-54-3) | SUBSTITUTED AN ORGANIC SOLVENT | N/A — N/A | 2024 | IL
-  [0.9725] Certain glycol ethers (CAS N230) [via Ethane, 1,2-dimethoxy- (CAS 110-71-4)] | SUBSTITUTED AN ORGANIC SOLVENT | N/A — N/A | 2024 | NC
-  [1.0] 1-Bromopropane (CAS 106-94-5) | DEVELOPED A NEW CHEMICAL PRODUCT TO REPLACE PREVIOUS CHEMICAL PRODUCT | N/A — N/A | 2020 | WA
-  [0.983] n-Hexane (CAS 110-54-3) | SUBSTITUTED AN ORGANIC SOLVENT | N/A — N/A | 2023 | IL
-  [0.9725] Certain glycol ethers (CAS N230) [via Ethane, 1,2-dimethoxy- (CAS 110-71-4)] | MODIFIED OR UPDATED EQUIPMENT OR LAYOUT | N/A — N/A | 2023 | TX
-  [1.0] 1-Bromopropane (CAS 106-94-5) | OTHER CHANGES IN OPERATING PRACTICES | N/A — N/A | 2019 | MD
+  [0.983] n-Hexane (CAS 110-54-3) | SUBSTITUTED RAW MATERIALS | 311942 — Spices & extracts | 2015 | MI | Tier 2 | Channels chemical,use,prior | Rank 7
+  [0.983] n-Hexane (CAS 110-54-3) | MODIFIED EQUIPMENT, LAYOUT, OR PIPING | 311224 — Soybean oil & other oilseed | 2020 | IL | Tier 2 | Channels chemical,use,prior | Rank 8
+
+Catch-all activity codes (less specific):
+  [1.0] 1-Bromopropane (CAS 106-94-5) | OTHER PROCESS MODIFICATIONS | 332117 — Powder metallurgy part manufacturing | 2017 | OH | Tier 1 | Channels chemical,use,prior | Rank 1
+  [0.9794] n-Butyl alcohol (CAS 71-36-3) | OTHER PROCESS MODIFICATIONS | 322121 — Paper (except newsprint) mills | 2015 | ME | Tier 2 | Channels chemical,use,prior | Rank 2
+  [0.9765] Ethylbenzene (CAS 100-41-4) | OTHER PROCESS MODIFICATIONS | 322220 — Paper bag & coated & treated paper | 2016 | IA | Tier 2 | Channels chemical,use,prior | Rank 3
+  [0.9748] Toluene (CAS 108-88-3) | OTHER PROCESS MODIFICATIONS | 325199 — All other basic organic chemicals | 2014 | MD | Tier 2 | Channels chemical,use,prior | Rank 4
+  [0.9748] Toluene (CAS 108-88-3) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2015 | MI | Tier 2 | Channels chemical,use,prior | Rank 5
+  [0.9748] Toluene (CAS 108-88-3) | OTHER PROCESS MODIFICATIONS | 325194 — Cyclic crude & intermediate, & gum & wood chemical | 2019 | LA | Tier 2 | Channels chemical,use,prior | Rank 6
+  [0.983] n-Hexane (CAS 110-54-3) | OTHER PROCESS MODIFICATIONS MADE | 311224 — Soybean oil & other oilseed | 2022 | IN | Tier 2 | Channels chemical,use,prior | Rank 9
+  [0.983] n-Hexane (CAS 110-54-3) | OTHER PRODUCT MODIFICATIONS | 336390 — Other motor vehicle parts | 2017 | UT | Tier 2 | Channels chemical,use,prior | Rank 10

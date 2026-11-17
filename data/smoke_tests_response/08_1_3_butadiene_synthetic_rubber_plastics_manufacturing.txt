@@ -3,31 +3,41 @@ CASE: 1,3-Butadiene — synthetic rubber / plastics manufacturing
 SMILES           : C=CC=C
 Industry sector  : Synthetic rubber and plastics material manufacturing
 Condition of use : —
+Matched uses     : —
+Matched sectors  : 326291 Rubber products for mechanical use (0.8664*); 325212 Synthetic rubber (vulcanizable elastomers) (0.866*); 325211 Plastics materials & resins (0.8347); 326299 Other rubber products (0.8103); 326220 Rubber & plastics hoses & belting (0.7843); 326199 All other plastics products (0.7773); 326112 Plastics packaging film and sheet (including laminated) manufacturing (0.7689); 326121 Plastics rods, sticks & profile shapes (0.7639); 326130 Laminated plastics plate, sheet (except packaging), and shape manufacturing (0.7546); 325220 Artificial and synthetic fibers and filaments (0.7437)  [* = at or above the sector threshold]
 EPA scenario     : Monomer used in polymerization for synthetic rubber, plastic, and resin manufacturing; industrial inhalation exposure presents unreasonable risk.
 EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-13-butadiene
 Query            : What source reduction activities have historically been effective for this chemical?
 needs_clarification: False
-records returned : 2
+records returned : 10
 --------------------------------------------------------------------------------
 ANSWER:
-According to the TRI knowledge graph context, two source-reduction activities have been reported as effective for 1,3-Butadiene (C=CC=C):
+Based on the provided knowledge graph context, there are no specific source reduction activities mentioned for the query chemical itself (C=CC=C). However, we can look at the activities reported for its structurally similar analogues.
 
-1. OTHER SPILL OR LEAK PREVENTION
-	* Reported for: 1,3-Butadiene (Similarity 1.0)
-	* Sector: Synthetic rubber (vulcanizable elastomers) (325212.0)
-	* Year: 2015
-	* State: KY
-2. OTHER IMPROVEMENTS TO OPERATING PRACTICES AND TRAINING
-	* Reported for: 1,3-Butadiene (Similarity 1.0)
-	* Sector: Plastics materials & resins (325211.0)
-	* Year: 2022
-	* State: MI
+The query chemical's most similar analogue is 1,3-Butadiene (CAS 106-99-0, similarity 1.0, identical structure to the query). However, the only activity mentioned for this analogue is "OTHER SPILL OR LEAK PREVENTION" (Rank 1), which is a catch-all code and less specific.
 
-These activities have been reported as effective in reducing emissions or releases of this chemical at specific facilities and sectors over the years.
+A more promising activity is reported for another analogue, Styrene (CAS 100-42-5, similarity 0.9838, ANALOGUE, not the query chemical). Specifically, Styrene was reported to have been used as a reactant in Sector 325211 — Plastics materials & resins, in multiple years (2015, 2021) and states (MI, TX). This activity is reported for multiple facilities and sectors, making it a more transferable candidate recommendation for the query chemical.
+
+Therefore, one historically effective source reduction activity for the closest analogue is the use of Styrene as a reactant in the plastics industry, specifically in Sector 325211 — Plastics materials & resins, in facilities located in states MI and TX, in years 2015 and 2021.
 --------------------------------------------------------------------------------
-DISTINCT SOURCE CHEMICALS (1) — cross-chemical recommendations by SMILES similarity:
+DISTINCT SOURCE CHEMICALS (6) — cross-chemical recommendations by SMILES similarity:
   sim=1.0000  1,3-Butadiene (CAS 106-99-0)
+  sim=0.9874  Benzene (CAS 71-43-2)
+  sim=0.9838  Styrene (CAS 100-42-5)
+  sim=0.9828  Toluene (CAS 108-88-3)
+  sim=0.9810  Ethylene (CAS 74-85-1)
+  sim=0.9804  Chloroprene (CAS 126-99-8)
 
 RECORDS (ranked / interleaved):
-  [1.0] 1,3-Butadiene (CAS 106-99-0) | OTHER SPILL OR LEAK PREVENTION | 325212.0 — Synthetic rubber (vulcanizable elastomers) | 2015 | KY
-  [1.0] 1,3-Butadiene (CAS 106-99-0) | OTHER IMPROVEMENTS TO OPERATING PRACTICES AND TRAINING | 325211.0 — Plastics materials & resins | 2022 | MI
+
+Catch-all activity codes (less specific):
+  [1.0] 1,3-Butadiene (CAS 106-99-0) | OTHER SPILL OR LEAK PREVENTION | 325212 — Synthetic rubber (vulcanizable elastomers) | 2015 | KY | Tier 3 | Channels chemical,sector,prior | Rank 1
+  [0.9828] Toluene (CAS 108-88-3) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2015 | MI | Tier 4 | Channels chemical,sector,prior | Rank 2
+  [0.9804] Chloroprene (CAS 126-99-8) | OTHER PROCESS MODIFICATIONS | 325212 — Synthetic rubber (vulcanizable elastomers) | 2017 | LA | Tier 4 | Channels chemical,sector,prior | Rank 3
+  [0.9874] Benzene (CAS 71-43-2) | OTHER PROCESS MODIFICATIONS | 325110 — Petrochemicals | 2014 | TX | Tier 5 | Channels chemical,prior | Rank 4
+  [0.9874] Benzene (CAS 71-43-2) | OTHER PROCESS MODIFICATIONS | 324110 — Petroleum refinery products | 2014 | OK | Tier 5 | Channels chemical,prior | Rank 5
+  [0.981] Ethylene (CAS 74-85-1) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2015 | TX | Tier 4 | Channels chemical,sector,prior | Rank 6
+  [0.9838] Styrene (CAS 100-42-5) | OTHER PROCESS MODIFICATIONS MADE | 325211 — Plastics materials & resins | 2021 | MI | Tier 4 | Channels chemical,sector,prior | Rank 7
+  [0.9838] Styrene (CAS 100-42-5) | OTHER PROCESS MODIFICATIONS | 326199 — All other plastics products | 2015 | CA | Tier 4 | Channels chemical,sector,prior | Rank 8
+  [0.9838] Styrene (CAS 100-42-5) | OTHER PROCESS MODIFICATIONS | 326199 — All other plastics products | 2017 | LA | Tier 4 | Channels chemical,sector,prior | Rank 9
+  [0.9838] Styrene (CAS 100-42-5) | OTHER PROCESS MODIFICATIONS | 326199 — All other plastics products | 2017 | TX | Tier 4 | Channels chemical,sector,prior | Rank 10

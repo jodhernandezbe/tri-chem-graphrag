@@ -254,6 +254,30 @@ RAG_GRAPH:
     # EMBEDDING_TYPE below. Defaults to the best evaluated performer (see docs/RESULTS.md);
     # MolDeBERTa was the prior hardcoded value and the weakest performer.
     CHEMICAL_EMBEDDING_TYPE: Hybrid
+    # Optional retrieval behaviours; the values below are the shipped behaviour. Each can be overridden per call.
+    # RANKING: similarity | specificity | consensus_specificity (record order; see tabulate_records)
+    RANKING: similarity
+    # COU_FILTER: hard | soft (soft repeats the traversal without the condition-of-use filter when it returns nothing)
+    COU_FILTER: hard
+    # ANALOGUES: molecular | context (context re-ranks the top-50 molecular neighbours by sector and use similarity)
+    ANALOGUES: molecular
+    # RETRIEVAL: fused | legacy (fused, the shipped default, scores reduction records by reciprocal-rank fusion of chemical,
+    # use, sector and prior channels and labels each record with a tier; it ignores RANKING, COU_FILTER and ANALOGUES.
+    # legacy stays available: set it here, or pass retrieval=legacy per call or in the API request)
+    RETRIEVAL: fused
+    # RETRIEVAL_WEIGHTS: fused channel weights in weighted reciprocal-rank fusion, score = sum of w / (60 + rank). Omitted
+    # channels weigh 1.0; weight 0 drops a channel. prior is 0.5: chosen by cross-validation inside the index split
+    # (audit_logs/prior_weight_evaluation.json), which lowers the share of catch-all codes ranked first.
+    RETRIEVAL_WEIGHTS:
+      chemical: 1.0
+      use: 1.0
+      sector: 1.0
+      prior: 0.5
+    # SECTOR_NOTICE_MIN_SIMILARITY: fused mode prints a sector notice when a sector was stated and none of the returned records
+    # sits in a matched NAICS title whose similarity to the stated sector is at or above this value. Fixed, not tuned: 0.85 lies
+    # in the gap between the best match for a sector absent from the graph ("Dry cleaning and laundry services": 0.80, a laundry
+    # equipment maker) and the best matches for sectors clearly present (PVC 0.8575, synthetic resin 0.8593, synthetic rubber 0.8664).
+    SECTOR_NOTICE_MIN_SIMILARITY: 0.85
   GENERATION:
     MODEL: "llama3.1"
     BASE_URL: "http://localhost:11434"

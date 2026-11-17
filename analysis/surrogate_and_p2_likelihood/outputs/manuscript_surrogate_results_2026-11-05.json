@@ -1,0 +1,216 @@
+{
+ "run_date": "2026-11-05 (system date 2026-11-04 in session; file name per request)",
+ "scripts": "analysis/surrogate_and_p2_likelihood/{build,agg,ctx,feat_kg,anal_kg,cases_kg,xwalk}.py run unmodified except path edits, in outputs/work; supplementary top3_analysis.py and descriptor_rho.py (outputs/work). Data: data/raw/tri_2a_2014-2024.csv, data/processed/tri_1a/1b_2014-2024_transformed.csv.",
+ "population": {
+  "n_chemicals": 88,
+  "definition": "chemicals with >=3 TRI 2a source-reduction records with estimated reduction code R1-R3 (>=25%), reporting years 2014-2024, with valid SMILES",
+  "records_R1_R3": 3041,
+  "chemicals_with_any_R1_R3": 194,
+  "pairs": 3828
+ },
+ "definitions": {
+  "P2_practice_similarity": "OP = cosine similarity of per-chemical vectors of counts of source-reduction activity codes (R1-R3 records), log1p(count) x IDF weight, L2-normalised, over the 88 chemicals",
+  "structural": "Morgan fingerprint radius 2, 2048 bits, Tanimoto",
+  "physicochemical": "11 RDKit descriptors, z-scored, similarity = 1/(1+Euclidean distance)",
+  "sector": "cosine of IDF-weighted log1p 4-digit primary NAICS counts per chemical (all TRI 1a reports 2014-2024)",
+  "condition_of_use": "cosine of IDF-weighted log1p Form R Section 3 chemical_activity counts (tri_1b)",
+  "context": "mean of sector and condition-of-use similarity",
+  "correlation": "Spearman rho over all n(n-1)/2 = 3828 chemical pairs: criterion similarity vs OP",
+  "analogue_agreement": "mean OP between a chemical and its top-3 analogues under the criterion (self excluded); mean over 88 chemicals; Random uses rng(42) uniform matrix",
+  "share_better": "fraction of chemicals whose context top-3 agreement > structural top-3 agreement",
+  "differed": "fraction of chemicals whose top-1 structural analogue != top-1 context analogue (cases_kg.py 'different top1', argmax tie-break)",
+  "wilcoxon": "paired two-sided Wilcoxon over chemicals of per-chemical top-3 agreement",
+  "descriptor_rho": "Spearman between embedding cosine distance and Tanimoto distance (structural) / Jaccard activity-code distance (development-split operational anchors, 6-digit NAICS x code); src/validation EmbeddingMetrics.compute, same as docs/RESULTS.md section 4",
+  "1-BP": "mean OP between 1-bromopropane and its top-3 analogues (cases_kg.json key 106-94-5, third element of each tuple)"
+ },
+ "neo4j_at_run_time": {
+  "read_only": true,
+  "nodes": {
+   "Chemical": 194,
+   "Facility": 1742,
+   "Report": 2932,
+   "Candidate": 2043,
+   "Sector": 309,
+   "Activity": 86,
+   "Reduction": 74
+  },
+  "edges": {
+   "FILED_BY": 2932,
+   "REPORTS_ON": 2932,
+   "CLASSIFIED_AS": 1833,
+   "RECORDS": 5399,
+   "DOCUMENTS": 3041,
+   "CONTAINS": 2162
+  },
+  "note": "anal_kg.py itself reads TRI files, not Neo4j; Neo4j used only for descriptor rhos and counts. Graph counts equal the file-derived window: 194 chemicals, 1742 facilities, 2932 reports, 3041 R1-R3 records."
+ },
+ "spearman_rho_with_P2_similarity": {
+  "structural_morgan_tanimoto": {
+   "rho_unrounded": -0.08103138839557592,
+   "p": 5.164491541317341e-07
+  },
+  "physicochemical": {
+   "rho_unrounded": 0.13518457344114926,
+   "p": 4.471083874366813e-17
+  },
+  "sector_naics4": {
+   "rho_unrounded": 0.3143943312755893,
+   "p": 1.395031005174179e-88
+  },
+  "condition_of_use": {
+   "rho_unrounded": 0.262091636406101,
+   "p": 3.682013206017389e-61
+  },
+  "context_naics_cou": {
+   "rho_unrounded": 0.3365164689471543,
+   "p": 5.4023741553207995e-102
+  },
+  "structural_plus_context": {
+   "rho_unrounded": 0.27876708898161223,
+   "p": 2.8477825099424034e-69
+  }
+ },
+ "anal_kg_stdout": "chemicals analysed 88\n{\n \"Structural (Morgan Tanimoto)\": [\n  -0.081,\n  5.164491541317341e-07\n ],\n \"Physicochemical descriptors\": [\n  0.135,\n  4.471083874366813e-17\n ],\n \"Industrial sector (NAICS)\": [\n  0.314,\n  1.395031005174179e-88\n ],\n \"Condition of use (Form R Sec. 3)\": [\n  0.262,\n  3.682013206017389e-61\n ],\n \"Context (NAICS+CoU)\": [\n  0.337,\n  5.4023741553207995e-102\n ],\n \"Structural+Context\": [\n  0.279,\n  2.8477825099424034e-69\n ]\n}\n('Structural', 1) 0.1977\n('Structural', 5) 0.2674\n('Structural', 'opsim_top1') 0.2737\n('Physicochemical', 1) 0.231\n('Physicochemical', 5) 0.3103\n('Physicochemical', 'opsim_top1') 0.2697\n('Sector (NAICS)', 1) 0.2479\n('Sector (NAICS)', 5) 0.3359\n('Sector (NAICS)', 'opsim_top1') 0.3467\n('Condition of use', 1) 0.2169\n('Condition of use', 5) 0.3167\n('Condition of use', 'opsim_top1') 0.2903\n('Context (NAICS+CoU)', 1) 0.2391\n('Context (NAICS+CoU)', 5) 0.3465\n('Context (NAICS+CoU)', 'opsim_top1') 0.3264\n('Structural+Context', 1) 0.2182\n('Structural+Context', 5) 0.3277\n('Structural+Context', 'opsim_top1') 0.3174\n('Random', 1) 0.1506\n('Random', 5) 0.2424\n('Random', 'opsim_top1') 0.1922\n('Oracle (true P2 profile)', 1) 0.4822\n('Oracle (true P2 profile)', 5) 0.5626\n('Oracle (true P2 profile)', 'opsim_top1') 0.6082\n",
+ "cases_kg_stdout_head": "wilcoxon ctx vs struct 0.006897520979453376 ctx vs pc 0.01855299880405788 share ctx better 0.48863636363636365\ndifferent top1 0.7840909090909091\n        n         p\nfam                \nF1   2049  0.430454\nF2    975  0.323077\nF3   4590  0.243573\nF4   2128  0.127350\nF5   4130  0.110169\noverall 13872 0.21921856978085352\nTrichloroethylene 174 [('Tetrachloroethylene', 0.3, 0.33), ('Formic acid', 0.17, 0.12), ('Pentachlorophenol', 0.12, 0.18)] [('Tetrachloroethylene', 0.69, 0.33), ('Chlorine', 0.55, 0.14), ('Chlorobenzene', 0.45, 0.08)] [('Tetrachloroethylene', 0.83, 0.33), ('1-Bromopropane', 0.82, 0.55), ('Dichloromethane', 0.8, 0.45)]\nTetrachloroethylene 113 [('Trichloroethylene', 0.3, 0.33), ('Chlorine', 0.17, 0.41), ('Pentachlorophenol', 0.15, 0.0)] [('Trichloroethylene', 0.69, 0.33), ('Chlorine', 0.45, 0.41), ('Chlorobenzene', 0.41, 0.09)] [('Trichloroethylene', 0.83, 0.33), ('Dichloromethane', 0.82, 0.3), ('Cumene', 0.8, 0.26)]\nMethylene chloride 305 [('Benzyl chloride', 0.2, 0.02), ('Chlorine', 0.2, 0.21), ('Hexachlorobenzene', 0.12, 0.1)] [('Chlorodifluoromethane (HCFC-22)', 0.77, 0.15), ('1-Bromopropane', 0.63, 0.52), ('Cyclohexane', 0.56, 0.12)] [('Tetrachloroethylene', 0.82, 0.3), ('Trichloroethylene', 0.8, 0.45), ('N,N-Dimethylformamide', 0.79, 0.19)]\n1-Bromopropane 65 [('n-Hexane', 0.36, 0.46), ('Triethylamine', 0.33, 0.0), ('n-Butyl alcohol', 0.27, 0.34)] [('Dichloromethane', 0.63, 0.52), ('Cyclohexane', 0.6, 0.0), ('Chlorodifluoromethane (HCFC-22)', 0.58, 0.0)] [('Tr",
+ "analogue_agreement_top3": {
+  "struct": 0.23763199949607117,
+  "phys": 0.2608559569512948,
+  "sector": 0.29651199246467663,
+  "cou": 0.2722489439335197,
+  "ctx": 0.3010430894659026,
+  "random": 0.1817558947816819
+ },
+ "analogue_agreement_top1": {
+  "struct": 0.2736872916573895,
+  "phys": 0.26969773219298543,
+  "sector": 0.3467276391863494,
+  "cou": 0.29032922774205855,
+  "ctx": 0.32638321225747247,
+  "random": 0.1922377522235437
+ },
+ "analogue_agreement_top5": {
+  "struct": 0.23051027353543876,
+  "phys": 0.23854070124933272,
+  "sector": 0.2745602560651441,
+  "cou": 0.2542965641691518,
+  "ctx": 0.27818451268175165,
+  "random": 0.18783201535916927
+ },
+ "tests_top3": {
+  "wilcoxon_ctx_vs_struct_p": 3.107636763734641e-05,
+  "wilcoxon_ctx_vs_phys_p": 0.014750355347060642,
+  "share_ctx_better_than_struct": 0.625,
+  "share_ctx_ge_struct": 0.6704545454545454,
+  "share_ctx_better_than_phys": 0.5909090909090909
+ },
+ "top1_different_cases_kg": 0.7840909090909091,
+ "top1_different_argsort": 0.7954545454545454,
+ "top1_tests": {
+  "wilcoxon_ctx_vs_struct_p": 0.006897520979453376,
+  "wilcoxon_ctx_vs_phys_p": 0.01855299880405788,
+  "share_ctx_better": 0.48863636363636365
+ },
+ "descriptor_rho": {
+  "MorganFingerprint": {
+   "n": 194,
+   "rho_tanimoto": 0.998196461278721,
+   "p_tanimoto": 0.0,
+   "rho_jaccard_code": -0.09181150037141954,
+   "p_jaccard_code": 2.9666318566458413e-71,
+   "rho_jaccard_family": 0.042179879106377494
+  },
+  "MolDeBERTa": {
+   "n": 166,
+   "rho_tanimoto": 0.28034579570397544,
+   "p_tanimoto": 0.0,
+   "rho_jaccard_code": 0.027819751339994644,
+   "p_jaccard_code": 3.86034288890448e-06,
+   "rho_jaccard_family": 0.07070845655041078
+  },
+  "Hybrid": {
+   "n": 166,
+   "rho_tanimoto": 0.3823574099807784,
+   "p_tanimoto": 0.0,
+   "rho_jaccard_code": 0.0016926110024228101,
+   "p_jaccard_code": 0.7787404035503579,
+   "rho_jaccard_family": 0.01875872686796857
+  },
+  "graph_nodes": {
+   "Chemical": 194,
+   "Facility": 1742,
+   "Report": 2932,
+   "Candidate": 2043,
+   "Sector": 309,
+   "Activity": 86,
+   "Reduction": 74
+  },
+  "graph_edges": {
+   "FILED_BY": 2932,
+   "REPORTS_ON": 2932,
+   "CLASSIFIED_AS": 1833,
+   "RECORDS": 5399,
+   "DOCUMENTS": 3041,
+   "CONTAINS": 2162
+  }
+ },
+ "bromopropane_106-94-5": {
+  "top3": {
+   "struct": [
+    [
+     "n-Hexane",
+     0.36,
+     0.46
+    ],
+    [
+     "Triethylamine",
+     0.33,
+     0.0
+    ],
+    [
+     "n-Butyl alcohol",
+     0.27,
+     0.34
+    ]
+   ],
+   "phys": [
+    [
+     "Dichloromethane",
+     0.63,
+     0.52
+    ],
+    [
+     "Cyclohexane",
+     0.6,
+     0.0
+    ],
+    [
+     "Chlorodifluoromethane (HCFC-22)",
+     0.58,
+     0.0
+    ]
+   ],
+   "ctx": [
+    [
+     "Trichloroethylene",
+     0.82,
+     0.55
+    ],
+    [
+     "Tetrachloroethylene",
+     0.76,
+     0.39
+    ],
+    [
+     "Dichloromethane",
+     0.73,
+     0.52
+    ]
+   ]
+  },
+  "mean_OP_top3": {
+   "struct": 0.26666666666666666,
+   "phys": 0.17333333333333334,
+   "ctx": 0.48666666666666664
+  }
+ }
+}

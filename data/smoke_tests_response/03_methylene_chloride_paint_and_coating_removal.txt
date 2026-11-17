@@ -3,29 +3,37 @@ CASE: Methylene chloride — paint and coating removal
 SMILES           : ClCCl
 Industry sector  : —
 Condition of use : Commercial paint and coating removal
+Matched uses     : Z301 cleaner (0.6797); z301_cleaner (0.6507); recycling (0.649); Recycling (0.649); Used as a chemical processing aid (0.6351); Z201 process lubricants (0.6234); Z306 waste treatment (0.6198); Z303 lubricant (0.6183); z201_process_lubricants (0.6179); used_as_a_chemical_processing_aid (0.6179)
+Matched sectors  : —  [* = at or above the sector threshold]
 EPA scenario     : Paint and coating removal, a condition of use EPA addressed; methylene chloride presents unreasonable risk under its conditions of use.
 EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/final-risk-evaluation-methylene-chloride
 Query            : What source reduction activities have historically been effective for this chemical?
 needs_clarification: False
-records returned : 7
+records returned : 10
 --------------------------------------------------------------------------------
 ANSWER:
-Based on the TRI knowledge graph context, the query chemical is Dichloromethane (ClCCl) with a CAS number of 75-09-2 and a similarity score of 1.0. The following source reduction activities have been reported as effective for this chemical:
+Based on the TRI knowledge graph context, the following source reduction activities have been historically effective for Dichloromethane (CAS 75-09-2):
 
-1. **SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL**: This activity was reported in multiple years (2024, 2023, and 2021) by facilities in State MN.
-2. **CHANGED TO AQUEOUS CLEANERS (FROM SOLVENTS OR OTHER MATERIALS)**: This activity was reported in 2020 by a facility in State MN.
-3. **IMPROVED APPLICATION TECHNIQUES**: This activity was reported in 2018 by a facility in State IL.
+1. **Changed to aqueous cleaners (from solvents or other materials)**: This activity was reported for Dichloromethane in Sector 325320 — Pesticides & other agricultural chemicals, in State MN, in Year 2020 (Rank 6).
+2. **Substituted manufacturing aid, processing aid, or other ancillary chemical**: This activity was reported for Dichloromethane in Sector 325320 — Pesticides & other agricultural chemicals, in State MN, in Years 2021, 2022, 2023, and 2024 (Ranks 1-4).
+3. **Optimized process conditions to increase efficiency**: This activity was reported for Dichloromethane in Sector 325411 — Medicinal & botanical drugs & vitamins, in State WI, in Year 2024 (Rank 5).
 
-These activities have been effective for Dichloromethane and its structurally similar analogues, making them transferable candidate recommendations for source reduction.
+These activities are considered effective because they have been reported multiple times across different years and sectors, indicating a consistent trend of source reduction for Dichloromethane.
 --------------------------------------------------------------------------------
-DISTINCT SOURCE CHEMICALS (1) — cross-chemical recommendations by SMILES similarity:
+DISTINCT SOURCE CHEMICALS (2) — cross-chemical recommendations by SMILES similarity:
   sim=1.0000  Dichloromethane (CAS 75-09-2)
+  sim=0.9611  Methanol (CAS 67-56-1)
 
 RECORDS (ranked / interleaved):
-  [1.0] Dichloromethane (CAS 75-09-2) | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | N/A — N/A | 2024 | MN
-  [1.0] Dichloromethane (CAS 75-09-2) | OPTIMIZED PROCESS CONDITIONS TO INCREASE EFFICIENCY | N/A — N/A | 2024 | WI
-  [1.0] Dichloromethane (CAS 75-09-2) | SUBSTITUTED AN ORGANIC SOLVENT | N/A — N/A | 2024 | MO
-  [1.0] Dichloromethane (CAS 75-09-2) | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | N/A — N/A | 2023 | MN
-  [1.0] Dichloromethane (CAS 75-09-2) | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | N/A — N/A | 2021 | MN
-  [1.0] Dichloromethane (CAS 75-09-2) | CHANGED TO AQUEOUS CLEANERS (FROM SOLVENTS OR OTHER MATERIALS) | N/A — N/A | 2020 | MN
-  [1.0] Dichloromethane (CAS 75-09-2) | IMPROVED APPLICATION TECHNIQUES | N/A — N/A | 2018 | IL
+  [1.0] Dichloromethane (CAS 75-09-2) | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | 325320 — Pesticides & other agricultural chemicals | 2021 | MN | Tier 1 | Channels chemical,use,prior | Rank 1
+  [1.0] Dichloromethane (CAS 75-09-2) | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | 325320 — Pesticides & other agricultural chemicals | 2022 | MN | Tier 1 | Channels chemical,use,prior | Rank 2
+  [1.0] Dichloromethane (CAS 75-09-2) | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | 325320 — Pesticides & other agricultural chemicals | 2023 | MN | Tier 1 | Channels chemical,use,prior | Rank 3
+  [1.0] Dichloromethane (CAS 75-09-2) | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | 325320 — Pesticides & other agricultural chemicals | 2024 | MN | Tier 1 | Channels chemical,use,prior | Rank 4
+  [1.0] Dichloromethane (CAS 75-09-2) | OPTIMIZED PROCESS CONDITIONS TO INCREASE EFFICIENCY | 325411 — Medicinal & botanical drugs & vitamins | 2024 | WI | Tier 1 | Channels chemical,use,prior | Rank 5
+  [1.0] Dichloromethane (CAS 75-09-2) | CHANGED TO AQUEOUS CLEANERS (FROM SOLVENTS OR OTHER MATERIALS) | 325320 — Pesticides & other agricultural chemicals | 2020 | MN | Tier 1 | Channels chemical,use,prior | Rank 6
+  [1.0] Dichloromethane (CAS 75-09-2) | SUBSTITUTED AN ORGANIC SOLVENT | 325998 — All oth misc chem products & preps (incl natural) | 2024 | MO | Tier 1 | Channels chemical,use,prior | Rank 7
+  [1.0] Dichloromethane (CAS 75-09-2) | IMPROVED APPLICATION TECHNIQUES | 325510 — Paints & coatings | 2018 | IL | Tier 1 | Channels chemical,use,prior | Rank 8
+
+Catch-all activity codes (less specific):
+  [0.9611] Methanol (CAS 67-56-1) | OTHER PROCESS MODIFICATIONS | 325998 — All oth misc chem products & preps (incl natural) | 2019 | TX | Tier 2 | Channels chemical,use,prior | Rank 9
+  [1.0] Dichloromethane (CAS 75-09-2) | OTHER PROCESS MODIFICATIONS | 339112 — Surgical & medical instruments | 2017 | PR | Tier 3 | Channels chemical,prior | Rank 10

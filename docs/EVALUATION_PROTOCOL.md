@@ -57,24 +57,27 @@ Neo4j index or model cannot be loaded and logs a warning, rather than aborting t
 > (`activity_name_index`), both 384-dim MiniLM. These support optional industry-sector and
 > condition-of-use semantic retrieval in the production pipeline. They are **not** part of any
 > scored metric here: the evaluation harness calls `retrieve_multi(smiles)` only, so the
-> condition-of-use / sector filters default off and the results below are unaffected.
+> condition-of-use / sector channels and filters are inactive for the scored queries, so the
+> results below are unaffected by them. The shipped default is fused retrieval (see DEVELOPMENT.md,
+> Retrieval Configuration); with the chemical alone it uses the chemical and prior channels only.
 >
-> The condition-of-use filter traverses `Report-[:RECORDS]->Activity` per the canonical
+> The condition-of-use filter of the legacy path traverses `Report-[:RECORDS]->Activity` per the canonical
 > ontology (`graph_model.svg`), so a matched activity is tied to the *same* Report as the
-> chemical and reduction it was filed with (report-level, not facility-level). Because the
-> harness passes no condition-of-use, this filter is a Cypher no-op
-> (`size($activity_names) = 0`) and the scored §2 / §2b / §3 results are unchanged by the
-> RECORDS edge being report-anchored.
+> chemical and reduction it was filed with (report-level, not facility-level). The chemical-only
+> queries pass no condition of use, so this filter is a Cypher no-op (`size($activity_names) = 0`) and
+> the chemical-only results are unaffected by the RECORDS edge being report-anchored. The known-use
+> test (§2c) does pass a use, and its Legacy row applies the filter.
 >
 > The graph also carries `Candidate` nodes (TRI category members that are *not* themselves
 > reported, e.g. constituents of "Nickel compounds") with the same three chemical
 > embeddings (`candidate_morgan_fp_index` / `_moldeberta_index` / `_hybrid_index`) and a
-> `Chemical (category) ─[:CONTAINS]→ Candidate` edge. In production, `retrieve_multi(...,
-> include_candidates=True)` expands a query SMILES through these to reach no-SMILES category
-> Chemicals (one row per category at its closest member's score). This is **not** scored:
-> the §2b shipped-recommender harness calls `retrieve_multi` with `include_candidates=False`
-> (the default), so every scored query matches `(:Chemical)` only and the results are
-> unaffected by the `Candidate` subgraph.
+> `Chemical (category) ─[:CONTAINS]→ Candidate` edge. In production, candidate expansion
+> reaches no-SMILES category Chemicals (one row per category at its closest member's score).
+> In the §2b harness the two rows differ on this point: the Legacy row calls `retrieve_multi` with
+> `include_candidates=False` (its default), so it matches `(:Chemical)` only, while the Shipped (fused) row
+> calls `retrieve_fused` with its default `include_candidates=True`, so its chemical channel also draws on
+> Candidate neighbours. The two rows therefore differ in this respect as well as in ranking. This is
+> recorded as an open point for the authors and has not been resolved here.
 
 ---
 
@@ -136,6 +139,11 @@ python -m src.validation.main --steps split anchors embedding retrieval
 
 The split step is **idempotent**: if `r.split` is already set on all Report nodes, it
 is a no-op (unless `--force-resplit` is passed).
+
+**Realised split (2026-11-04).** The stored split predated a correction of the graph (see
+DEVELOPMENT.md, ETL Pipeline), so it was re-drawn with `--force-resplit` and seed 42 over the corrected
+graph: 2,296 index reports, 636 test reports and 118 test chemicals. Before the re-draw, development runs
+used the earlier test split, so that split had been seen. Results from before the re-draw are superseded.
 
 ---
 
@@ -320,14 +328,41 @@ Implemented in `src/validation/retrieval_metrics.py → ActivityCoverageMetrics.
 *Purpose:* score the production recommendation path exactly as deployed, not just
 pure-vector retrieval.
 
-For each test chemical, run `RetrieverFactory.retrieve_multi(smiles)` (vector ANN +
-graph traversal + cross-entity intersection), tabulate the ranked source-reduction
-records via the shared `tabulate_records` helper, and take the top-k distinct
-recommended codes.  Score with the same **WeightedCoverage@k** / **CodePrecision@k**
-metrics plus Random (uniform k codes) and Oracle (the query's own highest-weight codes)
-baselines.  This is the table that reflects what an end user actually receives.
+For each test chemical the query is the chemical alone (no condition of use, no sector), and the
+top-k distinct recommended codes are scored with the same **WeightedCoverage@k** / **CodePrecision@k**
+metrics. Rows of Table 6:
+
+| Row | Method |
+|-----|--------|
+| Shipped (fused) | The configured default, `RETRIEVAL: fused`: reciprocal rank fusion (k = 60) of the chemical and prior channels; the use and sector channels are skipped because none is supplied |
+| Legacy | `RetrieverFactory.retrieve_multi`: vector ANN + graph traversal + cross-entity intersection, with its shipped limits of 5 neighbours and 50 reports per chemical |
+| MostCommon | The k activity codes reported by the most index-split chemicals (popularity floor) |
+| Random | k codes drawn uniformly from the index code vocabulary |
+| Oracle | The query's own highest-weight codes (ceiling, not achievable in production) |
+
+Every method reads **index-split reports only** (`report_split = 'index'`), so the query chemical's
+withheld test reports cannot be read back. Every method shares one record cap, fixed in advance at
+`RECORD_CAP` = 5,000 de-duplicated records per query before distinct codes are taken, so that each can
+list at least 20 distinct codes (k = 20) where its evidence allows. The earlier version of this harness
+could read withheld reports and is superseded.
 
 Implemented in `src/validation/recommendation_metrics.py → RecommendationMetrics.evaluate()`.
+
+---
+
+### 2c · Known-Use Test — Chemical Plus a Use It Declared
+
+*Purpose:* test the case a stakeholder brings: a chemical under a condition of use (CoU) that the
+evidence already records for it, checked against the activities actually reported under that use.
+
+For each test chemical and each distinct condition of use (Activity name) declared in its test-split
+reports, the query is the chemical's SMILES plus that use. The truth is the set of reduction codes on its
+test-split reports that declare that use. Evidence is index-split reports only, under the same record cap
+as §2b. Methods: Fused (shipped), Legacy (the use applied as a hard filter on the nearest-neighbour pool),
+MostCommon and Random. Queries are averaged within each chemical, and the chemical is the unit of a
+two-sided paired Wilcoxon test of WeightedCoverage@10 against Fused.
+
+Implemented in `src/validation/known_use_metrics.py → KnownUseMetrics.evaluate()`; CLI step `known-use`.
 
 ---
 
@@ -373,7 +408,11 @@ Implemented in `src/validation/retrieval_metrics.py → RetrievalMetrics.evaluat
 | Context precision ↑ | Fraction of retrieved context that is useful |
 | Context recall ↑ | Retrieved context contains the needed information |
 
-Conditions: MorganFingerprint, MolDeBERTa, Hybrid, Flat RAG (no graph traversal).
+Conditions: MorganFingerprint, MolDeBERTa, Hybrid, Flat RAG (no graph traversal). The three embedding
+conditions run the shipped pipeline (`RAGPipeline.run_structured`) with the `chemical_embedding` switch set
+to the condition's embedding type, so they measure the deployed tool rather than a separate code path. The
+Flat condition is vector search only. The reported run used eight QA pairs per condition; the CLI default
+is 20.
 Benchmark: `data/qa_benchmark.json` (100 questions, 25 per type, generated from graph
 facts).  Because retrieval is **SMILES-mandatory** (sector and condition-of-use are
 optional *additional* context), every question is **chemical-anchored** — it targets a
@@ -405,7 +444,7 @@ Implemented in `src/validation/ragas_evaluator.py → RAGASEvaluator.evaluate_al
 | MolDeBERTa only | Semantic retrieval baseline |
 | Hybrid | Combined structural + semantic |
 | Flat RAG (no graph traversal) | Vector retrieval without graph context |
-| Full GraphRAG | Complete system: vector retrieval + graph traversal |
+| Full GraphRAG | Complete system: the shipped pipeline (fused retrieval by default), with the embedding set by the `chemical_embedding` switch |
 
 The contrast between Flat RAG and Full GraphRAG on ActivityCoverage@k and RAGAS
 Context Recall is the primary claim: graph traversal is essential for activity recommendation.
@@ -420,6 +459,7 @@ Context Recall is the primary claim: graph traversal is essential for activity r
 | Lift vs Random | WeightedCoverage@10, CodePrecision@10 | Reporting every coverage/recommender table |
 | Friedman test | SectorCoverage@10 across digit depths {2, 3, 4, 6} | Comparing NAICS levels per embedding |
 | Wilcoxon signed-rank | GraphRAG vs Flat RAG on WeightedCoverage@10 | Ablation |
+| Paired Wilcoxon, two-sided, by chemical | Shipped (fused) vs Legacy and vs MostCommon, WeightedCoverage@10 | Table 6 (§2b) and known-use test (§2c) |
 
 Significance threshold: p < 0.05.
 
@@ -435,7 +475,9 @@ Significance threshold: p < 0.05.
 | Write stratified split to Neo4j | `anchor_builder.py` | `AnchorBuilder.write_stratified_split()` |
 | Embedding space metrics | `embedding_metrics.py` | `EmbeddingMetrics.compute()` |
 | Activity coverage evaluation (PRIMARY, pure vector) | `retrieval_metrics.py` | `ActivityCoverageMetrics.evaluate_all()` |
-| Shipped recommender (PRIMARY, graph path) | `recommendation_metrics.py` | `RecommendationMetrics.evaluate()` |
+| Shipped recommender, Table 6 (PRIMARY) | `recommendation_metrics.py` | `RecommendationMetrics.evaluate()` |
+| Fused retrieval (shipped default) | `fused_retriever.py` | `FusedRetriever.retrieve()` |
+| Known-use test (§2c) | `known_use_metrics.py` | `KnownUseMetrics.evaluate()` |
 | NAICS hierarchy analysis | `retrieval_metrics.py` | `ActivityCoverageMetrics.evaluate_naics_levels()` |
 | Retrieval quality, anchor-based (secondary) | `retrieval_metrics.py` | `RetrievalMetrics.evaluate_all()` |
 | Significance tests | `retrieval_metrics.py` | `RetrievalMetrics.significance_test()` |
@@ -465,6 +507,9 @@ These values are pre-registered and **must not change** after development begins
 | Activity family mapping | TRI_SOURCE_REDUCTION_GROUPS | `config.yaml` |
 | Morgan fingerprint radius | 2 | `config.yaml RAG_GRAPH.EMBEDDINGS` |
 | Morgan fingerprint bits | 2048 | `config.yaml RAG_GRAPH.EMBEDDINGS` |
+| Record cap per query (all recommender methods) | 5,000 | `recommendation_metrics.RECORD_CAP` |
+| Fusion constant (reciprocal rank fusion) | 60 | `fused_retriever.RRF_K` |
+| Fusion channel weights | chemical 1.0, use 1.0, sector 1.0, prior 0.5 | `config.yaml RAG_GRAPH.RETRIEVAL.RETRIEVAL_WEIGHTS` |
 
 ---
 
@@ -476,6 +521,9 @@ python -m src.validation.main --steps split
 
 # Force re-split even if r.split already exists
 python -m src.validation.main --steps split --force-resplit
+
+# Known-use test (§2c), after the split is in Neo4j
+python -m src.validation.main --steps split anchors known-use
 
 # Full evaluation (all steps, 6-digit NAICS, 20 RAGAS pairs per condition)
 python -m src.validation.main --steps split anchors embedding retrieval ragas \

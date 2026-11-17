@@ -3,6 +3,8 @@ CASE: Formaldehyde — manufacturing / resin production
 SMILES           : C=O
 Industry sector  : Synthetic resin and adhesive manufacturing
 Condition of use : —
+Matched uses     : —
+Matched sectors  : 325211 Plastics materials & resins (0.8593*); 325991 Custom compounding of purchased resins (0.8181); 325520 Adhesives (0.7759); 326112 Plastics packaging film and sheet (including laminated) manufacturing (0.7446); 326130 Laminated plastics plate, sheet (except packaging), and shape manufacturing (0.7413); 326113 Not rein plastics plates, sheets, etc (exc pkg) (0.7307); 325212 Synthetic rubber (vulcanizable elastomers) (0.7243); 326291 Rubber products for mechanical use (0.723); 321219 Reconstituted wood products (0.7182); 325220 Artificial and synthetic fibers and filaments (0.7176)  [* = at or above the sector threshold]
 EPA scenario     : Worker inhalation during manufacturing, processing, or use (e.g., resin production); formaldehyde presents unreasonable risk.
 EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-formaldehyde
 Query            : What source reduction activities have historically been effective for this chemical?
@@ -10,38 +12,29 @@ needs_clarification: False
 records returned : 10
 --------------------------------------------------------------------------------
 ANSWER:
-Based on the TRI knowledge graph context, the query chemical is Formaldehyde (CAS 50-00-0) with a structural similarity of 1.0 to itself.
+Based on the provided TRI knowledge graph context, the following source reduction activities have been historically effective for the query chemical (C=O):
 
-Historically effective source reduction activities reported for Formaldehyde include:
+1. **MODIFIED EQUIPMENT, LAYOUT, OR PIPING**: This activity was reported for Formaldehyde (CAS 50-00-0, similarity 1.0) in 2016 at a facility in Sector 325211 — Plastics materials & resins, State NY (Rank 1).
+2. **OPTIMIZED REACTION CONDITIONS OR OTHERWISE INCREASED EFFICIENCY OF SYNTHESIS**: This activity was reported for Formaldehyde (CAS 50-00-0, similarity 1.0) in 2019 at a facility in Sector 325211 — Plastics materials & resins, State NC (Rank 4).
 
-* OTHER MATERIAL MODIFICATIONS MADE | Sector 325211.0 — Plastics materials & resins | Year 2023 | State OH
-* OPTIMIZED REACTION CONDITIONS OR OTHERWISE INCREASED EFFICIENCY OF SYNTHESIS | Sector 325211.0 — Plastics materials & resins | Year 2019 | State NC
-* MODIFIED EQUIPMENT, LAYOUT, OR PIPING | Sector 325211.0 — Plastics materials & resins | Year 2016 | State NY
-* OTHER SPILL OR LEAK PREVENTION | Sector 325211.0 — Plastics materials & resins | Year 2015 | State OH
-* MODIFIED OR UPDATED EQUIPMENT OR LAYOUT | Sector 325211.0 — Plastics materials & resins | Year 2022 | State CT
-
-These activities have been reported effective for Formaldehyde in various facilities and sectors across different years.
-
-Additionally, since Ethylene (CAS 74-85-1) is a structurally similar analogue with a similarity of 0.9692, the following activity has also been reported effective:
-
-* INSTITUTED RECIRCULATION WITHIN A PROCESS | Sector 325211.0 — Plastics materials & resins | Year 2020 | State TX
-
-This activity was reported for Ethylene in 2020 and may be a transferable candidate recommendation for Formaldehyde due to their structural similarity.
+These activities are considered effective because they were reported for the query chemical itself (Formaldehyde, CAS 50-00-0) and have a similarity score of 1.0, indicating an identical structure to the query chemical.
 --------------------------------------------------------------------------------
 DISTINCT SOURCE CHEMICALS (4) — cross-chemical recommendations by SMILES similarity:
   sim=1.0000  Formaldehyde (CAS 50-00-0)
   sim=0.9692  Ethylene (CAS 74-85-1)
-  sim=0.9583  Cobalt compounds (CAS N096)  ← category reached via member Cobalt(II) oxide (CAS 1307-96-6)
-  sim=0.9573  Manganese compounds (CAS N450)  ← category reached via member Manganese(II) oxide (CAS 1344-43-0)
+  sim=0.9585  Nitrate compounds (water dissociable; reportable only when in aqueous solution) (CAS N511)
+  sim=0.9515  Toluene (CAS 108-88-3)
 
 RECORDS (ranked / interleaved):
-  [1.0] Formaldehyde (CAS 50-00-0) | OTHER MATERIAL MODIFICATIONS MADE | 325211.0 — Plastics materials & resins | 2023 | OH
-  [0.9692] Ethylene (CAS 74-85-1) | INSTITUTED RECIRCULATION WITHIN A PROCESS | 325211.0 — Plastics materials & resins | 2020 | TX
-  [0.9583] Cobalt compounds (CAS N096) [via Cobalt(II) oxide (CAS 1307-96-6)] | MODIFIED PACKAGING | 325211.0 — Plastics materials & resins | 2019 | IN
-  [0.9573] Manganese compounds (CAS N450) [via Manganese(II) oxide (CAS 1344-43-0)] | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | 325211.0 — Plastics materials & resins | 2022 | TX
-  [1.0] Formaldehyde (CAS 50-00-0) | OPTIMIZED REACTION CONDITIONS OR OTHERWISE INCREASED EFFICIENCY OF SYNTHESIS | 325211.0 — Plastics materials & resins | 2019 | NC
-  [0.9692] Ethylene (CAS 74-85-1) | INSTITUTED RECIRCULATION WITHIN A PROCESS | 325211.0 — Plastics materials & resins | 2019 | TX
-  [1.0] Formaldehyde (CAS 50-00-0) | MODIFIED EQUIPMENT, LAYOUT, OR PIPING | 325211.0 — Plastics materials & resins | 2016 | NY
-  [0.9692] Ethylene (CAS 74-85-1) | IMPLEMENTED INSPECTION OR MONITORING PROGRAM OF POTENTIAL SPILL OR LEAK SOURCES | 325211.0 — Plastics materials & resins | 2015 | TX
-  [1.0] Formaldehyde (CAS 50-00-0) | OTHER SPILL OR LEAK PREVENTION | 325211.0 — Plastics materials & resins | 2015 | OH
-  [1.0] Formaldehyde (CAS 50-00-0) | MODIFIED OR UPDATED EQUIPMENT OR LAYOUT | 325211.0 — Plastics materials & resins | 2022 | CT
+  [1.0] Formaldehyde (CAS 50-00-0) | MODIFIED EQUIPMENT, LAYOUT, OR PIPING | 325211 — Plastics materials & resins | 2016 | NY | Tier 3 | Channels chemical,sector,prior | Rank 1
+  [1.0] Formaldehyde (CAS 50-00-0) | OPTIMIZED REACTION CONDITIONS OR OTHERWISE INCREASED EFFICIENCY OF SYNTHESIS | 325211 — Plastics materials & resins | 2019 | NC | Tier 3 | Channels chemical,sector,prior | Rank 4
+  [0.9692] Ethylene (CAS 74-85-1) | INSTITUTED RECIRCULATION WITHIN A PROCESS | 325211 — Plastics materials & resins | 2019 | TX | Tier 4 | Channels chemical,sector,prior | Rank 8
+  [0.9692] Ethylene (CAS 74-85-1) | INSTITUTED RECIRCULATION WITHIN A PROCESS | 325211 — Plastics materials & resins | 2020 | TX | Tier 4 | Channels chemical,sector,prior | Rank 9
+  [0.9692] Ethylene (CAS 74-85-1) | IMPLEMENTED INSPECTION OR MONITORING PROGRAM OF POTENTIAL SPILL OR LEAK SOURCES | 325211 — Plastics materials & resins | 2015 | TX | Tier 4 | Channels chemical,sector,prior | Rank 10
+
+Catch-all activity codes (less specific):
+  [0.9692] Ethylene (CAS 74-85-1) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2015 | TX | Tier 4 | Channels chemical,sector,prior | Rank 2
+  [1.0] Formaldehyde (CAS 50-00-0) | OTHER MATERIAL MODIFICATIONS MADE | 325211 — Plastics materials & resins | 2023 | OH | Tier 3 | Channels chemical,sector,prior | Rank 3
+  [1.0] Formaldehyde (CAS 50-00-0) | OTHER SPILL OR LEAK PREVENTION | 325211 — Plastics materials & resins | 2015 | OH | Tier 3 | Channels chemical,sector,prior | Rank 5
+  [0.9585] Nitrate compounds (water dissociable; reportable only when in aqueous solution) (CAS N511) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2015 | CT | Tier 4 | Channels chemical,sector,prior | Rank 6
+  [0.9515] Toluene (CAS 108-88-3) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2015 | MI | Tier 4 | Channels chemical,sector,prior | Rank 7

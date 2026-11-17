@@ -105,9 +105,10 @@ class TestRecordsToContext:
         ]
         ctx = records_to_context(records, "c1ccccc1")
         # Query header and both supplied chemicals appear; nothing else can leak in.
-        assert "Query chemical SMILES: c1ccccc1" in ctx
+        assert "QUERY STRUCTURE (SMILES): c1ccccc1" in ctx
         assert "Benzene" in ctx and "Toluene" in ctx
-        assert "QUERY CHEMICAL" in ctx  # the similarity-1.0 chemical is marked
+        assert "IDENTICAL STRUCTURE TO THE QUERY" in ctx
+        assert "ANALOGUE (not the query chemical)" in ctx
         assert "Recycling" in ctx and "Substitution" in ctx
 
     def test_chemicals_ordered_by_descending_similarity(self):
@@ -117,3 +118,39 @@ class TestRecordsToContext:
         ]
         ctx = records_to_context(records, "c1ccccc1")
         assert ctx.index("Benzene") < ctx.index("Toluene")
+
+    def test_unnamed_query_is_not_given_an_analogue_name(self):
+        ctx = records_to_context([self._rec("Allyl chloride", "107-05-1", 0.98, "X")], "C=CCl")
+        assert "QUERY CHEMICAL NAME: not provided" in ctx
+        assert "[Allyl chloride | CAS 107-05-1 | Similarity 0.98 — ANALOGUE" in ctx
+
+
+class TestSectorFromReport:
+
+    def test_chemical_path_uses_report_sector(self):
+        rep = {
+            "reduction_code": "S01",
+            "reduction_name": "Sub",
+            "year": 2020,
+            "state": "TX",
+            "sector_code": "3254",
+            "sector_title": "Pharma",
+        }
+        rec = tabulate_records([_hit("1-1-1", 0.5)], [_chemical_subgraph("1-1-1", "X", [rep])])[0]
+        assert rec["Sector"] == "3254 — Pharma"
+
+    def test_chemical_sector_path_uses_subgraph_sector(self):
+        sg = _chemical_subgraph("1-1-1", "X", [{"reduction_code": "S01", "year": 2020, "state": "TX"}])
+        sg.update(node_type="Chemical_Sector", sector_code="3311", sector_title="Steel")
+        assert tabulate_records([_hit("1-1-1", 0.5)], [sg])[0]["Sector"] == "3311 — Steel"
+
+    def test_missing_sector_stays_na_and_keys_unchanged(self):
+        reps = [
+            {"reduction_code": "S01", "year": 2020, "state": "TX", "sector_code": "1", "sector_title": "A"},
+            {"reduction_code": "S01", "year": 2020, "state": "TX", "sector_code": "2", "sector_title": "B"},
+        ]
+        records = tabulate_records([_hit("1-1-1", 0.5)], [_chemical_subgraph("1-1-1", "X", reps)])
+        # Same (chemical, activity, year, state) still collapses to one record; first wins.
+        assert len(records) == 1 and records[0]["Sector"] == "1 — A"
+        bare = tabulate_records([_hit("1-1-1", 0.5)], [_chemical_subgraph("1-1-1", "X", [{"reduction_code": "S01"}])])
+        assert bare[0]["Sector"] == "N/A — N/A"

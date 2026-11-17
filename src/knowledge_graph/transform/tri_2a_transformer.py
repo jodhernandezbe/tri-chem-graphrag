@@ -19,6 +19,8 @@ from .base_transformer import BaseTriTransformer
 
 logger = logging.getLogger(__name__)
 
+ANNUAL_REDUCTION_SUFFIX = "_est_annual_reduction_code"
+
 
 class Tri2aTransformer(BaseTriTransformer):
     """Transformer for TRI 2a files (Source Reduction)."""
@@ -30,7 +32,10 @@ class Tri2aTransformer(BaseTriTransformer):
     def _filter_columns(self, df: pd.DataFrame) -> pd.DataFrame:
         base_columns = [col for col in self._get_columns_to_use() if col in df.columns]
         reduction_columns = [
-            col for col in df.columns if "source_reduction_activity" in col or "est_annual_reduction_code" in col
+            col
+            for col in df.columns
+            if ("source_reduction_activity" in col or col.endswith(ANNUAL_REDUCTION_SUFFIX))
+            and not col.endswith(ANNUAL_REDUCTION_SUFFIX + "_description")
         ]
         return df[base_columns + reduction_columns].copy()  # type: ignore[return-value]
 
@@ -43,7 +48,7 @@ class Tri2aTransformer(BaseTriTransformer):
     def _get_reduction_columns_mapping(self, all_columns: List[str]) -> Dict[str, List[str]]:
         codes = [col for col in all_columns if "source_reduction_activity_code" in col and "est_annual" not in col]
         descriptions = [col for col in all_columns if "source_reduction_activity_description" in col]
-        annual_reductions = [col for col in all_columns if "est_annual_reduction_code" in col]
+        annual_reductions = [col for col in all_columns if col.endswith(ANNUAL_REDUCTION_SUFFIX)]
         return {"codes": codes, "descriptions": descriptions, "annual_reductions": annual_reductions}
 
     def _is_valid_scalar(self, value: object) -> bool:

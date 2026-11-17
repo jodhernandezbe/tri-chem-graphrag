@@ -3,25 +3,42 @@ CASE: Trichloroethylene (TCE) — vapor degreasing
 SMILES           : ClC=C(Cl)Cl
 Industry sector  : —
 Condition of use : Vapor degreasing of fabricated metal parts
+Matched uses     : Z202 metalworking fluids (0.7158); z202_metalworking_fluids (0.6996); As a manufactured impurity (0.6809); as_a_manufactured_impurity (0.6704); Z201 process lubricants (0.6526); Z308 construction materials (0.6496); Produce the chemical (0.6475); z308_construction_materials (0.6441); As a process impurity (0.6415); produce_the_chemical (0.6409)
+Matched sectors  : —  [* = at or above the sector threshold]
 EPA scenario     : Vapor degreasing, a primary industrial use; EPA found TCE presents unreasonable risk under its conditions of use.
 EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-trichloroethylene-tce-0
 Query            : What source reduction activities have historically been effective for this chemical?
 needs_clarification: False
-records returned : 1
+records returned : 10
 --------------------------------------------------------------------------------
 ANSWER:
-According to the TRI knowledge graph context, one source-reduction activity that has been reported as effective is:
+Based on the provided knowledge graph context, the following source reduction activities have been historically effective for the query chemical (ClC=C(Cl)Cl):
 
-* REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT |
-  - Reported for: Tetrachloroethylene (CAS 127-18-4) with a Similarity of 0.9929 to the query chemical ClC=C(Cl)Cl
-  - Sector: N/A — N/A
-  - Year: 2019
-  - State: CA
+1. **MODIFIED STRIPPING/CLEANING EQUIPMENT**: This activity was reported for Trichloroethylene (CAS 79-01-6, similarity 1.0, identical structure to the query) in Sector 325211 — Plastics materials & resins, in Year 2016, State TX (Rank 1).
+2. **REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT**: This activity was reported for Tetrachloroethylene (CAS 127-18-4, similarity 0.9929, ANALOGUE) in Sector 336413 — Aircraft parts & auxiliary equipment, nesoi, in Year 2019, State CA (Rank 2).
+3. **SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL**: This activity was reported for Dichloromethane (CAS 75-09-2, similarity 0.9773, ANALOGUE) in Sector 336350 — Motor vehicle transmission & power train parts, in Year 2022, State TX (Rank 3).
 
-This activity was reported for Tetrachloroethylene, which is structurally very similar (Similarity = 0.9929) to the query chemical.
+These activities are transferable candidate recommendations for the query chemical, as they were reported for structurally similar analogues.
 --------------------------------------------------------------------------------
-DISTINCT SOURCE CHEMICALS (1) — cross-chemical recommendations by SMILES similarity:
+DISTINCT SOURCE CHEMICALS (7) — cross-chemical recommendations by SMILES similarity:
+  sim=1.0000  Trichloroethylene (CAS 79-01-6)
   sim=0.9929  Tetrachloroethylene (CAS 127-18-4)
+  sim=0.9872  Chloroprene (CAS 126-99-8)
+  sim=0.9773  Dichloromethane (CAS 75-09-2)
+  sim=0.9654  Toluene (CAS 108-88-3)
+  sim=0.9635  Mercury compounds (CAS N458)  ← category reached via member Mercury(II) bromide (CAS 7789-47-1)
+  sim=0.9614  Zinc compounds (CAS N982)  ← category reached via member Zinc chloride (CAS 7646-85-7)
 
 RECORDS (ranked / interleaved):
-  [0.9929] Tetrachloroethylene (CAS 127-18-4) | REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT | N/A — N/A | 2019 | CA
+  [1.0] Trichloroethylene (CAS 79-01-6) | MODIFIED STRIPPING/CLEANING EQUIPMENT | 325211 — Plastics materials & resins | 2016 | TX | Tier 1 | Channels chemical,use,prior | Rank 1
+  [0.9929] Tetrachloroethylene (CAS 127-18-4) | REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT | 336413 — Aircraft parts & auxiliary equipment, nesoi | 2019 | CA | Tier 2 | Channels chemical,use,prior | Rank 2
+  [0.9773] Dichloromethane (CAS 75-09-2) | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | 336350 — Motor vehicle transmission & power train parts | 2022 | TX | Tier 2 | Channels chemical,use,prior | Rank 3
+
+Catch-all activity codes (less specific):
+  [0.9654] Toluene (CAS 108-88-3) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2015 | MI | Tier 2 | Channels chemical,use,prior | Rank 4
+  [1.0] Trichloroethylene (CAS 79-01-6) | OTHER PROCESS MODIFICATIONS | 326299 — Other rubber products | 2020 | TN | Tier 3 | Channels chemical,prior | Rank 5
+  [0.9635] Mercury compounds (CAS N458) [via Mercury(II) bromide (CAS 7789-47-1)] | OTHER PROCESS MODIFICATIONS | 221112 — Fossil fuel electric power generation | 2016 | TX | Tier 2 | Channels chemical,use,prior | Rank 6
+  [0.9635] Mercury compounds (CAS N458) [via Mercury(II) bromide (CAS 7789-47-1)] | OTHER PROCESS MODIFICATIONS | 327310 — Cements | 2016 | CA | Tier 2 | Channels chemical,use,prior | Rank 7
+  [0.9635] Mercury compounds (CAS N458) [via Mercury(II) bromide (CAS 7789-47-1)] | OTHER PROCESS MODIFICATIONS | 327310 — Cements | 2019 | CA | Tier 2 | Channels chemical,use,prior | Rank 8
+  [0.9872] Chloroprene (CAS 126-99-8) | OTHER PROCESS MODIFICATIONS | 325212 — Synthetic rubber (vulcanizable elastomers) | 2017 | LA | Tier 2 | Channels chemical,use,prior | Rank 9
+  [0.9614] Zinc compounds (CAS N982) [via Zinc chloride (CAS 7646-85-7)] | OTHER PROCESS MODIFICATIONS | 331110 — Iron and steel and ferroalloy steel  products | 2019 | AL | Tier 2 | Channels chemical,use,prior | Rank 10

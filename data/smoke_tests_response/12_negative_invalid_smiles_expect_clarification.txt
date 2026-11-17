@@ -3,6 +3,8 @@ CASE: NEGATIVE — invalid SMILES (expect clarification)
 SMILES           : ClC=C(Cl
 Industry sector  : —
 Condition of use : Vapor degreasing
+Matched uses     : —
+Matched sectors  : —  [* = at or above the sector threshold]
 EPA scenario     : Input-validation control (deliberately malformed structure).
 EPA reference    : —
 Query            : What source reduction activities have historically been effective for this chemical?

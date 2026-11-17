@@ -3,6 +3,8 @@ CASE: TCEP — flame retardant in paint/coating manufacturing
 SMILES           : O=P(OCCCl)(OCCCl)OCCCl
 Industry sector  : —
 Condition of use : Flame-retardant additive in paint and coating manufacturing and polymers
+Matched uses     : P210 flame retardants (0.8143); Z305 flame retardant (0.8115); z305_flame_retardant (0.7792); p210_flame_retardants (0.7729); Used as a chemical processing aid (0.6683); Used as a reactant (0.6512); Produce the chemical (0.632); used_as_a_chemical_processing_aid (0.6288); On site use of the chemical (0.6284); z308_construction_materials (0.6265)
+Matched sectors  : —  [* = at or above the sector threshold]
 EPA scenario     : Flame-retardant use in paint and coating manufacturing and polymers; seven conditions of use present unreasonable risk to workers.
 EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-tris2-chloroethyl-phosphate-tcep
 Query            : What source reduction activities have historically been effective for this chemical?
@@ -10,42 +12,35 @@ needs_clarification: False
 records returned : 10
 --------------------------------------------------------------------------------
 ANSWER:
-Based on the TRI knowledge graph context, the query chemical is O=P(OCCCl)(OCCCl)OCCCl and its structurally most similar chemicals are Dichlorvos (CAS 62-73-7) with a similarity of 0.9699.
+Based on the provided knowledge graph context, the query chemical is identified by its SMILES ("QUERY STRUCTURE"): O=P(OCCCl)(OCCCl)OCCCl. However, the query chemical's name is not provided.
 
-For Dichlorvos (CAS 62-73-7), one reported source reduction activity is:
+The context contains records of source-reduction activities for a structurally similar chemical, Certain glycol ethers (CAS N230, similarity 0.9612, ANALOGUE, not the query chemical). These records are tagged as ANALOGUE, indicating that the activities are transferable candidate recommendations for the query chemical.
 
-* OPTIMIZED REACTION CONDITIONS OR OTHERWISE INCREASED EFFICIENCY OF SYNTHESIS | Sector N/A — N/A | Year 2018 | State AL
+The most promising activities for the query chemical are:
 
-This activity has been reported for a chemical with a high structural similarity to the query chemical, making it a transferable candidate recommendation.
+1. **SUBSTITUTED RAW MATERIALS**: Certain glycol ethers (CAS N230, similarity 0.9612, ANALOGUE, not the query chemical) | Tier 2: analogue, stated use | Channels chemical,use,prior | Uses Used as a chemical processing aid | Sector 336211 — Motor vehicle bodies | Year 2015 | State MI
+2. **SUBSTITUTED RAW MATERIALS**: Certain glycol ethers (CAS N230, similarity 0.9612, ANALOGUE, not the query chemical) | Tier 2: analogue, stated use | Channels chemical,use,prior | Uses Used as a chemical processing aid | Sector 331513 — Steel foundries (except investment) | Year 2016 | State MS
+3. **SUBSTITUTED RAW MATERIALS, FEEDSTOCK, OR REACTANT CHEMICAL**: Certain glycol ethers (CAS N230, similarity 0.9612, ANALOGUE, not the query chemical) | Tier 2: analogue, stated use | Channels chemical,use,prior | Uses Ancillary or other use; Used as a chemical processing aid; Z101 process solvents; Z301 cleaner | Sector 334412 — Printed circuits | Year 2022 | State OR
+4. **SUBSTITUTED RAW MATERIALS, FEEDSTOCK, OR REACTANT CHEMICAL**: Certain glycol ethers (CAS N230, similarity 0.9612, ANALOGUE, not the query chemical) | Tier 2: analogue, stated use | Channels chemical,use,prior | Uses Used as a chemical processing aid; Z101 process solvents | Sector 332618 — Other fabricated wire products | Year 2022 | State KY
+5. **SUBSTITUTED RAW MATERIALS, FEEDSTOCK, OR REACTANT CHEMICAL**: Certain glycol ethers (CAS N230, similarity 0.9612, ANALOGUE, not the query chemical) | Tier 2: analogue, stated use | Channels chemical,use,prior | Uses Used as a chemical processing aid; Z106 solution buffers | Sector 424690 — Other chemical and allied products merchant wholesalers | Year 2022 | State TX
 
-For Certain glycol ethers (CAS N230), which have a similarity of 0.9612, several source reduction activities have been reported:
+These activities are ranked by a fusion of chemical similarity, stated use, stated sector, and overall practice. The records are tagged as Tier 2: analogue, stated use, indicating that they are transferable candidate recommendations for the query chemical.
 
-* OTHER MATERIAL MODIFICATIONS MADE | Sector N/A — N/A | Year 2024 | State IN
-* SUBSTITUTED AN ORGANIC SOLVENT | Sector N/A — N/A | Year 2024 | State NC
-* SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | Sector N/A — N/A | Year 2021 | State FL
-* OTHER IMPROVEMENTS TO OPERATING PRACTICES AND TRAINING | Sector N/A — N/A | Year 2021 | State TN
-* MODIFIED PRODUCT PACKAGING | Sector N/A — N/A | Year 2021 | State TX
-* OTHER PROCESS MODIFICATIONS | Sector N/A — N/A | Year 2020 | State DE
-* SUBSTITUTED A FEEDSTOCK OR REAGENT CHEMICAL WITH A DIFFERENT CHEMICAL | Sector N/A — N/A | Year 2020 | State OH
-* IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES | Sector N/A — N/A | Year 2020 | State TX
-* SUBSTITUTED COATING MATERIALS USED | Sector N/A — N/A | Year 2019 | State TN
-
-These activities have been reported for a chemical with a high structural similarity to the query chemical, making them transferable candidate recommendations.
-
-Note that some of these activities recur across multiple chemicals (e.g., Certain glycol ethers and Dichlorvos), facilities, or years.
+Note that the query chemical's name is not provided, and the context does not contain sufficient information to answer the question precisely and factually for the query chemical. However, based on the provided records, the most promising activities for the query chemical are related to substituting raw materials, feedstock, or reactant chemicals.
 --------------------------------------------------------------------------------
-DISTINCT SOURCE CHEMICALS (2) — cross-chemical recommendations by SMILES similarity:
-  sim=0.9699  Dichlorvos (CAS 62-73-7)
+DISTINCT SOURCE CHEMICALS (1) — cross-chemical recommendations by SMILES similarity:
   sim=0.9612  Certain glycol ethers (CAS N230)  ← category reached via member Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)
 
 RECORDS (ranked / interleaved):
-  [0.9699] Dichlorvos (CAS 62-73-7) | OPTIMIZED REACTION CONDITIONS OR OTHERWISE INCREASED EFFICIENCY OF SYNTHESIS | N/A — N/A | 2018 | AL
-  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | OTHER MATERIAL MODIFICATIONS MADE | N/A — N/A | 2024 | IN
-  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | SUBSTITUTED AN ORGANIC SOLVENT | N/A — N/A | 2024 | NC
-  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | N/A — N/A | 2021 | FL
-  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | OTHER IMPROVEMENTS TO OPERATING PRACTICES AND TRAINING | N/A — N/A | 2021 | TN
-  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | MODIFIED PRODUCT PACKAGING | N/A — N/A | 2021 | TX
-  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | OTHER PROCESS MODIFICATIONS | N/A — N/A | 2020 | DE
-  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | SUBSTITUTED A FEEDSTOCK OR REAGENT CHEMICAL WITH A DIFFERENT CHEMICAL | N/A — N/A | 2020 | OH
-  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES | N/A — N/A | 2020 | TX
-  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | SUBSTITUTED COATING MATERIALS USED | N/A — N/A | 2019 | TN
+  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | SUBSTITUTED RAW MATERIALS | 336211 — Motor vehicle bodies | 2015 | MI | Tier 2 | Channels chemical,use,prior | Rank 1
+  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | SUBSTITUTED RAW MATERIALS | 331513 — Steel foundries (except investment) | 2016 | MS | Tier 2 | Channels chemical,use,prior | Rank 2
+  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | SUBSTITUTED RAW MATERIALS, FEEDSTOCK, OR REACTANT CHEMICAL | 334412 — Printed circuits | 2022 | OR | Tier 2 | Channels chemical,use,prior | Rank 3
+  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | SUBSTITUTED RAW MATERIALS, FEEDSTOCK, OR REACTANT CHEMICAL | 332618 — Other fabricated wire products | 2022 | KY | Tier 2 | Channels chemical,use,prior | Rank 4
+  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | SUBSTITUTED RAW MATERIALS, FEEDSTOCK, OR REACTANT CHEMICAL | 424690 — Other chemical and allied products merchant wholesalers | 2022 | TX | Tier 2 | Channels chemical,use,prior | Rank 5
+  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES | 424690 — Other chemical and allied products merchant wholesalers | 2020 | TX | Tier 2 | Channels chemical,use,prior | Rank 6
+  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | 325199 — All other basic organic chemicals | 2021 | FL | Tier 2 | Channels chemical,use,prior | Rank 9
+  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | SUBSTITUTED A FEEDSTOCK OR REAGENT CHEMICAL WITH A DIFFERENT CHEMICAL | 336120 — Heavy duty trucks & chassis | 2020 | OH | Tier 2 | Channels chemical,use,prior | Rank 10
+
+Catch-all activity codes (less specific):
+  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | OTHER RAW MATERIAL MODIFICATIONS | 322220 — Paper bag & coated & treated paper | 2014 | IN | Tier 2 | Channels chemical,use,prior | Rank 7
+  [0.9612] Certain glycol ethers (CAS N230) [via Ethanol, 2-butoxy-, dihydrogen phosphate (CAS 14260-98-1)] | OTHER RAW MATERIAL MODIFICATIONS | 326150 — Urethane and oth foam products (exc polystyrene) | 2015 | NC | Tier 2 | Channels chemical,use,prior | Rank 8

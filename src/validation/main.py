@@ -3,9 +3,9 @@
 
 """Entry point for the TRI Chemical GraphRAG evaluation pipeline.
 
-Runs any combination of the five evaluation steps — anchor building, embedding
-space metrics, retrieval ranking metrics, QA benchmark generation, and end-to-end
-RAGAS evaluation — then writes the results to docs/RESULTS.md and saves all
+Runs any combination of the evaluation steps — anchor building, embedding
+space metrics, retrieval ranking metrics, the shipped-recommender and known-use tests,
+QA benchmark generation, and end-to-end RAGAS evaluation — then writes the results to docs/RESULTS.md and saves all
 figures to images/.
 
 Usage examples::
@@ -46,7 +46,9 @@ from src.validation.anchor_builder import (
     StructuralAnchors,
 )
 from src.validation.embedding_metrics import EmbeddingMetrics, EmbeddingMetricsResult
+from src.validation.known_use_metrics import KnownUseMetrics, KnownUseResult
 from src.validation.recommendation_metrics import (
+    RECORD_CAP,
     RecommendationCoverageResult,
     RecommendationMetrics,
 )
@@ -71,7 +73,7 @@ DOCS_DIR = ROOT / "docs"
 QA_BENCHMARK_PATH = ROOT / "data" / "qa_benchmark.json"
 
 EMBEDDING_TYPES = CHEMICAL_EMBEDDING_TYPES
-VALID_STEPS = ("split", "anchors", "embedding", "retrieval", "recommendation", "qa-benchmark", "ragas")
+VALID_STEPS = ("split", "anchors", "embedding", "retrieval", "recommendation", "known-use", "qa-benchmark", "ragas")
 
 _NAICS_LEVEL_LABELS: Dict[int, str] = {
     2: "2-digit (Sector)",
@@ -309,6 +311,55 @@ def _recommendation_table(results: List[RecommendationCoverageResult]) -> str:
     return header + sep + rows
 
 
+def _known_use_table(results: List[KnownUseResult]) -> str:
+    baseline = next((r.weighted_coverage_at_k.get(10) for r in results if r.method == "Random"), None)
+    header = (
+        "| Method | WeightedCov@5 ↑ | @10 | @20 | Lift@10 vs Random | CodePrec@10 ↑ | RawCov@10 "
+        "| Distinct codes listed | p vs Fused (WCov@10) | queries | chemicals |\n"
+    )
+    sep = "|--------|---|---|---|---|---|---|---|---|---|---|\n"
+    rows = ""
+    for r in results:
+        listed = _fmt_f(r.mean_distinct_codes, 1)
+        p_val = "—" if r.p_vs_fused is None else f"{r.p_vs_fused:.2g}"
+        rows += (
+            f"| {r.method} | {_fmt_f(r.weighted_coverage_at_k.get(5))} | {_fmt_f(r.weighted_coverage_at_k.get(10))} "
+            f"| {_fmt_f(r.weighted_coverage_at_k.get(20))} "
+            f"| {_fmt_lift(r.weighted_coverage_at_k.get(10), baseline, r.method)} "
+            f"| {_fmt_f(r.code_precision_at_k.get(10))} | {_fmt_f(r.raw_coverage_at_k.get(10))} "
+            f"| {listed} | {p_val} | {r.n_queries} | {r.n_chemicals} |\n"
+        )
+    return header + sep + rows
+
+
+def _save_known_use_chart(results: List[KnownUseResult], images_dir: Path) -> Path:
+    labels = [r.method for r in results]
+    x = np.arange(len(labels))
+    width = 0.25
+    colors = ["#4e79a7", "#f28e2b", "#e15759"]
+    fig, ax = plt.subplots(figsize=(8, 5))
+    for i, k in enumerate(K_VALUES):
+        ax.bar(
+            x + i * width,
+            [r.weighted_coverage_at_k.get(k, 0.0) for r in results],
+            width,
+            label=f"WeightedCov@{k}",
+            color=colors[i],
+        )
+    ax.set_xticks(x + width)
+    ax.set_xticklabels(labels)
+    ax.set_ylabel("IDF-weighted coverage")
+    ax.set_title("Known-use test — chemical plus a use it declared (test split, index evidence)")
+    ax.legend()
+    ax.set_ylim(0, 1)
+    fig.tight_layout()
+    path = images_dir / "known_use.png"
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+    logger.info(f"Saved known-use chart → {path}")
+    return path
+
+
 def _sector_table(results: List[SectorCoverageResult]) -> str:
     embedding_types = list(dict.fromkeys(r.embedding_type for r in results))
     levels = sorted({r.naics_level for r in results})
@@ -482,6 +533,7 @@ def _write_results_md(
     ragas_results: List[Dict[str, Any]],
     docs_dir: Path,
     images_dir: Optional[Path] = None,
+    known_use_results: Optional[List[KnownUseResult]] = None,
 ) -> Path:
     img_dir = images_dir if images_dir is not None else docs_dir.parent / "images"
     from src.validation.ragas_evaluator import judge_descriptor
@@ -519,6 +571,12 @@ def _write_results_md(
         _recommendation_table(recommendation_results)
         if recommendation_results
         else "_Shipped-recommender evaluation was not run._"
+    )
+
+    known_use_section = (
+        _known_use_table(known_use_results) + "\n\n![Known use](../images/known_use.png)"
+        if known_use_results
+        else "_Known-use evaluation was not run._"
     )
 
     content = f"""# Evaluation Results — TRI Chemical GraphRAG
@@ -577,17 +635,38 @@ test-split codes (uses ground truth — not achievable by any blind retrieval me
 
 ---
 
-## 2b · Shipped Recommender — End-to-End Graph Path (stratified test split, 20%)
+## 2b · Shipped Recommender — End-to-End Path (stratified test split, 20%)
 
-Scores the **production** recommendation path exactly as deployed: `retrieve_multi`
-(vector ANN + graph traversal + cross-entity intersection) → ranked source-reduction
-records.  Here k is the number of distinct top-ranked recommended activity codes, and
-the same IDF-weighted coverage / code-precision metrics are applied.  This is the table
-that reflects what an end user actually receives, in contrast to the pure-vector intrinsic
-metrics above.  Random draws k codes uniformly; Oracle recommends the query's own
-highest-weight codes (ceiling).
+Scores the **production** recommendation path as deployed.  The query is the chemical alone
+(no condition of use, no sector).  `Shipped (fused)` is the configured default
+(`RETRIEVAL: fused`: reciprocal-rank fusion of the chemical, use, sector and prior channels over
+reduction records, with the equal-weight variant F1); `Legacy` is the previous path
+(`retrieve_multi`: vector ANN + graph traversal + cross-entity intersection), kept available
+with `RETRIEVAL: legacy`.  Here k is the number of distinct top-ranked recommended activity
+codes, and the same IDF-weighted coverage / code-precision metrics are applied.  Both read
+**index-split reports only**: the query chemical's withheld test reports are hidden from the
+graph.  Both share one record cap, fixed in advance: at most {RECORD_CAP} de-duplicated records
+per query before distinct codes are taken, so that each can list at least 20 distinct codes
+(k = 20) where its evidence allows (Legacy keeps its shipped limits of 5 neighbours and 50 reports
+per chemical, which are retrieval limits and not the record cap).  Random draws k codes uniformly;
+Oracle recommends the query's own highest-weight codes (ceiling).  MostCommon always recommends
+the k activity codes reported by the most index-split chemicals (a popularity floor).
 
 {recommendation_section}
+
+---
+
+## 2c · Known-Use Test — Chemical Plus a Use It Declared (stratified test split, 20%)
+
+Table 2b gives the recommender the chemical alone.  Here each test chemical is queried once per
+distinct condition of use (Activity name) declared in its test-split reports: the query is its SMILES
+plus that use, and the truth is the set of reduction codes on its test-split reports declaring that
+use.  Evidence is index-split reports only, with the same record cap of {RECORD_CAP} de-duplicated
+records.  `Fused` is the shipped default; `Legacy` applies the use as a hard filter on the
+nearest-neighbour pool; MostCommon and Random are as above.  Queries are averaged within each chemical,
+which is the unit of the paired Wilcoxon test (two-sided) of WeightedCov@10 against Fused.
+
+{known_use_section}
 
 ---
 
@@ -707,6 +786,11 @@ class EvaluationPipeline:
     ) -> List[RecommendationCoverageResult]:
         return RecommendationMetrics().evaluate(profiles)
 
+    def _step_known_use(self, profiles: ActivityProfiles) -> List[KnownUseResult]:
+        results = KnownUseMetrics().evaluate(profiles)
+        _save_known_use_chart(results, self._images_dir)
+        return results
+
     def _step_embedding(
         self,
         structural: StructuralAnchors,
@@ -776,7 +860,7 @@ class EvaluationPipeline:
 
         Args:
             steps (List[str]): Subset of ('anchors', 'embedding', 'retrieval',
-                'qa-benchmark', 'ragas'). Steps are always executed in dependency
+                'recommendation', 'known-use', 'qa-benchmark', 'ragas'). Steps are always executed in dependency
                 order regardless of the order given.
         """
         run_date = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -787,13 +871,14 @@ class EvaluationPipeline:
         coverage_results: List[ActivityCoverageResult] = []
         sector_results: List[SectorCoverageResult] = []
         recommendation_results: List[RecommendationCoverageResult] = []
+        known_use_results: List[KnownUseResult] = []
         ret_structural: List[RetrievalMetricsResult] = []
         ret_operational: List[RetrievalMetricsResult] = []
         sig_structural: List[SignificanceTestResult] = []
         sig_operational: List[SignificanceTestResult] = []
         ragas_results: List[Dict[str, Any]] = []
 
-        needs_anchors = bool({"anchors", "embedding", "retrieval", "recommendation"} & set(steps))
+        needs_anchors = bool({"anchors", "embedding", "retrieval", "recommendation", "known-use"} & set(steps))
         if needs_anchors or "split" in steps:
             logger.info("=== Step: stratified split ===")
             self._step_split()
@@ -813,6 +898,10 @@ class EvaluationPipeline:
         if "recommendation" in steps and profiles is not None:
             logger.info("=== Step: shipped recommender (end-to-end graph path) ===")
             recommendation_results = self._step_recommendation(profiles)
+
+        if "known-use" in steps and profiles is not None:
+            logger.info("=== Step: known-use test (chemical plus declared use) ===")
+            known_use_results = self._step_known_use(profiles)
 
         if "retrieval" in steps and structural is not None and operational is not None:
             logger.info("=== Step: retrieval metrics (anchor-based) ===")
@@ -842,6 +931,7 @@ class EvaluationPipeline:
                 ragas_results,
                 self._docs_dir,
                 self._images_dir,
+                known_use_results,
             )
         elif ragas_results:
             _patch_ragas_section(ragas_results, self._docs_dir)

@@ -68,12 +68,15 @@ async def query(request: QueryRequest) -> QueryResponse:
             chemical_smiles=request.chemical_smiles,
             industry_sector=request.industry_sector,
             condition_of_use=request.condition_of_use,
+            switches={"retrieval": request.retrieval} if request.retrieval else None,
         )
         return QueryResponse(
             answer=result["answer"],
             records=result["records"],
             needs_clarification=result["needs_clarification"],
             clarification=result["clarification"],
+            matched_uses=result.get("matched_uses", []),
+            matched_sectors=result.get("matched_sectors", []),
         )
     except Exception as exc:
         logger.error(f"Pipeline error: {exc}")

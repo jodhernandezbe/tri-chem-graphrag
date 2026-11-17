@@ -7,7 +7,7 @@ Author: Jose D. Hernandez-Betancur
 Date: 2026-05-13
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -31,6 +31,10 @@ class QueryRequest(BaseModel):
         default="",
         description="Optional condition-of-use text for Activity semantic retrieval.",
     )
+    retrieval: Optional[Literal["fused", "legacy"]] = Field(
+        default=None,
+        description="Optional retrieval override: 'fused' or 'legacy'. Omitted, the configured default (fused) applies.",
+    )
 
 
 class QueryResponse(BaseModel):
@@ -48,4 +52,12 @@ class QueryResponse(BaseModel):
     clarification: str = Field(
         default="",
         description="Clarification message when needs_clarification is True; empty otherwise.",
+    )
+    matched_uses: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Fused mode: Activity names the use channel matched (name, score), best first.",
+    )
+    matched_sectors: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Fused mode: NAICS titles the sector channel matched (code, title, score, qualifying), best first.",
     )

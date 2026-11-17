@@ -3,7 +3,7 @@
 
 """End-to-end RAG quality evaluation using the RAGAS framework.
 
-Loads the frozen synthetic QA benchmark, runs the full RAG pipeline for each
+Loads the frozen synthetic QA benchmark, runs the shipped RAG pipeline (RAGPipeline.run_structured) for each
 embedding type and the flat-vector ablation, and reports faithfulness, answer
 relevancy, context precision, and context recall.
 
@@ -26,9 +26,8 @@ from langchain_ollama import ChatOllama
 
 from src.config_manager import ConfigManager
 from src.neo4j_connector import Neo4jConnector
-from src.rag_graph.context import ContextBuilder
-from src.rag_graph.context.subgraph_formatter import format_subgraph
 from src.rag_graph.generation.prompt_manager import PromptManager
+from src.rag_graph.generation.rag_pipeline import RAGPipeline
 from src.rag_graph.retrieval import RetrieverFactory
 from src.rag_graph.retrieval.retriever_factory import guarded_search
 from src.validation.llm_json import clean_json_text
@@ -145,8 +144,12 @@ def _generate_answer(context: str, question: str, llm: ChatOllama) -> str:
     return str(response.content)
 
 
-def _subgraph_strings(subgraphs: List[Dict[str, Any]]) -> List[str]:
-    return [s for sg in subgraphs if (s := format_subgraph(sg))]
+_RECORD_FIELDS = ("Chemical", "CAS", "Similarity", "Sector", "Reduction Activity", "Year", "State")
+
+
+def _record_strings(records: List[Dict[str, Any]]) -> List[str]:
+    """Render each pipeline record, as shown to the user, as one context string for the RAGAS judge."""
+    return [" | ".join(f"{field}: {r.get(field, '')}" for field in _RECORD_FIELDS) for r in records]
 
 
 class RAGASEvaluator:
@@ -156,11 +159,12 @@ class RAGASEvaluator:
         self,
         benchmark_path: Path = DEFAULT_BENCHMARK_PATH,
         connector: Optional[Neo4jConnector] = None,
+        pipeline: Optional[RAGPipeline] = None,
     ) -> None:
         self._benchmark_path = benchmark_path
         self._connector = connector or Neo4jConnector()
         self._factory = RetrieverFactory()
-        self._context_builder = ContextBuilder()
+        self._pipeline = pipeline
 
     def _load_benchmark(self) -> List[Dict[str, Any]]:
         if not self._benchmark_path.exists():
@@ -189,12 +193,44 @@ class RAGASEvaluator:
             return self._resolve_sector_title(meta["naics_code"])
         return qa_pair["question"]
 
-    def _run_full(self, embedding_type: str, retrieval_key: str, question: str) -> tuple[str, List[str]]:
-        _, subgraphs = self._factory.retrieve(embedding_type, retrieval_key)
-        context = self._context_builder.build(subgraphs)
-        llm = _build_llm()
-        answer = _generate_answer(context, question, llm)
-        return answer, _subgraph_strings(subgraphs)
+    @staticmethod
+    def _pipeline_inputs(qa_pair: Dict[str, Any], retrieval_key: str) -> Dict[str, str]:
+        """Map the retrieval key onto the pipeline argument that carries it (SMILES, sector, or free text)."""
+        meta = qa_pair.get("metadata", {})
+        if "cas_number" in meta:
+            return {"chemical_smiles": retrieval_key}
+        if "naics_code" in meta:
+            return {"industry_sector": retrieval_key}
+        return {}
+
+    def _get_pipeline(self) -> RAGPipeline:
+        if self._pipeline is None:
+            self._pipeline = RAGPipeline()
+        return self._pipeline
+
+    def _run_full(self, embedding_type: str, pipeline_inputs: Dict[str, str], question: str) -> tuple[str, List[str]]:
+        """Run the shipped pipeline (default switches) with the chemical embedding overridden.
+
+        Args:
+            embedding_type (str): MorganFingerprint, MolDeBERTa or Hybrid.
+            pipeline_inputs (Dict[str, str]): ``chemical_smiles`` or ``industry_sector`` carrying the retrieval key.
+            question (str): Benchmark question, passed as the pipeline query.
+
+        Returns:
+            tuple[str, List[str]]: The pipeline answer and one context string per returned record.
+
+        Raises:
+            RuntimeError: If the pipeline asks for clarification instead of answering.
+        """
+        result = self._get_pipeline().run_structured(
+            query=question,
+            chemical_smiles=pipeline_inputs.get("chemical_smiles", ""),
+            industry_sector=pipeline_inputs.get("industry_sector", ""),
+            switches={"chemical_embedding": embedding_type},
+        )
+        if result["needs_clarification"]:
+            raise RuntimeError(f"Pipeline requested clarification: {result['clarification']}")
+        return result["answer"], _record_strings(result["records"])
 
     def _run_flat(self, embedding_type: str, retrieval_key: str, question: str, k: int = 5) -> tuple[str, List[str]]:
         vector_store = self._factory.get_vector_store(embedding_type)
@@ -239,7 +275,7 @@ class RAGASEvaluator:
                 if condition == "flat":
                     answer, contexts = self._run_flat(embed_type, retrieval_key, question)
                 else:
-                    answer, contexts = self._run_full(condition, retrieval_key, question)
+                    answer, contexts = self._run_full(condition, self._pipeline_inputs(pair, retrieval_key), question)
                 samples.append(
                     {
                         "user_input": pair["question"],

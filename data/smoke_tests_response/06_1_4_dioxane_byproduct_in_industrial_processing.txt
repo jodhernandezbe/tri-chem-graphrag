@@ -3,6 +3,8 @@ CASE: 1,4-Dioxane — byproduct in industrial processing
 SMILES           : C1COCCO1
 Industry sector  : —
 Condition of use : Generated as a byproduct during industrial chemical processing
+Matched uses     : Produce the chemical (0.8606); produce_the_chemical (0.8326); Used as a chemical processing aid (0.768); As a byproduct (0.7633); used_as_a_chemical_processing_aid (0.7426); Sale or distribution of the chemical (0.7284); As a process impurity (0.7223); On site use of the chemical (0.7213); as_a_byproduct (0.7107); Import the chemical (0.7099)
+Matched sectors  : —  [* = at or above the sector threshold]
 EPA scenario     : Worker exposure where 1,4-dioxane is generated as a byproduct; significantly contributes to the unreasonable-risk determination.
 EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/final-risk-evaluation-14-dioxane
 Query            : What source reduction activities have historically been effective for this chemical?
@@ -10,39 +12,33 @@ needs_clarification: False
 records returned : 10
 --------------------------------------------------------------------------------
 ANSWER:
-Based on the TRI knowledge graph context, the query chemical is 1,4-Dioxane (CAS 123-91-1) with a structural similarity of 1.0 to itself.
+Based on the TRI knowledge graph context, the following source reduction activities have been historically effective for the query chemical (C1COCCO1):
 
-Historically effective source reduction activities reported for 1,4-Dioxane include:
+1. **IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS**: This activity has been reported for the query chemical (1,4-Dioxane, CAS 123-91-1) in two instances:
+	* Rank 2: Channels chemical,use,prior, Sector 325110 — Petrochemicals, Year 2022, State AL
+	* Rank 3: Channels chemical,use,prior, Sector 325211 — Plastics materials & resins, Year 2024, State WV
+2. **SUBSTITUTED A FEEDSTOCK OR REAGENT CHEMICAL WITH A DIFFERENT CHEMICAL**: This activity has been reported for the query chemical (1,4-Dioxane, CAS 123-91-1) in one instance:
+	* Rank 4: Channels chemical,use,prior, Sector 325211 — Plastics materials & resins, Year 2014, State SC
 
-* IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS in West Virginia (State WV) in the year 2024.
-* SUBSTITUTED A FEEDSTOCK OR REAGENT CHEMICAL WITH A DIFFERENT CHEMICAL in South Carolina (State SC) in the year 2014.
-
-Additionally, since structural similarity is considered, activities reported for its close analogues can also be transferable candidate recommendations. For example:
-
-* Cyclohexane (CAS 110-82-7), with a structural similarity of 0.9845 to 1,4-Dioxane, has the following effective source reduction activity:
-	+ MODIFIED EQUIPMENT, LAYOUT, OR PIPING in Virginia (State VA) in the year 2015.
-* tert-Butyl alcohol (CAS 75-65-0), with a structural similarity of 0.9809 to 1,4-Dioxane, has the following effective source reduction activity:
-	+ OTHER PRODUCT MODIFICATIONS in Ohio (State OH) in the year 2014.
-
-These activities are highlighted as they recur across multiple chemicals or years.
+These activities are considered effective because they have been reported for the query chemical itself, indicating a direct application of the activity to reduce emissions.
 --------------------------------------------------------------------------------
-DISTINCT SOURCE CHEMICALS (7) — cross-chemical recommendations by SMILES similarity:
+DISTINCT SOURCE CHEMICALS (5) — cross-chemical recommendations by SMILES similarity:
   sim=1.0000  1,4-Dioxane (CAS 123-91-1)
   sim=0.9845  Cyclohexane (CAS 110-82-7)
-  sim=0.9822  Triethylamine (CAS 121-44-8)
   sim=0.9809  tert-Butyl alcohol (CAS 75-65-0)
   sim=0.9791  p-Xylene (CAS 106-42-3)
   sim=0.9790  Certain glycol ethers (CAS N230)  ← category reached via member Ethane, 1,2-dimethoxy- (CAS 110-71-4)
-  sim=0.9755  Mercury compounds (CAS N458)  ← category reached via member Methylmercury (CAS 16056-34-1)
 
 RECORDS (ranked / interleaved):
-  [1.0] 1,4-Dioxane (CAS 123-91-1) | IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS | N/A — N/A | 2024 | WV
-  [0.9845] Cyclohexane (CAS 110-82-7) | INCREASED PURITY OR RAW MATERIALS | N/A — N/A | 2018 | CA
-  [0.9822] Triethylamine (CAS 121-44-8) | IMPROVED SCHEDULING, RECORD KEEPING, OR PROCEDURES FOR OPERATIONS, CLEANING, AND MAINTENANCE | N/A — N/A | 2022 | PA
-  [0.9809] tert-Butyl alcohol (CAS 75-65-0) | OTHER PRODUCT MODIFICATIONS | N/A — N/A | 2014 | OH
-  [0.9791] p-Xylene (CAS 106-42-3) | IMPROVED DRAINING PROCEDURES | N/A — N/A | 2018 | TX
-  [0.979] Certain glycol ethers (CAS N230) [via Ethane, 1,2-dimethoxy- (CAS 110-71-4)] | SUBSTITUTED AN ORGANIC SOLVENT | N/A — N/A | 2024 | NC
-  [0.9755] Mercury compounds (CAS N458) [via Methylmercury (CAS 16056-34-1)] | OTHER PROCESS MODIFICATIONS MADE | N/A — N/A | 2023 | MI
-  [1.0] 1,4-Dioxane (CAS 123-91-1) | SUBSTITUTED A FEEDSTOCK OR REAGENT CHEMICAL WITH A DIFFERENT CHEMICAL | N/A — N/A | 2014 | SC
-  [0.9845] Cyclohexane (CAS 110-82-7) | MODIFIED EQUIPMENT, LAYOUT, OR PIPING | N/A — N/A | 2015 | VA
-  [0.979] Certain glycol ethers (CAS N230) [via Ethane, 1,2-dimethoxy- (CAS 110-71-4)] | SUBSTITUTED MANUFACTURING AID, PROCESSING AID, OR OTHER ANCILLARY CHEMICAL | N/A — N/A | 2021 | FL
+  [1.0] 1,4-Dioxane (CAS 123-91-1) | IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS | 325110 — Petrochemicals | 2022 | AL | Tier 1 | Channels chemical,use,prior | Rank 2
+  [1.0] 1,4-Dioxane (CAS 123-91-1) | IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS | 325211 — Plastics materials & resins | 2024 | WV | Tier 1 | Channels chemical,use,prior | Rank 3
+  [1.0] 1,4-Dioxane (CAS 123-91-1) | SUBSTITUTED A FEEDSTOCK OR REAGENT CHEMICAL WITH A DIFFERENT CHEMICAL | 325211 — Plastics materials & resins | 2014 | SC | Tier 1 | Channels chemical,use,prior | Rank 4
+  [0.9845] Cyclohexane (CAS 110-82-7) | MODIFIED EQUIPMENT, LAYOUT, OR PIPING | 324110 — Petroleum refinery products | 2015 | UT | Tier 2 | Channels chemical,use,prior | Rank 5
+  [0.979] Certain glycol ethers (CAS N230) [via Ethane, 1,2-dimethoxy- (CAS 110-71-4)] | SUBSTITUTED RAW MATERIALS | 424690 — Other chemical and allied products merchant wholesalers | 2014 | TX | Tier 2 | Channels chemical,use,prior | Rank 6
+  [0.9791] p-Xylene (CAS 106-42-3) | IMPROVED DRAINING PROCEDURES | 325110 — Petrochemicals | 2018 | TX | Tier 2 | Channels chemical,use,prior | Rank 8
+  [0.979] Certain glycol ethers (CAS N230) [via Ethane, 1,2-dimethoxy- (CAS 110-71-4)] | IMPROVED MAINTENANCE SCHEDULING, RECORDKEEPING, OR PROCEDURES | 424690 — Other chemical and allied products merchant wholesalers | 2014 | TX | Tier 2 | Channels chemical,use,prior | Rank 9
+  [0.979] Certain glycol ethers (CAS N230) [via Ethane, 1,2-dimethoxy- (CAS 110-71-4)] | MODIFIED PRODUCT PACKAGING | 424690 — Other chemical and allied products merchant wholesalers | 2021 | TX | Tier 2 | Channels chemical,use,prior | Rank 10
+
+Catch-all activity codes (less specific):
+  [0.979] Certain glycol ethers (CAS N230) [via Ethane, 1,2-dimethoxy- (CAS 110-71-4)] | OTHER PROCESS MODIFICATIONS | 325613 — Surface active agents | 2020 | DE | Tier 2 | Channels chemical,use,prior | Rank 1
+  [0.9809] tert-Butyl alcohol (CAS 75-65-0) | OTHER PRODUCT MODIFICATIONS | 325211 — Plastics materials & resins | 2014 | OH | Tier 2 | Channels chemical,use,prior | Rank 7

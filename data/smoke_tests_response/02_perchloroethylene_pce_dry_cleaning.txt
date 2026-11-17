@@ -3,13 +3,58 @@ CASE: Perchloroethylene (PCE) — dry cleaning
 SMILES           : ClC(Cl)=C(Cl)Cl
 Industry sector  : Dry cleaning and laundry services
 Condition of use : —
+Matched uses     : —
+Matched sectors  : 335224 Household laundry equipment manufacturing (0.8016); 325611 Soaps & other detergents (0.7417); 313310 Textile and fabric finishing mills (0.7317); 423830 Industrial machinery and equipment merchant wholesalers (0.6977); 325612 Polishes & other sanitation goods (0.6962); 332710 Machine shops (0.679); 322291 Sanitary paper products (0.6775); 333111 Farm machinery & equipment (0.6772); 339114 Dental equipment & supplies (0.6712); 562211 Hazardous waste treatment and disposal (0.6705)  [* = at or above the sector threshold]
 EPA scenario     : Commercial dry cleaning, a condition of use; 60 of 61 conditions of use contribute to the unreasonable-risk determination.
 EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-perchloroethylene-pce
 Query            : What source reduction activities have historically been effective for this chemical?
 needs_clarification: False
-records returned : 0
+records returned : 10
 --------------------------------------------------------------------------------
 ANSWER:
-No source-reduction records were found for ClC(Cl)=C(Cl)Cl in the 'Dry cleaning and laundry services' sector. No facilities reported source-reduction activities for this chemical or its structurally similar analogues under the specified context in the TRI data (1987–2024).
+Note: No records were found in the stated sector ('Dry cleaning and laundry services'); the records below come from other industries (Aircraft; Soaps & other detergents; Sanitary paper products; Other rubber products; Hazardous waste treatment and disposal; Textile and fabric finishing mills).
+
+Based on the provided knowledge graph context, there are no specific source reduction activities mentioned for the query chemical itself. However, we can look at the activities reported for its structurally similar analogues.
+
+The query chemical is identified by its SMILES ("QUERY STRUCTURE"): ClC(Cl)=C(Cl)Cl. The structurally most similar chemicals are:
+
+1. Tetrachloroethylene (CAS 127-18-4, similarity 1.0, identical structure to the query)
+2. 1,4-Dichlorobenzene (CAS 106-46-7, similarity 0.9785, ANALOGUE)
+3. Vanadium compounds (CAS N770, similarity 0.9675, ANALOGUE)
+4. Trichloroethylene (CAS 79-01-6, similarity 0.9929, ANALOGUE)
+
+Looking at the records, we can see that:
+
+* Tetrachloroethylene (CAS 127-18-4) was reported to have "OTHER PROCESS MODIFICATIONS" in Tier 3: same chemical, other use (Channels chemical, prior) in Sector 336411 — Aircraft in Year 2015 (Rank 1).
+* Vanadium compounds (CAS N770) were reported to have "OTHER PROCESS MODIFICATIONS" in Tier 4: analogue, stated sector (Channels chemical, sector, prior) in Sector 322291 — Sanitary paper products in Year 2015 (Rank 4) and Year 2016 (Rank 5).
+* Trichloroethylene (CAS 79-01-6) was reported to have "OTHER PROCESS MODIFICATIONS" in Tier 5: analogue, other context (Channels chemical, prior) in Sector 326299 — Other rubber products in Year 2020 (Rank 6).
+
+Based on these records, the following source reduction activities have historically been effective for structurally similar analogues of the query chemical:
+
+1. OTHER PROCESS MODIFICATIONS (Tetrachloroethylene, Tier 3, Sector 336411 — Aircraft, Year 2015)
+2. OTHER PROCESS MODIFICATIONS (Vanadium compounds, Tier 4, Sector 322291 — Sanitary paper products, Year 2015 and Year 2016)
+3. OTHER PROCESS MODIFICATIONS (Trichloroethylene, Tier 5, Sector 326299 — Other rubber products, Year 2020)
+
+Note that these activities are based on the records of structurally similar analogues and may not be directly applicable to the query chemical.
 --------------------------------------------------------------------------------
-RECORDS: (none)
+DISTINCT SOURCE CHEMICALS (6) — cross-chemical recommendations by SMILES similarity:
+  sim=1.0000  Tetrachloroethylene (CAS 127-18-4)
+  sim=0.9929  Trichloroethylene (CAS 79-01-6)
+  sim=0.9785  1,4-Dichlorobenzene (CAS 106-46-7)
+  sim=0.9675  Vanadium compounds (CAS N770)  ← category reached via member Vanadium dichloride (CAS 10580-52-6)
+  sim=0.0000  n-Butyl alcohol (CAS 71-36-3)
+  sim=0.0000  Methanol (CAS 67-56-1)
+
+RECORDS (ranked / interleaved):
+
+Catch-all activity codes (less specific):
+  [1.0] Tetrachloroethylene (CAS 127-18-4) | OTHER PROCESS MODIFICATIONS | 336411 — Aircraft | 2015 | OK | Tier 3 | Channels chemical,prior | Rank 1
+  [0.9785] 1,4-Dichlorobenzene (CAS 106-46-7) | OTHER CHANGES IN INVENTORY CONTROL | 325611 — Soaps & other detergents | 2016 | KS | Tier 4 | Channels chemical,sector,prior | Rank 2
+  [0.0] n-Butyl alcohol (CAS 71-36-3) | OTHER PROCESS MODIFICATIONS | 325611 — Soaps & other detergents | 2019 | MI | Tier 6 | Channels sector,prior | Rank 3
+  [0.9675] Vanadium compounds (CAS N770) [via Vanadium dichloride (CAS 10580-52-6)] | OTHER PROCESS MODIFICATIONS | 322291 — Sanitary paper products | 2015 | WI | Tier 4 | Channels chemical,sector,prior | Rank 4
+  [0.9675] Vanadium compounds (CAS N770) [via Vanadium dichloride (CAS 10580-52-6)] | OTHER PROCESS MODIFICATIONS | 322291 — Sanitary paper products | 2016 | WI | Tier 4 | Channels chemical,sector,prior | Rank 5
+  [0.9929] Trichloroethylene (CAS 79-01-6) | OTHER PROCESS MODIFICATIONS | 326299 — Other rubber products | 2020 | TN | Tier 5 | Channels chemical,prior | Rank 6
+  [0.9929] Trichloroethylene (CAS 79-01-6) | OTHER RAW MATERIAL MODIFICATIONS | 562211 — Hazardous waste treatment and disposal | 2014 | WI | Tier 4 | Channels chemical,sector,prior | Rank 7
+  [0.0] Methanol (CAS 67-56-1) | OTHER PROCESS MODIFICATIONS | 313310 — Textile and fabric finishing mills | 2015 | MD | Tier 6 | Channels sector,prior | Rank 8
+  [0.0] Methanol (CAS 67-56-1) | OTHER PROCESS MODIFICATIONS | 313310 — Textile and fabric finishing mills | 2016 | MD | Tier 6 | Channels sector,prior | Rank 9
+  [0.0] Methanol (CAS 67-56-1) | OTHER PROCESS MODIFICATIONS | 313310 — Textile and fabric finishing mills | 2017 | MD | Tier 6 | Channels sector,prior | Rank 10

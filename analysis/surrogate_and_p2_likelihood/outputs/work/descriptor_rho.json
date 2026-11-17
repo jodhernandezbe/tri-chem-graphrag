@@ -1,0 +1,43 @@
+{
+ "MorganFingerprint": {
+  "n": 194,
+  "rho_tanimoto": 0.998196461278721,
+  "p_tanimoto": 0.0,
+  "rho_jaccard_code": -0.09181150037141954,
+  "p_jaccard_code": 2.9666318566458413e-71,
+  "rho_jaccard_family": 0.042179879106377494
+ },
+ "MolDeBERTa": {
+  "n": 166,
+  "rho_tanimoto": 0.28034579570397544,
+  "p_tanimoto": 0.0,
+  "rho_jaccard_code": 0.027819751339994644,
+  "p_jaccard_code": 3.86034288890448e-06,
+  "rho_jaccard_family": 0.07070845655041078
+ },
+ "Hybrid": {
+  "n": 166,
+  "rho_tanimoto": 0.3823574099807784,
+  "p_tanimoto": 0.0,
+  "rho_jaccard_code": 0.0016926110024228101,
+  "p_jaccard_code": 0.7787404035503579,
+  "rho_jaccard_family": 0.01875872686796857
+ },
+ "graph_nodes": {
+  "Chemical": 194,
+  "Facility": 1742,
+  "Report": 2932,
+  "Candidate": 2043,
+  "Sector": 309,
+  "Activity": 86,
+  "Reduction": 74
+ },
+ "graph_edges": {
+  "FILED_BY": 2932,
+  "REPORTS_ON": 2932,
+  "CLASSIFIED_AS": 1833,
+  "RECORDS": 5399,
+  "DOCUMENTS": 3041,
+  "CONTAINS": 2162
+ }
+}

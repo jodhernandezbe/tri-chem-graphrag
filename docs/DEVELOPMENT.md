@@ -186,6 +186,95 @@ docker-compose up neo4j -d
 python -m src.knowledge_graph.main --years 2022
 ```
 
+### Transformer pairing fix and graph repairs (2026-11-04)
+
+**Defect.** `Tri2aTransformer` (`src/knowledge_graph/transform/tri_2a_transformer.py`) matched every column
+containing `est_annual_reduction_code`, which also matched the `..._est_annual_reduction_code_description`
+text columns. The estimate list was therefore interleaved with descriptions, and the loader paired
+`codes[i]` with `annual_reductions[i]` on that list. Activity 2 received a description, activity 3 received
+activity 2's estimate, and activity 4 received a description. Activities 2 and 4 were dropped, and activity 3
+could be loaded with the wrong estimate.
+
+**Fix.** Each activity is paired with its own `<ordinal>_source_reduction_activity_code_est_annual_reduction_code`
+column, and only R1 to R3 are kept. The `_description` columns are excluded from the reduction columns.
+
+**Graph after repair.** The 2014 to 2024 graph was repaired in place to match a clean build. The first four
+counts equal the raw-data counts from `data/raw/tri_2a_*.csv`:
+
+- 3,041 activities (`DOCUMENTS` edges)
+- 2,932 reports, 1,742 facilities
+- 194 chemicals, of which 166 have a valid structure
+- 2,043 `Candidate` nodes and 2,162 `CONTAINS` edges
+
+Before the repair the graph held 2,940 / 2,912 / 1,736 / 192 for the first four counts, 2,040 Candidates and
+2,159 CONTAINS edges.
+
+**One-off repair scripts** in `manuscript/scripts/`. Both are dry run by default, pass `--apply` to write, and
+write an audit JSON:
+
+- `patch_graph_transformer_fix.py` diffs the graph against the corrected transformer output and adds, removes
+  or corrects `DOCUMENTS` edges, and adds the missing Report, Facility, Sector, Chemical and Candidate nodes.
+  Audit: `manuscript/audit_logs/transformer_patch_2026-11-04.json`.
+- `delete_orphan_2022_nodes.py` removes the RY2022 Report nodes left without a `DOCUMENTS` edge, and the nodes
+  stranded by them. A clean build does not create these. Audit: `manuscript/audit_logs/orphan_cleanup_2026-11-04.json`.
+
+Database dumps taken before each run are in `manuscript/audit_logs/neo4j_backup/`, under
+`2026-11-04_pre_orphan_cleanup/` and `2026-11-04_pre_transformer_patch/`. Diagnosis: `manuscript/audit_logs/count_gaps_2026-11-04.md`.
+
+## Retrieval Configuration
+
+Retrieval behaviour is set in `config/config.yaml` under `RAG_GRAPH.RETRIEVAL`. The shipped values are the
+defaults. Each can be overridden per call through the `switches` argument of `RAGPipeline.run` and
+`run_structured`, or through the `retrieval` field of the API request. Invalid values raise `ValueError`.
+
+### Fused retrieval (shipped default, `RETRIEVAL: fused`)
+
+Fused retrieval scores reduction records (one report, chemical and activity code) and fuses four channels by
+weighted reciprocal rank fusion, score = Σ w / (60 + rank). Channels for inputs that were not supplied are skipped.
+
+| Channel | Ranks records by | Weight |
+|---------|------------------|-------:|
+| chemical | Similarity of the 50 nearest chemicals in the configured embedding (`CHEMICAL_EMBEDDING_TYPE`, Hybrid) | 1.0 |
+| use | The stated condition of use matched to the 10 nearest Activity names | 1.0 |
+| sector | The stated sector matched to the 10 nearest NAICS titles | 1.0 |
+| prior | How many chemicals among the visible reports use the record's code | 0.5 |
+
+The prior weight (`RETRIEVAL_WEIGHTS`) was chosen by cross-validation inside the index split
+(`manuscript/audit_logs/prior_weight_evaluation.json`). No language model takes part in retrieval or ranking.
+
+Each record is labelled with an evidence tier:
+
+1. same chemical, stated use
+2. analogue, stated use
+3. same chemical, other use
+4. analogue, stated sector
+5. analogue, other context
+6. other practice (not an analogue)
+
+Evidence is never dropped silently. When no record matches the stated use, the answer starts with a fixed notice
+and the records are ranked by chemical similarity, sector and overall practice. The legacy sector and
+condition-of-use fallbacks also add fixed notices. Catch-all activity codes (those beginning "other") are listed after
+the specific codes under a fixed heading. This changes presentation only, not the scores or the order of the
+underlying ranking.
+
+### Legacy retrieval (`RETRIEVAL: legacy`)
+
+Set `RETRIEVAL: legacy`, or pass `retrieval=legacy` for one call, to restore the previous similarity-ranked
+traversal (vector ANN, graph traversal, cross-entity intersection). It is kept to reproduce earlier answers. The
+other switches below apply to legacy only.
+
+### Other switches
+
+| Switch | Values | Default | Effect |
+|--------|--------|---------|--------|
+| `ranking` | `similarity`, `specificity`, `consensus_specificity` | `similarity` | Orders records in `tabulate_records`. The non-similarity options weight activity codes by IDF. |
+| `cou_filter` | `hard`, `soft` | `hard` | `hard` returns only records matching the condition of use. `soft` repeats the traversal without that filter when nothing matches, and the answer says so. |
+| `analogues` | `molecular`, `context` | `molecular` | `context` re-ranks the top 50 molecular neighbours by sector and use similarity. |
+| `chemical_embedding` | `MorganFingerprint`, `MolDeBERTa`, `Hybrid` | `Hybrid` (`CHEMICAL_EMBEDDING_TYPE`) | Chemical index for SMILES similarity. The RAGAS conditions set it per run. |
+| `report_split` | `index`, `test`, or none | none (all reports) | Per-call argument of the retriever rather than a config switch. Evaluators pass `index` so that withheld reports are hidden. |
+
+Switch values are defined in `src/rag_graph/retrieval/switches.py`.
+
 ## Documentation Style
 
 The project follows the Google style to document the code. The pre-commit hooks are configured to check this style.

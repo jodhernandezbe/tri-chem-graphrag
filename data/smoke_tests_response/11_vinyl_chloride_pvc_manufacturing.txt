@@ -3,33 +3,54 @@ CASE: Vinyl chloride — PVC manufacturing
 SMILES           : C=CCl
 Industry sector  : Polyvinyl chloride (PVC) and plastics resin manufacturing
 Condition of use : —
+Matched uses     : —
+Matched sectors  : 325211 Plastics materials & resins (0.8575*); 326112 Plastics packaging film and sheet (including laminated) manufacturing (0.8051); 326199 All other plastics products (0.774); 326130 Laminated plastics plate, sheet (except packaging), and shape manufacturing (0.7686); 325991 Custom compounding of purchased resins (0.7469); 326113 Not rein plastics plates, sheets, etc (exc pkg) (0.74); 326191 Plastics plumbing fixtures (0.7385); 326122 Plastics tubes, hoses, pipes & pipe fittings (0.7285); 326140 Polystyrene foam products (0.7268); 326121 Plastics rods, sticks & profile shapes (0.708)  [* = at or above the sector threshold]
 EPA scenario     : Manufacturing/processing as the monomer in polyvinyl chloride (PVC) production; within the risk-evaluation scope.
 EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-vinyl-chloride
 Query            : What source reduction activities have historically been effective for this chemical?
 needs_clarification: False
-records returned : 3
+records returned : 10
 --------------------------------------------------------------------------------
 ANSWER:
-According to the TRI knowledge graph context, the query chemical is Allyl chloride (CAS 107-05-1) with a structural similarity of 0.9854.
+Based on the provided knowledge graph context, the query chemical is identified by its SMILES ("QUERY STRUCTURE"): C=CCl. Unfortunately, the context does not contain sufficient information to answer the question about the query chemical itself. However, we can look at the activities reported for its structurally similar analogues.
 
-Historically, the following source reduction activity has been reported as effective:
+The structurally similar analogues are:
 
-* OTHER PROCESS MODIFICATIONS MADE | Sector 325211.0 — Plastics materials & resins | Year 2024 | State TX
+1. Vinylidene chloride (CAS 75-35-4, similarity 0.9821, ANALOGUE)
+2. Trichloroethylene (CAS 79-01-6, similarity 0.9797, ANALOGUE)
 
-This activity was reported for Allyl chloride (CAS 107-05-1) itself, with a structural similarity of 1.0.
+For Vinylidene chloride (CAS 75-35-4), the following source reduction activity was reported:
 
-Additionally, since Allyl chloride has close structural analogues, we can also consider the following activities:
+* Rank 3 | SUBSTITUTED RAW MATERIALS | Vinylidene chloride (CAS 75-35-4, similarity 0.9821, ANALOGUE) | Tier 4: analogue, stated sector | Channels chemical,sector,prior | Uses As a process impurity; Used as a reactant | Sector 325211 — Plastics materials & resins | Year 2015 | State NJ
 
-* OTHER PROCESS MODIFICATIONS MADE | Sector 326199.0 — All other plastics products | Year 2022 | State NE (reported for Copper compounds, CAS N100, with a similarity of 0.9585)
+For Trichloroethylene (CAS 79-01-6), the following source reduction activities were reported:
 
-These activities are transferable candidate recommendations for Allyl chloride due to their structural similarity and reported effectiveness across facilities and sectors.
+* Rank 5 | INSTALLED VAPOR RECOVERY SYSTEMS | Trichloroethylene (CAS 79-01-6, similarity 0.9797, ANALOGUE) | Tier 4: analogue, stated sector | Channels chemical,sector,prior | Uses Used as a manufacturing aid | Sector 325211 — Plastics materials & resins | Year 2017 | State OR
+* Rank 6 | MODIFIED STRIPPING/CLEANING EQUIPMENT | Trichloroethylene (CAS 79-01-6, similarity 0.9797, ANALOGUE) | Tier 4: analogue, stated sector | Channels chemical,sector,prior | Uses Ancillary or other use; As a manufactured impurity; As a process impurity; On site use of the chemical; Produce the chemical; Used as a reactant | Sector 325211 — Plastics materials & resins | Year 2016 | State TX
+
+These activities are transferable candidate recommendations for the closest analogue, based on its structural similarity to Vinylidene chloride and Trichloroethylene.
 --------------------------------------------------------------------------------
-DISTINCT SOURCE CHEMICALS (3) — cross-chemical recommendations by SMILES similarity:
+DISTINCT SOURCE CHEMICALS (9) — cross-chemical recommendations by SMILES similarity:
   sim=0.9854  Allyl chloride (CAS 107-05-1)
-  sim=0.9585  Copper compounds (CAS N100)  ← category reached via member Copper chloride (CuCl2) (CAS 7447-39-4)
-  sim=0.9578  Nickel compounds (CAS N495)  ← category reached via member Nickel(II) chloride (CAS 7718-54-9)
+  sim=0.9821  Vinylidene chloride (CAS 75-35-4)
+  sim=0.9797  Trichloroethylene (CAS 79-01-6)
+  sim=0.9775  Ethylene (CAS 74-85-1)
+  sim=0.9715  Toluene (CAS 108-88-3)
+  sim=0.0000  Lead (CAS 7439-92-1)
+  sim=0.0000  Phenol (CAS 108-95-2)
+  sim=0.0000  Nitrate compounds (water dissociable; reportable only when in aqueous solution) (CAS N511)
+  sim=0.0000  Sodium nitrite (CAS 7632-00-0)
 
 RECORDS (ranked / interleaved):
-  [0.9854] Allyl chloride (CAS 107-05-1) | OTHER PROCESS MODIFICATIONS MADE | 325211.0 — Plastics materials & resins | 2024 | TX
-  [0.9585] Copper compounds (CAS N100) [via Copper chloride (CuCl2) (CAS 7447-39-4)] | OTHER PROCESS MODIFICATIONS MADE | 326199.0 — All other plastics products | 2022 | NE
-  [0.9578] Nickel compounds (CAS N495) [via Nickel(II) chloride (CAS 7718-54-9)] | OTHER IMPROVEMENTS TO INVENTORY AND MATERIAL MANAGEMENT | 326199.0 — All other plastics products | 2022 | OH
+  [0.9821] Vinylidene chloride (CAS 75-35-4) | SUBSTITUTED RAW MATERIALS | 325211 — Plastics materials & resins | 2015 | NJ | Tier 4 | Channels chemical,sector,prior | Rank 3
+  [0.9797] Trichloroethylene (CAS 79-01-6) | INSTALLED VAPOR RECOVERY SYSTEMS | 325211 — Plastics materials & resins | 2017 | OR | Tier 4 | Channels chemical,sector,prior | Rank 5
+  [0.9797] Trichloroethylene (CAS 79-01-6) | MODIFIED STRIPPING/CLEANING EQUIPMENT | 325211 — Plastics materials & resins | 2016 | TX | Tier 4 | Channels chemical,sector,prior | Rank 6
+
+Catch-all activity codes (less specific):
+  [0.9775] Ethylene (CAS 74-85-1) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2015 | TX | Tier 4 | Channels chemical,sector,prior | Rank 1
+  [0.9854] Allyl chloride (CAS 107-05-1) | OTHER PROCESS MODIFICATIONS MADE | 325211 — Plastics materials & resins | 2024 | TX | Tier 4 | Channels chemical,sector,prior | Rank 2
+  [0.9715] Toluene (CAS 108-88-3) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2015 | MI | Tier 4 | Channels chemical,sector,prior | Rank 4
+  [0.0] Lead (CAS 7439-92-1) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2014 | LA | Tier 6 | Channels sector,prior | Rank 7
+  [0.0] Sodium nitrite (CAS 7632-00-0) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2015 | TX | Tier 6 | Channels sector,prior | Rank 8
+  [0.0] Nitrate compounds (water dissociable; reportable only when in aqueous solution) (CAS N511) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2015 | CT | Tier 6 | Channels sector,prior | Rank 9
+  [0.0] Phenol (CAS 108-95-2) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2017 | TX | Tier 6 | Channels sector,prior | Rank 10

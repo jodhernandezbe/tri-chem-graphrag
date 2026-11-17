@@ -1,0 +1,51 @@
+chemicals analysed 88
+{
+ "Structural (Morgan Tanimoto)": [
+  -0.081,
+  5.164491541317341e-07
+ ],
+ "Physicochemical descriptors": [
+  0.135,
+  4.471083874366813e-17
+ ],
+ "Industrial sector (NAICS)": [
+  0.314,
+  1.395031005174179e-88
+ ],
+ "Condition of use (Form R Sec. 3)": [
+  0.262,
+  3.682013206017389e-61
+ ],
+ "Context (NAICS+CoU)": [
+  0.337,
+  5.4023741553207995e-102
+ ],
+ "Structural+Context": [
+  0.279,
+  2.8477825099424034e-69
+ ]
+}
+('Structural', 1) 0.1977
+('Structural', 5) 0.2674
+('Structural', 'opsim_top1') 0.2737
+('Physicochemical', 1) 0.231
+('Physicochemical', 5) 0.3103
+('Physicochemical', 'opsim_top1') 0.2697
+('Sector (NAICS)', 1) 0.2479
+('Sector (NAICS)', 5) 0.3359
+('Sector (NAICS)', 'opsim_top1') 0.3467
+('Condition of use', 1) 0.2169
+('Condition of use', 5) 0.3167
+('Condition of use', 'opsim_top1') 0.2903
+('Context (NAICS+CoU)', 1) 0.2391
+('Context (NAICS+CoU)', 5) 0.3465
+('Context (NAICS+CoU)', 'opsim_top1') 0.3264
+('Structural+Context', 1) 0.2182
+('Structural+Context', 5) 0.3277
+('Structural+Context', 'opsim_top1') 0.3174
+('Random', 1) 0.1506
+('Random', 5) 0.2424
+('Random', 'opsim_top1') 0.1922
+('Oracle (true P2 profile)', 1) 0.4822
+('Oracle (true P2 profile)', 5) 0.5626
+('Oracle (true P2 profile)', 'opsim_top1') 0.6082

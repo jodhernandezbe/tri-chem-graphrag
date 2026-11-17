@@ -3,6 +3,8 @@ CASE: N-Methylpyrrolidone (NMP) — industrial solvent use
 SMILES           : CN1CCCC1=O
 Industry sector  : —
 Condition of use : Industrial use as a solvent
+Matched uses     : Used as a chemical processing aid (0.7754); used_as_a_chemical_processing_aid (0.7559); On site use of the chemical (0.7402); Z101 process solvents (0.7361); Used as a manufacturing aid (0.7331); z101_process_solvents (0.7288); Produce the chemical (0.7275); used_as_a_manufacturing_aid (0.7122); produce_the_chemical (0.7114); Import the chemical (0.7078)
+Matched sectors  : —  [* = at or above the sector threshold]
 EPA scenario     : Industrial/commercial use as a solvent (dermal exposure); NMP whole chemical presents unreasonable risk (29 of 37 conditions of use drive the determination).
 EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/risk-evaluation-n-methylpyrrolidone-nmp-0
 Query            : What source reduction activities have historically been effective for this chemical?
@@ -10,36 +12,28 @@ needs_clarification: False
 records returned : 10
 --------------------------------------------------------------------------------
 ANSWER:
-Based on the TRI knowledge graph context, the query chemical is CN1CCCC1=O (N-Methyl-2-pyrrolidone). The most promising source reduction activities reported for this chemical and its structurally similar analogues are:
+Based on the provided TRI knowledge graph context, the following source reduction activities have been reported as effective for N-Methyl-2-pyrrolidone (CAS 872-50-4):
 
-1. **SUBSTITUTED AN ORGANIC SOLVENT** (Similarity: 1.0 — QUERY CHEMICAL)
-	* Reported for: N-Methyl-2-pyrrolidone | CAS 872-50-4
-	* Sector: N/A — N/A
-	* Year: 2023 | State MA
-2. **SUBSTITUTED RAW MATERIALS, FEEDSTOCK, OR REACTANT CHEMICAL** (Similarity: 0.9815)
-	* Reported for: N,N-Dimethylformamide | CAS 68-12-2
-	* Sector: N/A — N/A
-	* Year: 2024 | State RI
+1. **Instituted Recirculation within a Process**: This activity has been reported for N-Methyl-2-pyrrolidone in the sector 334413 — Semiconductors & related devices, specifically in the state of Vermont (VT) in 2014 and 2015 (Rank 6 and 7).
+2. **Substituted Raw Materials**: This activity has been reported for N-Methyl-2-pyrrolidone in the sector 336360 — Motor vehicle seating & interior trim, specifically in the state of Massachusetts (MA) in 2018 (Rank 3) and in the sector 326113 — Not rein plastics plates, sheets, etc (exc pkg), specifically in the state of South Carolina (SC) in 2020 (Rank 4).
 
-These activities have been reported effective in reducing the use of organic solvents and substituting raw materials, feedstock, or reactant chemicals.
+These activities have been reported as effective for the query chemical and its structurally similar analogues, and are ranked based on a combination of structural similarity and reported effectiveness across facilities and sectors.
 --------------------------------------------------------------------------------
-DISTINCT SOURCE CHEMICALS (7) — cross-chemical recommendations by SMILES similarity:
+DISTINCT SOURCE CHEMICALS (3) — cross-chemical recommendations by SMILES similarity:
   sim=1.0000  N-Methyl-2-pyrrolidone (CAS 872-50-4)
   sim=0.9815  N,N-Dimethylformamide (CAS 68-12-2)
-  sim=0.9773  sec-Butyl alcohol (CAS 78-92-2)
-  sim=0.9769  Methyl methacrylate (CAS 80-62-6)
-  sim=0.9739  Lead compounds (CAS N420)  ← category reached via member Cyclohexanecarboxylic acid, lead salt (1:?) (CAS 50825-29-1)
-  sim=0.9729  Certain glycol ethers (CAS N230)  ← category reached via member Ethanol, 2-(1-methylethoxy)-, acetate (CAS 19234-20-9)
-  sim=0.9727  Silver compounds (CAS N740)  ← category reached via member 2,5-Pyrrolidinedione, silver(1+) salt (1:1) (CAS 55047-82-0)
+  sim=0.9758  Methyl isobutyl ketone (CAS 108-10-1)
 
 RECORDS (ranked / interleaved):
-  [1.0] N-Methyl-2-pyrrolidone (CAS 872-50-4) | IMPROVED CONTAINMENT OR MATERIAL HANDLING OPERATIONS | N/A — N/A | 2024 | IA
-  [0.9815] N,N-Dimethylformamide (CAS 68-12-2) | SUBSTITUTED RAW MATERIALS, FEEDSTOCK, OR REACTANT CHEMICAL | N/A — N/A | 2024 | RI
-  [0.9773] sec-Butyl alcohol (CAS 78-92-2) | REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT | N/A — N/A | 2018 | KS
-  [0.9769] Methyl methacrylate (CAS 80-62-6) | OPTIMIZED PROCESS CONDITIONS TO INCREASE EFFICIENCY | N/A — N/A | 2024 | FL
-  [0.9739] Lead compounds (CAS N420) [via Cyclohexanecarboxylic acid, lead salt (1:?) (CAS 50825-29-1)] | SUBSTITUTED RAW MATERIALS, FEEDSTOCK, OR REACTANT CHEMICAL | N/A — N/A | 2024 | MO
-  [0.9729] Certain glycol ethers (CAS N230) [via Ethanol, 2-(1-methylethoxy)-, acetate (CAS 19234-20-9)] | OTHER IMPROVEMENTS TO OPERATING PRACTICES AND TRAINING | N/A — N/A | 2024 | TN
-  [0.9727] Silver compounds (CAS N740) [via 2,5-Pyrrolidinedione, silver(1+) salt (1:1) (CAS 55047-82-0)] | OPTIMIZED PROCESS CONDITIONS TO INCREASE EFFICIENCY | N/A — N/A | 2023 | RI
-  [1.0] N-Methyl-2-pyrrolidone (CAS 872-50-4) | SUBSTITUTED AN ORGANIC SOLVENT | N/A — N/A | 2023 | MA
-  [0.9815] N,N-Dimethylformamide (CAS 68-12-2) | IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS | N/A — N/A | 2024 | MA
-  [0.9773] sec-Butyl alcohol (CAS 78-92-2) | OTHER PROCESS MODIFICATIONS | N/A — N/A | 2015 | NY
+  [1.0] N-Methyl-2-pyrrolidone (CAS 872-50-4) | SUBSTITUTED RAW MATERIALS | 336360 — Motor vehicle seating & interior trim | 2018 | MA | Tier 1 | Channels chemical,use,prior | Rank 3
+  [1.0] N-Methyl-2-pyrrolidone (CAS 872-50-4) | SUBSTITUTED RAW MATERIALS | 326113 — Not rein plastics plates, sheets, etc (exc pkg) | 2020 | SC | Tier 1 | Channels chemical,use,prior | Rank 4
+  [1.0] N-Methyl-2-pyrrolidone (CAS 872-50-4) | INSTITUTED RECIRCULATION WITHIN A PROCESS | 334413 — Semiconductors & related devices | 2014 | VT | Tier 1 | Channels chemical,use,prior | Rank 6
+  [1.0] N-Methyl-2-pyrrolidone (CAS 872-50-4) | INSTITUTED RECIRCULATION WITHIN A PROCESS | 334413 — Semiconductors & related devices | 2015 | VT | Tier 1 | Channels chemical,use,prior | Rank 7
+  [1.0] N-Methyl-2-pyrrolidone (CAS 872-50-4) | REFORMULATED OR DEVELOPED NEW PRODUCT LINE | 334413 — Semiconductors & related devices | 2022 | CA | Tier 1 | Channels chemical,use,prior | Rank 8
+  [1.0] N-Methyl-2-pyrrolidone (CAS 872-50-4) | OPTIMIZED REACTION CONDITIONS OR OTHERWISE INCREASED EFFICIENCY OF SYNTHESIS | 334413 — Semiconductors & related devices | 2014 | CA | Tier 1 | Channels chemical,use,prior | Rank 9
+
+Catch-all activity codes (less specific):
+  [1.0] N-Methyl-2-pyrrolidone (CAS 872-50-4) | OTHER PROCESS MODIFICATIONS | 313320 — Coated fabrics | 2019 | CA | Tier 1 | Channels chemical,use,prior | Rank 1
+  [0.9815] N,N-Dimethylformamide (CAS 68-12-2) | OTHER PROCESS MODIFICATIONS | 313320 — Coated fabrics | 2019 | CA | Tier 2 | Channels chemical,use,prior | Rank 2
+  [0.9758] Methyl isobutyl ketone (CAS 108-10-1) | OTHER PROCESS MODIFICATIONS | 325199 — All other basic organic chemicals | 2016 | NY | Tier 2 | Channels chemical,use,prior | Rank 5
+  [1.0] N-Methyl-2-pyrrolidone (CAS 872-50-4) | OTHER IMPROVEMENTS TO INVENTORY AND MATERIAL MANAGEMENT | 325411 — Medicinal & botanical drugs & vitamins | 2021 | IA | Tier 1 | Channels chemical,use,prior | Rank 10

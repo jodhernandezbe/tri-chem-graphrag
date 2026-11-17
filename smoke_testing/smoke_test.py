@@ -22,11 +22,16 @@ import os
 import pathlib
 import re
 import sys
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Mapping, Optional
 
 import requests
 
 from smoke_testing.epa_risk_eval_cases import EPA_RISK_EVAL_CASES
+from src.rag_graph.retrieval.fused_retriever import (
+    CATCH_ALL_HEADING,
+    matches_header_lines,
+    split_catch_all,
+)
 
 DEFAULT_BASE_URL = os.getenv("GRAPHRAG_API_URL", "http://localhost:8000")
 RESPONSE_DIR = pathlib.Path(__file__).resolve().parents[1] / "data" / "smoke_tests_response"
@@ -45,6 +50,16 @@ def _context_summary(payload: Dict[str, Any]) -> str:
     return "no extra context"
 
 
+def _record_line(r: Mapping[str, Any], rank: Optional[int]) -> str:
+    entry = r.get("EntryPoint", "")
+    via = f" [via {entry}]" if entry else ""
+    fused = f" | Tier {r['Tier']} | Channels {','.join(r.get('Channels', []))} | Rank {rank}" if rank is not None else ""
+    return (
+        f"  [{r.get('Similarity')}] {r.get('Chemical')} (CAS {r.get('CAS')}){via} | "
+        f"{r.get('Reduction Activity')} | {r.get('Sector')} | {r.get('Year')} | {r.get('State')}{fused}"
+    )
+
+
 def _render_records(records: List[Dict[str, Any]]) -> List[str]:
     if not records:
         return ["RECORDS: (none)"]
@@ -57,13 +72,12 @@ def _render_records(records: List[Dict[str, Any]]) -> List[str]:
         via = f"  ← category reached via member {entry}" if entry else ""
         lines.append(f"  sim={sim:.4f}  {name} (CAS {cas}){via}")
     lines += ["", "RECORDS (ranked / interleaved):"]
-    for r in records:
-        entry = r.get("EntryPoint", "")
-        via = f" [via {entry}]" if entry else ""
-        lines.append(
-            f"  [{r.get('Similarity')}] {r.get('Chemical')} (CAS {r.get('CAS')}){via} | "
-            f"{r.get('Reduction Activity')} | {r.get('Sector')} | {r.get('Year')} | {r.get('State')}"
-        )
+    fused = "Tier" in records[0]
+    specific, catch_all = split_catch_all(records) if fused else ([(0, r) for r in records], [])
+    lines.extend(_record_line(r, rank if fused else None) for rank, r in specific)
+    if catch_all:
+        lines += ["", CATCH_ALL_HEADING]
+        lines.extend(_record_line(r, rank) for rank, r in catch_all)
     return lines
 
 
@@ -76,6 +90,7 @@ def _render_report(case: Dict[str, Any], body: Dict[str, Any]) -> str:
         f"SMILES           : {payload.get('chemical_smiles', '')}",
         f"Industry sector  : {payload.get('industry_sector', '') or '—'}",
         f"Condition of use : {payload.get('condition_of_use', '') or '—'}",
+        *matches_header_lines(body.get("matched_uses", []), body.get("matched_sectors", [])),
         f"EPA scenario     : {case.get('scenario', '') or '—'}",
         f"EPA reference    : {case.get('reference', '') or '—'}",
         f"Query            : {payload.get('query', '')}",

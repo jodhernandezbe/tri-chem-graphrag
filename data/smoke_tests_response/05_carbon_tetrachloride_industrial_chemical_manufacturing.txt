@@ -3,23 +3,53 @@ CASE: Carbon tetrachloride — industrial chemical manufacturing
 SMILES           : ClC(Cl)(Cl)Cl
 Industry sector  : —
 Condition of use : Industrial processing and use in chemical manufacturing
+Matched uses     : Used as a chemical processing aid (0.8132); Produce the chemical (0.7943); used_as_a_chemical_processing_aid (0.7725); produce_the_chemical (0.7677); Used as a manufacturing aid (0.749); On site use of the chemical (0.749); Import the chemical (0.7331); Sale or distribution of the chemical (0.7324); Used as a reactant (0.7091); used_as_a_manufacturing_aid (0.7035)
+Matched sectors  : —  [* = at or above the sector threshold]
 EPA scenario     : Industrial processing/use in chemical manufacturing; 13 of 15 conditions of use present unreasonable risk to workers.
 EPA reference    : https://www.epa.gov/assessing-and-managing-chemicals-under-tsca/final-risk-evaluation-carbon-tetrachloride
 Query            : What source reduction activities have historically been effective for this chemical?
 needs_clarification: False
-records returned : 1
+records returned : 10
 --------------------------------------------------------------------------------
 ANSWER:
-According to the TRI knowledge graph context, one source-reduction activity that has been reported as implemented is:
+Based on the provided knowledge graph context, the query chemical is identified by its SMILES ("QUERY STRUCTURE"): ClC(Cl)(Cl)Cl. However, the query chemical's name is not provided.
 
-* IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS (reported for Carbon tetrachloride | CAS 56-23-5 | Similarity 1.0 — QUERY CHEMICAL)
+Since the query chemical's name is not given, I will analyze the provided records to identify source reduction activities that are transferable candidates for the query chemical.
 
-This activity was reported in the state of Louisiana (LA) in 2022.
+Two records are relevant to the query chemical:
 
-Note that this is the only specific source-reduction activity mentioned in the context for the query chemical and its structurally most similar chemicals.
+1. Rank 6 | REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT | 1,2-Dichloroethane (CAS 107-06-2, similarity 0.9702, ANALOGUE, not the query chemical) | Tier 2: analogue, stated use | Channels chemical,use,prior | Uses Used as a chemical processing aid; Z101 process solvents | Sector 325320 — Pesticides & other agricultural chemicals | Year 2020 | State WI
+2. Rank 8 | MODIFIED EQUIPMENT, LAYOUT, OR PIPING | Cyclohexane (CAS 110-82-7, similarity 0.968, ANALOGUE, not the query chemical) | Tier 2: analogue, stated use | Channels chemical,use,prior | Uses Used as a chemical processing aid | Sector 325211 — Plastics materials & resins | Year 2015 | State VA
+
+These records indicate that reducing or eliminating the use of organic solvents and modifying equipment, layout, or piping have been effective source reduction activities for chemicals similar to the query chemical.
+
+For the query chemical, the following source reduction activities are transferable candidates:
+
+1. REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT (Tier 2: analogue, stated use) - reported for 1,2-Dichloroethane (CAS 107-06-2) in Sector 325320 — Pesticides & other agricultural chemicals in Year 2020.
+2. MODIFIED EQUIPMENT, LAYOUT, OR PIPING (Tier 2: analogue, stated use) - reported for Cyclohexane (CAS 110-82-7) in Sector 325211 — Plastics materials & resins in Year 2015.
+
+These activities are ranked based on their structural similarity to the query chemical and reported effectiveness across facilities and sectors.
 --------------------------------------------------------------------------------
-DISTINCT SOURCE CHEMICALS (1) — cross-chemical recommendations by SMILES similarity:
-  sim=1.0000  Carbon tetrachloride (CAS 56-23-5)
+DISTINCT SOURCE CHEMICALS (8) — cross-chemical recommendations by SMILES similarity:
+  sim=0.9702  1,2-Dichloroethane (CAS 107-06-2)
+  sim=0.9680  Cyclohexane (CAS 110-82-7)
+  sim=0.9674  Tetrachloroethylene (CAS 127-18-4)
+  sim=0.9674  Naphthalene (CAS 91-20-3)
+  sim=0.9661  Toluene (CAS 108-88-3)
+  sim=0.9630  1-Bromopropane (CAS 106-94-5)
+  sim=0.9628  Chromium compounds (except for chromite ore mined in the Transvaal Region) (CAS N090)  ← category reached via member Chromium bromide (CrBr3) (CAS 10031-25-1)
+  sim=0.9615  Trichloroethylene (CAS 79-01-6)
 
 RECORDS (ranked / interleaved):
-  [1.0] Carbon tetrachloride (CAS 56-23-5) | IMPLEMENTED NEW TECHNOLOGY, TECHNIQUE, OR PROCESS | N/A — N/A | 2022 | LA
+  [0.9702] 1,2-Dichloroethane (CAS 107-06-2) | REDUCED OR ELIMINATED USE OF AN ORGANIC SOLVENT | 325320 — Pesticides & other agricultural chemicals | 2020 | WI | Tier 2 | Channels chemical,use,prior | Rank 6
+  [0.968] Cyclohexane (CAS 110-82-7) | MODIFIED EQUIPMENT, LAYOUT, OR PIPING | 325211 — Plastics materials & resins | 2015 | VA | Tier 2 | Channels chemical,use,prior | Rank 8
+
+Catch-all activity codes (less specific):
+  [0.9674] Naphthalene (CAS 91-20-3) | OTHER PROCESS MODIFICATIONS | 325180 — All other basic inorganic chemicals | 2015 | MS | Tier 2 | Channels chemical,use,prior | Rank 1
+  [0.9674] Tetrachloroethylene (CAS 127-18-4) | OTHER PROCESS MODIFICATIONS | 336411 — Aircraft | 2015 | OK | Tier 2 | Channels chemical,use,prior | Rank 2
+  [0.9661] Toluene (CAS 108-88-3) | OTHER PROCESS MODIFICATIONS | 325199 — All other basic organic chemicals | 2014 | MD | Tier 2 | Channels chemical,use,prior | Rank 3
+  [0.9661] Toluene (CAS 108-88-3) | OTHER PROCESS MODIFICATIONS | 325211 — Plastics materials & resins | 2015 | MI | Tier 2 | Channels chemical,use,prior | Rank 4
+  [0.9661] Toluene (CAS 108-88-3) | OTHER PROCESS MODIFICATIONS | 325194 — Cyclic crude & intermediate, & gum & wood chemical | 2019 | LA | Tier 2 | Channels chemical,use,prior | Rank 5
+  [0.963] 1-Bromopropane (CAS 106-94-5) | OTHER PROCESS MODIFICATIONS | 332117 — Powder metallurgy part manufacturing | 2017 | OH | Tier 2 | Channels chemical,use,prior | Rank 7
+  [0.9628] Chromium compounds (except for chromite ore mined in the Transvaal Region) (CAS N090) [via Chromium bromide (CrBr3) (CAS 10031-25-1)] | OTHER PROCESS MODIFICATIONS | 332813 — Electroplating, plating, polishing, anodizing, and coloring | 2020 | CA | Tier 2 | Channels chemical,use,prior | Rank 9
+  [0.9615] Trichloroethylene (CAS 79-01-6) | OTHER PROCESS MODIFICATIONS | 326299 — Other rubber products | 2020 | TN | Tier 2 | Channels chemical,use,prior | Rank 10

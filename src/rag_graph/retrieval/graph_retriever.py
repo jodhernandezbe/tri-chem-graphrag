@@ -24,13 +24,14 @@ logger = logging.getLogger(__name__)
 CHEMICAL_TRAVERSAL = """
 MATCH (c:Chemical {cas_number: $key})
 OPTIONAL MATCH (r:Report)-[:REPORTS_ON]->(c)
+WHERE $report_split IS NULL OR r.split = $report_split
 OPTIONAL MATCH (r)-[:FILED_BY]->(f:Facility)
 OPTIONAL MATCH (f)-[:CLASSIFIED_AS]->(s:Sector)
 OPTIONAL MATCH (r)-[:DOCUMENTS]->(red:Reduction)
 WHERE size($activity_names) = 0
    OR EXISTS { MATCH (r)-[:RECORDS]->(a:Activity) WHERE a.name IN $activity_names }
 WITH c,
-     collect(DISTINCT {
+     [x IN collect(DISTINCT {
          year:           r.reporting_year,
          facility:       f.trifid,
          state:          f.state,
@@ -38,7 +39,7 @@ WITH c,
          sector_title:   s.naics_title,
          reduction_code: red.code,
          reduction_name: red.name
-     })[..$limit] AS reports
+     }) WHERE x.reduction_code IS NOT NULL][..$limit] AS reports
 RETURN {
     node_type:   'Chemical',
     name:        c.name,
@@ -53,12 +54,13 @@ SECTOR_TRAVERSAL = """
 MATCH (s:Sector {naics_code: $key})
 OPTIONAL MATCH (f:Facility)-[:CLASSIFIED_AS]->(s)
 OPTIONAL MATCH (r:Report)-[:FILED_BY]->(f)
+WHERE $report_split IS NULL OR r.split = $report_split
 OPTIONAL MATCH (r)-[:REPORTS_ON]->(c:Chemical)
 OPTIONAL MATCH (r)-[:DOCUMENTS]->(red:Reduction)
 WHERE size($activity_names) = 0
    OR EXISTS { MATCH (r)-[:RECORDS]->(a:Activity) WHERE a.name IN $activity_names }
 WITH s,
-     collect(DISTINCT {
+     [x IN collect(DISTINCT {
          facility:       f.trifid,
          state:          f.state,
          chemical:       c.name,
@@ -66,7 +68,7 @@ WITH s,
          year:           r.reporting_year,
          reduction_code: red.code,
          reduction_name: red.name
-     })[..$limit] AS context
+     }) WHERE x.reduction_code IS NOT NULL][..$limit] AS context
 RETURN {
     node_type:   'Sector',
     naics_code:  s.naics_code,
@@ -88,9 +90,10 @@ LIMIT 1
 CROSS_ENTITY_TRAVERSAL = """
 MATCH (c:Chemical)<-[:REPORTS_ON]-(r:Report)-[:FILED_BY]->(f:Facility)-[:CLASSIFIED_AS]->(s:Sector)
 WHERE c.cas_number IN $cas_numbers AND s.naics_code IN $naics_codes
+  AND ($report_split IS NULL OR r.split = $report_split)
   AND (size($activity_names) = 0
        OR EXISTS { MATCH (r)-[:RECORDS]->(a:Activity) WHERE a.name IN $activity_names })
-OPTIONAL MATCH (r)-[:DOCUMENTS]->(red:Reduction)
+MATCH (r)-[:DOCUMENTS]->(red:Reduction)
 WITH c, s,
      collect(DISTINCT {
          year:           r.reporting_year,
@@ -114,6 +117,41 @@ CANDIDATE_CATEGORIES = """
 MATCH (cat:Chemical)-[:CONTAINS]->(m:Candidate)
 WHERE m.cas_number IN $cas_numbers
 RETURN m.cas_number AS member, m.name AS member_name, cat.cas_number AS category
+"""
+
+CONTEXT_SECTOR_COUNTS = """
+MATCH (c:Chemical)<-[:REPORTS_ON]-(r:Report)-[:FILED_BY]->(:Facility)-[:CLASSIFIED_AS]->(s:Sector)
+WHERE s.naics_code IS NOT NULL AND ($report_split IS NULL OR r.split = $report_split)
+RETURN c.cas_number AS cas, left(toString(toInteger(s.naics_code)), 4) AS key, count(DISTINCT r) AS n
+"""
+
+CONTEXT_COU_COUNTS = """
+MATCH (c:Chemical)<-[:REPORTS_ON]-(r:Report)-[:RECORDS]->(a:Activity)
+WHERE $report_split IS NULL OR r.split = $report_split
+RETURN c.cas_number AS cas, a.name AS key, count(DISTINCT r) AS n
+"""
+
+CODE_CHEMICAL_COUNTS = """
+MATCH (c:Chemical)<-[:REPORTS_ON]-(r:Report)-[:DOCUMENTS]->(red:Reduction)
+WHERE red.code IS NOT NULL AND ($report_split IS NULL OR r.split = $report_split)
+RETURN red.code AS code, count(DISTINCT c) AS n_chemicals
+"""
+
+CHEMICALS_WITH_CODES = """
+MATCH (c:Chemical)<-[:REPORTS_ON]-(r:Report)-[:DOCUMENTS]->(red:Reduction)
+WHERE red.code IS NOT NULL AND ($report_split IS NULL OR r.split = $report_split)
+RETURN count(DISTINCT c) AS n_chemicals
+"""
+
+REDUCTION_RECORDS = """
+MATCH (c:Chemical)<-[:REPORTS_ON]-(r:Report)-[d:DOCUMENTS]->(red:Reduction)
+WHERE red.code IS NOT NULL AND ($report_split IS NULL OR r.split = $report_split)
+OPTIONAL MATCH (r)-[:FILED_BY]->(f:Facility)
+OPTIONAL MATCH (f)-[:CLASSIFIED_AS]->(s:Sector)
+OPTIONAL MATCH (r)-[:RECORDS]->(a:Activity)
+RETURN elementId(r) AS report_id, r.document_control_number AS dcn, c.cas_number AS cas, c.name AS chemical,
+       red.code AS code, red.name AS name, collect(DISTINCT a.name) AS uses, s.naics_code AS sector_code,
+       s.naics_title AS sector_title, r.reporting_year AS year, f.state AS state, d.annual_reduction AS annual_reduction
 """
 
 NODE_KEY: Dict[str, str] = {
@@ -150,6 +188,7 @@ class GraphRetriever:
         self,
         node: Dict[str, Any],
         activity_names: Optional[List[str]] = None,
+        report_split: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Expand a seed node into a subgraph dict via Cypher.
 
@@ -158,6 +197,8 @@ class GraphRetriever:
                 (e.g. ``cas_number`` for Chemical, ``naics_code`` for Sector).
             activity_names (Optional[List[str]]): Condition-of-use activity names to
                 restrict the traversal to. An empty/``None`` list disables the filter.
+            report_split (Optional[str]): When set (e.g. ``'index'``), only reports whose
+                ``split`` property equals it are read. ``None`` (default) reads all reports.
 
         Returns:
             Dict[str, Any]: Subgraph dictionary, or empty dict if no record found.
@@ -171,7 +212,7 @@ class GraphRetriever:
         query = TRAVERSAL_QUERY[self.node_label]
         results = self._graph.query(
             query,
-            {"key": key_value, "limit": self.limit, "activity_names": activity_names or []},
+            {"key": key_value, "limit": self.limit, "activity_names": activity_names or [], "report_split": report_split},
         )
 
         if not results:
@@ -183,6 +224,7 @@ class GraphRetriever:
         self,
         nodes: List[Dict[str, Any]],
         activity_names: Optional[List[str]] = None,
+        report_split: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """Traverse all seed nodes and return their subgraphs.
 
@@ -190,11 +232,12 @@ class GraphRetriever:
             nodes (List[Dict[str, Any]]): Seed node property dicts.
             activity_names (Optional[List[str]]): Condition-of-use activity names to
                 restrict the traversal to. An empty/``None`` list disables the filter.
+            report_split (Optional[str]): Restrict to reports with this ``split`` value; ``None`` reads all.
 
         Returns:
             List[Dict[str, Any]]: Non-empty subgraph dicts.
         """
-        return [sg for node in nodes if (sg := self.traverse(node, activity_names))]
+        return [sg for node in nodes if (sg := self.traverse(node, activity_names, report_split))]
 
 
 class CrossEntityRetriever:
@@ -231,6 +274,7 @@ class CrossEntityRetriever:
         cas_numbers: List[str],
         naics_codes: List[str],
         activity_names: Optional[List[str]] = None,
+        report_split: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """Find subgraphs at the intersection of chemicals and sectors.
 
@@ -239,6 +283,7 @@ class CrossEntityRetriever:
             naics_codes (List[str]): NAICS codes from sector vector retrieval.
             activity_names (Optional[List[str]]): Condition-of-use activity names to
                 restrict the intersection to. An empty/``None`` list disables the filter.
+            report_split (Optional[str]): Restrict to reports with this ``split`` value; ``None`` reads all.
 
         Returns:
             List[Dict[str, Any]]: Cross-entity subgraph dicts, empty if no intersection.
@@ -249,6 +294,7 @@ class CrossEntityRetriever:
                 "cas_numbers": cas_numbers,
                 "naics_codes": naics_codes,
                 "activity_names": activity_names or [],
+                "report_split": report_split,
                 "limit": self.limit,
             },
         )
@@ -268,3 +314,42 @@ class CrossEntityRetriever:
             return {}
         results = self._graph.query(CANDIDATE_CATEGORIES, {"cas_numbers": cas_numbers})
         return {r["member"]: (r["category"], r["member_name"]) for r in results}
+
+    def context_rows(self, report_split: Optional[str] = None) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        """Read per-chemical report counts by 4-digit NAICS and by condition of use (read-only).
+
+        Args:
+            report_split (Optional[str]): Count only reports with this ``split``; ``None`` counts all.
+
+        Returns:
+            Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]: ``(sector rows, condition-of-use rows)``, each
+                with ``cas``, ``key`` and ``n``.
+        """
+        params = {"report_split": report_split}
+        return self._graph.query(CONTEXT_SECTOR_COUNTS, params), self._graph.query(CONTEXT_COU_COUNTS, params)
+
+    def code_profiles(self, report_split: Optional[str] = None) -> Tuple[Dict[str, int], int]:
+        """Count, per activity code, the chemicals that report it (read-only).
+
+        Args:
+            report_split (Optional[str]): Count only reports with this ``split``; ``None`` counts all.
+
+        Returns:
+            Tuple[Dict[str, int], int]: ``({code: number of chemicals reporting it}, number of chemicals
+                reporting any code)``.
+        """
+        params = {"report_split": report_split}
+        per_code = {str(r["code"]): int(r["n_chemicals"]) for r in self._graph.query(CODE_CHEMICAL_COUNTS, params)}
+        total = self._graph.query(CHEMICALS_WITH_CODES, params)
+        return per_code, int(total[0]["n_chemicals"]) if total else 0
+
+    def reduction_records(self, report_split: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Read every reduction record (report, chemical, code, uses, sector, year, state) under a split (read-only).
+
+        Args:
+            report_split (Optional[str]): Only reports with this ``split``; ``None`` reads all.
+
+        Returns:
+            List[Dict[str, Any]]: One row per (report, code) with the keys of ``REDUCTION_RECORDS``.
+        """
+        return [dict(r) for r in self._graph.query(REDUCTION_RECORDS, {"report_split": report_split})]
