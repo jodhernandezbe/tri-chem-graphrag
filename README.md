@@ -1,5 +1,7 @@
 # TRI Chemical GraphRAG
 
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.24327492-blue?logo=zenodo&logoColor=white)](https://doi.org/10.5281/zenodo.24327492)
+
 A Python application for TRI chemical knowledge graph retrieval-augmented generation using Neo4j.
 
 ## Requirements
@@ -60,7 +62,9 @@ curl -X POST http://localhost:8000/query \
 
 ## Citation
 
-If you use this software, please cite it. Citation metadata is in [`CITATION.cff`](./CITATION.cff): GitHub's
+If you use this software, please cite it as [10.5281/zenodo.24327492](https://doi.org/10.5281/zenodo.24327492), which always
+resolves to the latest release; to cite one specific version, use that version's own DOI from its Zenodo page.
+Citation metadata is in [`CITATION.cff`](./CITATION.cff): GitHub's
 "Cite this repository" button reads it, and Zenodo uses it to describe each archived release (there is
 deliberately no `.zenodo.json`). `tests/test_citation.py` keeps it consistent with `LICENSE` and `pyproject.toml`.
 

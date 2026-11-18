@@ -29,6 +29,8 @@ abstract: >-
   framework's ten highest-ranked suggestions. The framework transforms established proven
   industrial practices into a foundation for new chemical plant design and retrofits, focusing
   modeling and testing on technically and economically viable alternatives.
+# Concept DOI: resolves to the latest archived release (each release also has its own DOI).
+doi: "10.5281/zenodo.24327492"
 repository-code: "https://github.com/jodhernandezbe/tri-chem-graphrag"
 license: Apache-2.0
 version: "0.1.0"
