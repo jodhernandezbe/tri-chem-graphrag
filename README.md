@@ -57,3 +57,13 @@ curl -X POST http://localhost:8000/query \
 
 - [DEVELOPMENT.md](./docs/DEVELOPMENT.md)
 - [PRODUCTION.md](./docs/PRODUCTION.md)
+
+## Citation
+
+If you use this software, please cite it. Citation metadata is in [`CITATION.cff`](./CITATION.cff): GitHub's
+"Cite this repository" button reads it, and Zenodo uses it to describe each archived release (there is
+deliberately no `.zenodo.json`). `tests/test_citation.py` keeps it consistent with `LICENSE` and `pyproject.toml`.
+
+## License
+
+Released under the [Apache License 2.0](./LICENSE).

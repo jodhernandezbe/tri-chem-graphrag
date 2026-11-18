@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use this framework or build on it, please cite it as below."
+title: "A knowledge graph-augmented retrieval framework using Toxics Release Inventory source reduction records to support pollution prevention decisions"
+type: software
+authors:
+  - family-names: "Hernandez-Betancur"
+    given-names: "Jose"
+    orcid: "https://orcid.org/0000-0003-2652-1405"
+  - family-names: "Ruiz-Mercado"
+    given-names: "Gerardo J."
+abstract: >-
+  Chemical industry stakeholders seek for pollution prevention (P2) strategies while safeguarding
+  the technoeconomic feasibility of such process systems engineering endeavours. This requires
+  case-by-case design, modeling, testing, and cost optimization of many possibilities for new and
+  existing facilities. This study focuses on creating a graph-based learning from-data framework
+  utilizing the source reduction activities reported by industrial facilities to the U.S. Toxics
+  Release Inventory (TRI) program from 2014 to 2024. For a certain chemical and associated
+  industrial and commercial condition of use (CoU), it provides a prioritized list of P2
+  initiatives that facilities have previously executed, achieving a cost-effective minimum
+  reduction of 25%. The framework employs P2 alternative identification through surrogate
+  analysis that integrates chemical structure with industrial sector and CoU information.
+  Specifying the CoU made the recommendations more informative, giving engineers a shortlist
+  specific to their processes, so feasibility studies can start from options that comparable
+  facilities have already proven. In a first case study, the methodology identified supporting
+  evidence for eleven chemicals of concern, six via surrogates or alternative uses. In a second
+  case study, six chemicals that are not reported to TRI were checked against P2 activities
+  documented in peer-reviewed studies; for four of the six, the documented activity was among the
+  framework's ten highest-ranked suggestions. The framework transforms established proven
+  industrial practices into a foundation for new chemical plant design and retrofits, focusing
+  modeling and testing on technically and economically viable alternatives.
+repository-code: "https://github.com/jodhernandezbe/tri-chem-graphrag"
+license: Apache-2.0
+version: "0.1.0"
+date-released: "2026-11-17"
+keywords:
+  - Knowledge graph-augmented retrieval
+  - chemical source reduction
+  - chemical informatics
+  - pollution prevention
+  - surrogate chemical selection
